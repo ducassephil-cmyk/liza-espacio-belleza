@@ -1,0 +1,216 @@
+// Version: 4.0.0
+type AccessControlState__623790961 =
+  {
+    var adminAssigned : Bool;
+    userRoles : Map__222667396<Principal, UserRole__324529758>
+  };
+type Application__50653840 =
+  {
+    email : Text;
+    id : Nat;
+    message : Text;
+    name : Text;
+    specialty : Text;
+    submittedAt : Nat
+  };
+type Application__730444589 =
+  {
+    email : Text;
+    id : Id__761573356;
+    message : Text;
+    name : Text;
+    specialty : Text;
+    submittedAt : Timestamp__108213952
+  };
+type ComboType__1064867283 = {#monthly; #newClient; #untilDecember};
+type ComboType__204878913 = {#monthly; #newClient; #untilDecember};
+type Combo__1015610576 =
+  {
+    agendaproUrl : Text;
+    comboType : ComboType__204878913;
+    cuposTotal : Nat;
+    description : Text;
+    id : Nat;
+    name : Text;
+    priceCLP : Nat;
+    regularPriceCLP : Nat;
+    servicesIncluded : [Nat];
+    validity : Text
+  };
+type Combo__26561004 =
+  {
+    agendaproUrl : Text;
+    comboType : ComboType__1064867283;
+    cuposTotal : Nat;
+    description : Text;
+    id : Id__761573356;
+    name : Text;
+    priceCLP : Nat;
+    regularPriceCLP : Nat;
+    servicesIncluded : [Id__761573356];
+    validity : Text
+  };
+type Data__80296667<K, V> =
+  {var count : Nat__1040412405; kvs : [var ?(K, V)]};
+type Id__761573356 = Nat;
+type Internal__41346355<K, V> =
+  {children : [var ?Node__1000929467<K, V>]; data : Data__80296667<K, V>};
+type Leaf__712614010<K, V> = {data : Data__80296667<K, V>};
+type List__529703492<T> =
+  {
+    var blockIndex : Nat__1040412405;
+    var blocks : [var [var ?T]];
+    var elementIndex : Nat__1040412405
+  };
+type List__560604548<T> = List__529703492<T>;
+type Map__222667396<K, V> = Map__912772452<K, V>;
+type Map__709709801<K, V> =
+  {var root : Node__1000929467<K, V>; var size : Nat__1040412405};
+type Map__912772452<K, V> = Map__709709801<K, V>;
+type Nat__1040412405 = Nat__920180692;
+type Nat__920180692 = Nat;
+type NewActor__222500057 =
+  {
+    accessControlState : AccessControlState__623790961;
+    applications : Map__222667396<Nat, Application__50653840>;
+    combos : List__560604548<Combo__1015610576>;
+    nextApplicationId : {var next : Nat};
+    partners : List__560604548<Partner__1047476074>;
+    products : List__560604548<Product__435346296>;
+    services : List__560604548<Service__736171852>;
+    testimonials : List__560604548<Testimonial__24856606>;
+    workers : List__560604548<Worker__656195866>
+  };
+type Node__1000929467<K, V> =
+  {#internal : Internal__41346355<K, V>; #leaf : Leaf__712614010<K, V>};
+type OldActor__845032218 = {};
+type Partner__1047476074 =
+  {description : Text; id : Nat; logoText : Text; name : Text};
+type Partner__848695295 =
+  {description : Text; id : Id__761573356; logoText : Text; name : Text};
+type ProductBadge__599458856 = {#new; #recommended};
+type ProductBadge__843140268 = {#new; #recommended};
+type Product__435346296 =
+  {
+    badge : ?ProductBadge__599458856;
+    description : Text;
+    id : Nat;
+    name : Text;
+    usage : Text
+  };
+type Product__640692114 =
+  {
+    badge : ?ProductBadge__843140268;
+    description : Text;
+    id : Id__761573356;
+    name : Text;
+    usage : Text
+  };
+type ServiceCategory__177644183 = {#corporal; #especial; #facial};
+type ServiceCategory__550588429 = {#corporal; #especial; #facial};
+type Service__3857615 =
+  {
+    agendaproUrl : Text;
+    allIncluded : Bool;
+    category : ServiceCategory__177644183;
+    cuposTotal : Nat;
+    description : Text;
+    durationMins : Nat;
+    id : Id__761573356;
+    longDescription : Text;
+    name : Text;
+    priceCLP : Nat;
+    techniques : [Text];
+    toolsIncluded : [Text]
+  };
+type Service__736171852 =
+  {
+    agendaproUrl : Text;
+    allIncluded : Bool;
+    category : ServiceCategory__550588429;
+    cuposTotal : Nat;
+    description : Text;
+    durationMins : Nat;
+    id : Nat;
+    longDescription : Text;
+    name : Text;
+    priceCLP : Nat;
+    techniques : [Text];
+    toolsIncluded : [Text]
+  };
+type Testimonial__24856606 = {clientName : Text; comment : Text; id : Nat};
+type Testimonial__75159495 =
+  {clientName : Text; comment : Text; id : Id__761573356};
+type Timestamp__108213952 = Nat;
+type UserRole__324529758 = {#admin; #guest; #user};
+type UserRole__686137147 = {#admin; #guest; #user};
+type Worker__214164436 =
+  {
+    bio : Text;
+    id : Id__761573356;
+    name : Text;
+    role : Text;
+    servicesIds : [Id__761573356];
+    silhouetteVariant : Nat
+  };
+type Worker__656195866 =
+  {
+    bio : Text;
+    id : Nat;
+    name : Text;
+    role : Text;
+    servicesIds : [Nat];
+    silhouetteVariant : Nat
+  };
+{
+  "20260720_000000" : (_old : OldActor__845032218) -> NewActor__222500057
+}
+actor  {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__222667396<Principal, UserRole__686137147>
+    };
+  stable applications :
+    {
+      var root : Node__1000929467<Nat, Application__730444589>;
+      var size : Nat__1040412405
+    };
+  stable combos :
+    {
+      var blockIndex : Nat__1040412405;
+      var blocks : [var [var ?Combo__26561004]];
+      var elementIndex : Nat__1040412405
+    };
+  stable nextApplicationId : {var next : Nat};
+  stable partners :
+    {
+      var blockIndex : Nat__1040412405;
+      var blocks : [var [var ?Partner__848695295]];
+      var elementIndex : Nat__1040412405
+    };
+  stable products :
+    {
+      var blockIndex : Nat__1040412405;
+      var blocks : [var [var ?Product__640692114]];
+      var elementIndex : Nat__1040412405
+    };
+  stable services :
+    {
+      var blockIndex : Nat__1040412405;
+      var blocks : [var [var ?Service__3857615]];
+      var elementIndex : Nat__1040412405
+    };
+  stable testimonials :
+    {
+      var blockIndex : Nat__1040412405;
+      var blocks : [var [var ?Testimonial__75159495]];
+      var elementIndex : Nat__1040412405
+    };
+  stable workers :
+    {
+      var blockIndex : Nat__1040412405;
+      var blocks : [var [var ?Worker__214164436]];
+      var elementIndex : Nat__1040412405
+    }
+};

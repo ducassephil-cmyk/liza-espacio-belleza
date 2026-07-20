@@ -1,0 +1,168 @@
+type Worker = 
+ record {
+   bio: text;
+   id: Id;
+   name: text;
+   role: text;
+   servicesIds: vec Id;
+   silhouetteVariant: nat;
+ };
+type Value = 
+ variant {
+   "bool": bool;
+   float: float64;
+   "int": int;
+   "nat": nat;
+   "null";
+   "text": text;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type Timestamp = nat;
+type Testimonial = 
+ record {
+   clientName: text;
+   comment: text;
+   id: Id;
+ };
+type ServiceCategory = 
+ variant {
+   corporal;
+   especial;
+   facial;
+ };
+type Service = 
+ record {
+   agendaproUrl: text;
+   allIncluded: bool;
+   category: ServiceCategory;
+   cuposTotal: nat;
+   description: text;
+   durationMins: nat;
+   id: Id;
+   longDescription: text;
+   name: text;
+   priceCLP: nat;
+   techniques: vec text;
+   toolsIncluded: vec text;
+ };
+type Result__1 = 
+ record {
+   hasMore: bool;
+   rows: vec vec Cell;
+ };
+type Result_1 = 
+ variant {
+   err: Error;
+   ok;
+ };
+type Result = 
+ variant {
+   err: Error_;
+   ok: Application;
+ };
+type ProductBadge = 
+ variant {
+   new;
+   recommended;
+ };
+type Product = 
+ record {
+   badge: opt ProductBadge;
+   description: text;
+   id: Id;
+   name: text;
+   usage: text;
+ };
+type Partner = 
+ record {
+   description: text;
+   id: Id;
+   logoText: text;
+   name: text;
+ };
+type Id = nat;
+type Error_ = 
+ variant {
+   invalidInput: text;
+   notFound: text;
+   unauthorized: text;
+ };
+type Error = 
+ variant {
+   AmbiguousAttribute: record {
+                         field: text;
+                         sources: vec text;
+                       };
+   FrontendOriginMismatch: record {
+                             expected: vec text;
+                             got: text;
+                           };
+   FrontendOriginsNotConfigured;
+   MalformedCandid;
+   MissingField: text;
+   MixedSsoSources: record {
+                      otherKeys: vec text;
+                      ssoKeys: vec text;
+                    };
+   NoAttributes;
+   Stale: record {ageNs: nat;};
+   UnknownNonce;
+   UntrustedSsoSource: record {domain: text;};
+ };
+type ComboType = 
+ variant {
+   monthly;
+   newClient;
+   untilDecember;
+ };
+type Combo = 
+ record {
+   agendaproUrl: text;
+   comboType: ComboType;
+   cuposTotal: nat;
+   description: text;
+   id: Id;
+   name: text;
+   priceCLP: nat;
+   regularPriceCLP: nat;
+   servicesIncluded: vec Id;
+   validity: text;
+ };
+type Cell = 
+ record {
+   name: text;
+   value: Value;
+ };
+type Application = 
+ record {
+   email: text;
+   id: Id;
+   message: text;
+   name: text;
+   specialty: text;
+   submittedAt: Timestamp;
+ };
+service : {
+  _initialize_access_control: () -> ();
+  _internet_identity_sign_in_finish: () -> (Result_1);
+  _internet_identity_sign_in_start: () -> (blob);
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  execute: (qJson: text) -> (Result__1) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getCombos: () -> (vec Combo) query;
+  getPartners: () -> (vec Partner) query;
+  getProducts: () -> (vec Product) query;
+  getServices: () -> (vec Service) query;
+  getServicesByCategory: (category: ServiceCategory) -> (vec Service) query;
+  getTestimonials: () -> (vec Testimonial) query;
+  getWorkers: () -> (vec Worker) query;
+  isCallerAdmin: () -> (bool) query;
+  schema: () -> (text) query;
+  submitApplication: (name: text, email: text, specialty: text, message:
+   text) -> (Result);
+}

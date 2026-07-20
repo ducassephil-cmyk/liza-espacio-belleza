@@ -1,0 +1,299 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("/assets/fonts/Fraunces.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "General Sans";
+  src: url("/assets/fonts/GeneralSans.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/assets/fonts/GeistMono.woff2") format("woff2");
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --font-display: "Fraunces";
+    --font-body: "General Sans";
+    --font-mono: "Geist Mono";
+    --radius: 0.75rem;
+
+    /* Liza palette — rosados / nude / lavanda suave (light primary) */
+    --background: 0.97 0.012 60;
+    --foreground: 0.18 0.025 350;
+    --card: 0.99 0.006 60;
+    --card-foreground: 0.18 0.025 350;
+    --popover: 0.99 0.006 60;
+    --popover-foreground: 0.18 0.025 350;
+
+    --primary: 0.62 0.18 0;
+    --primary-foreground: 0.99 0.006 60;
+
+    --secondary: 0.93 0.02 30;
+    --secondary-foreground: 0.28 0.03 350;
+    --muted: 0.94 0.018 300;
+    --muted-foreground: 0.5 0.02 350;
+
+    --accent: 0.65 0.13 305;
+    --accent-foreground: 0.16 0.02 305;
+
+    --destructive: 0.58 0.2 18;
+    --destructive-foreground: 0.98 0.006 18;
+
+    --success: 0.7 0.13 160;
+    --success-foreground: 0.16 0.02 160;
+    --warning: 0.78 0.14 75;
+    --warning-foreground: 0.18 0.025 75;
+
+    --border: 0.88 0.018 50;
+    --input: 0.88 0.018 50;
+    --ring: 0.62 0.18 0;
+
+    /* Prism / iridescent accents — small details only */
+    --prism-rose: 0.72 0.18 5;
+    --prism-violet: 0.7 0.16 300;
+    --prism-cyan: 0.78 0.13 200;
+    --prism-gold: 0.82 0.14 85;
+
+    /* Black glass tokens — for main CTA buttons */
+    --glass-bg: 0.14 0.012 350;
+    --glass-bg-hover: 0.1 0.012 350;
+    --glass-foreground: 0.97 0.012 60;
+    --glass-border: 0.32 0.02 300;
+
+    /* Iridescent gradient tokens */
+    --gradient-prism: linear-gradient(
+      120deg,
+      oklch(0.72 0.18 5),
+      oklch(0.7 0.16 300),
+      oklch(0.78 0.13 200)
+    );
+    --gradient-rose-soft: linear-gradient(
+      135deg,
+      oklch(0.95 0.025 20),
+      oklch(0.93 0.03 320)
+    );
+    --gradient-hero-text: linear-gradient(
+      110deg,
+      oklch(0.55 0.18 350),
+      oklch(0.62 0.16 305),
+      oklch(0.68 0.13 200)
+    );
+
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --chart-1: 0.62 0.18 0;
+    --chart-2: 0.65 0.13 305;
+    --chart-3: 0.7 0.13 160;
+    --chart-4: 0.78 0.14 75;
+    --chart-5: 0.72 0.18 5;
+
+    --sidebar: 0.96 0.012 60;
+    --sidebar-foreground: 0.18 0.025 350;
+    --sidebar-primary: 0.62 0.18 0;
+    --sidebar-primary-foreground: 0.99 0.006 60;
+    --sidebar-accent: 0.93 0.02 30;
+    --sidebar-accent-foreground: 0.28 0.03 350;
+    --sidebar-border: 0.88 0.018 50;
+    --sidebar-ring: 0.62 0.18 0;
+  }
+
+  .dark {
+    --background: 0.145 0.018 350;
+    --foreground: 0.94 0.012 60;
+    --card: 0.19 0.02 350;
+    --card-foreground: 0.94 0.012 60;
+    --popover: 0.19 0.02 350;
+    --popover-foreground: 0.94 0.012 60;
+
+    --primary: 0.72 0.16 5;
+    --primary-foreground: 0.145 0.018 5;
+
+    --secondary: 0.23 0.022 350;
+    --secondary-foreground: 0.86 0.012 60;
+    --muted: 0.23 0.022 350;
+    --muted-foreground: 0.62 0.015 60;
+
+    --accent: 0.7 0.14 305;
+    --accent-foreground: 0.145 0.018 305;
+
+    --destructive: 0.62 0.2 18;
+    --destructive-foreground: 0.94 0.012 18;
+
+    --success: 0.7 0.14 160;
+    --success-foreground: 0.145 0.018 160;
+    --warning: 0.78 0.14 75;
+    --warning-foreground: 0.145 0.018 75;
+
+    --border: 0.3 0.02 350;
+    --input: 0.3 0.02 350;
+    --ring: 0.72 0.16 5;
+
+    --prism-rose: 0.74 0.18 5;
+    --prism-violet: 0.72 0.16 300;
+    --prism-cyan: 0.8 0.13 200;
+    --prism-gold: 0.84 0.14 85;
+
+    --glass-bg: 0.16 0.012 350;
+    --glass-bg-hover: 0.12 0.012 350;
+    --glass-foreground: 0.97 0.012 60;
+    --glass-border: 0.34 0.022 300;
+
+    --gradient-prism: linear-gradient(
+      120deg,
+      oklch(0.74 0.18 5),
+      oklch(0.72 0.16 300),
+      oklch(0.8 0.13 200)
+    );
+    --gradient-rose-soft: linear-gradient(
+      135deg,
+      oklch(0.22 0.025 20),
+      oklch(0.2 0.03 320)
+    );
+    --gradient-hero-text: linear-gradient(
+      110deg,
+      oklch(0.78 0.16 350),
+      oklch(0.78 0.16 305),
+      oklch(0.82 0.13 200)
+    );
+
+    --chart-1: 0.72 0.16 5;
+    --chart-2: 0.7 0.14 305;
+    --chart-3: 0.7 0.14 160;
+    --chart-4: 0.78 0.14 75;
+    --chart-5: 0.74 0.18 5;
+
+    --sidebar: 0.19 0.02 350;
+    --sidebar-foreground: 0.94 0.012 60;
+    --sidebar-primary: 0.72 0.16 5;
+    --sidebar-primary-foreground: 0.145 0.018 5;
+    --sidebar-accent: 0.23 0.022 350;
+    --sidebar-accent-foreground: 0.86 0.012 60;
+    --sidebar-border: 0.3 0.02 350;
+    --sidebar-ring: 0.72 0.16 5;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+}
+
+@layer utilities {
+  .transition-smooth {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .text-prism {
+    background: var(--gradient-prism);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .text-hero-gradient {
+    background: var(--gradient-hero-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .border-prism {
+    border-image: var(--gradient-prism) 1;
+  }
+  .bg-glass {
+    background-color: oklch(var(--glass-bg) / 0.85);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid oklch(var(--glass-border) / 0.6);
+  }
+  .bg-glass-hover:hover {
+    background-color: oklch(var(--glass-bg-hover) / 0.9);
+  }
+  .text-glass {
+    color: oklch(var(--glass-foreground));
+  }
+  .bg-prism-rose {
+    background-color: oklch(var(--prism-rose));
+  }
+  .bg-prism-violet {
+    background-color: oklch(var(--prism-violet));
+  }
+  .bg-prism-cyan {
+    background-color: oklch(var(--prism-cyan));
+  }
+  .text-prism-rose {
+    color: oklch(var(--prism-rose));
+  }
+  .text-prism-violet {
+    color: oklch(var(--prism-violet));
+  }
+  .text-prism-cyan {
+    color: oklch(var(--prism-cyan));
+  }
+  .shadow-soft {
+    box-shadow: 0 2px 8px -2px oklch(0.4 0.04 350 / 0.12), 0 4px 16px -4px
+      oklch(0.4 0.04 350 / 0.08);
+  }
+  .shadow-elevated {
+    box-shadow: 0 8px 24px -8px oklch(0.4 0.04 350 / 0.18), 0 16px 48px -12px
+      oklch(0.4 0.04 350 / 0.12);
+  }
+  .shadow-glass {
+    box-shadow: 0 4px 24px -6px oklch(0.2 0.02 350 / 0.4), inset 0 1px 0 0
+      oklch(0.95 0.01 60 / 0.08);
+  }
+
+  /* Black glass CTA decorative layers — pseudo-elements so Radix Slot's
+     React.Children.only invariant holds when asChild is true (the <a> is the
+     single child of Slot). Sheen = ::before (prism top edge), glow = ::after
+     (soft inner hover glow). Both are pointer-events-none and aria-hidden by
+     nature of being pseudo-elements. */
+  [data-slot="black-glass-button"]::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    pointer-events: none;
+    background-image: var(--gradient-prism);
+    background-size: 200% 100%;
+    animation: prism-shimmer 6s ease-in-out infinite;
+  }
+  [data-slot="black-glass-button"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: radial-gradient(
+      120% 80% at 50% 0%,
+      oklch(var(--prism-rose) / 0.18),
+      transparent 60%
+    );
+  }
+  [data-slot="black-glass-button"]:hover::after {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
