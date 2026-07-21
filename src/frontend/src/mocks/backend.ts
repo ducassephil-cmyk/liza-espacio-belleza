@@ -1,10 +1,49 @@
 import type { backendInterface } from "@/backend";
 import {
   ComboType,
+  MintableItemType,
   ProductBadge,
   ServiceCategory,
   UserRole,
 } from "@/backend";
+import type {
+  Error_,
+  MintedServiceToken,
+  Result_1,
+  VusdDemoConfig,
+  VusdWallet,
+} from "@/backend";
+
+// ---- vUSD demo in-memory state ----
+// Mock state lives for the lifetime of the page. The demo walletId is stored
+// in localStorage by useVusdSession; here we keep a single in-memory wallet per
+// session so balances and minted tokens persist across modal reopens.
+
+const VUSD_CONFIG: VusdDemoConfig = {
+  clpUsdRate: 950n, // 950 CLP = 1 USD = 1 vUSD
+  demoTopupAmount: 100000n, // 1000.00 vUSD per topup
+};
+
+const VUSD_INITIAL_BALANCE = 100000n; // 1000.00 vUSD
+
+interface MockWalletState {
+  wallet: VusdWallet;
+  tokens: MintedServiceToken[];
+}
+
+// Map of walletId -> wallet state. A single demo wallet is created on connect.
+const vusdState = new Map<string, MockWalletState>();
+let vusdTokenCounter = 0n;
+
+function nowNs(): bigint {
+  return BigInt(Date.now()) * 1_000_000n;
+}
+
+function genWalletId(): string {
+  // Faux wallet address: 0xvUSD... + random hex.
+  const hex = Math.random().toString(16).slice(2, 10).padEnd(8, "0");
+  return `0xvUSD${hex}`;
+}
 
 export const mockBackend: backendInterface = {
   async _initialize_access_control(): Promise<void> {
@@ -75,6 +114,13 @@ export const mockBackend: backendInterface = {
         description:
           "Pagos en cuotas simples y rápidas, con descuentos exclusivos para clientas del protocolo Liza.",
         logoText: "Flow",
+      },
+      {
+        id: 1n,
+        name: "Protocolo DeFi vUSD",
+        description:
+          "Protocolo DeFi que emite vUSD, un USD sintético estable, para pagos y reservas sin fricción.",
+        logoText: "vU",
       },
     ];
   },
@@ -297,6 +343,96 @@ export const mockBackend: backendInterface = {
         specialty,
         message,
         submittedAt: 0n,
+      },
+    };
+  },
+
+  // ---- vUSD demo methods (mock implementations) ----
+  // These mirror the generated backendInterface vUSD methods. The useVusd
+  // hooks probe the actor at runtime and fall back to this in-memory mock
+  // when the real actor is unavailable (e.g. local dev without a canister).
+
+  async getVusdConfig(): Promise<VusdDemoConfig> {
+    return { ...VUSD_CONFIG };
+  },
+
+  async getVusdWallet(walletId: string): Promise<VusdWallet | null> {
+    const state = vusdState.get(walletId);
+    return state ? { ...state.wallet, balance: state.wallet.balance } : null;
+  },
+
+  async connectDemoWallet(): Promise<VusdWallet> {
+    const walletId = genWalletId();
+    const wallet: VusdWallet = {
+      walletId,
+      balance: VUSD_INITIAL_BALANCE,
+      createdAt: nowNs(),
+    };
+    vusdState.set(walletId, { wallet, tokens: [] });
+    return { ...wallet };
+  },
+
+  async topupVusd(walletId: string): Promise<VusdWallet> {
+    const state = vusdState.get(walletId);
+    if (!state) {
+      throw new Error("Wallet no encontrada. Conéctala nuevamente.");
+    }
+    state.wallet = {
+      ...state.wallet,
+      balance: state.wallet.balance + VUSD_CONFIG.demoTopupAmount,
+    };
+    return { ...state.wallet };
+  },
+
+  async getMintedTokens(walletId: string): Promise<MintedServiceToken[]> {
+    const state = vusdState.get(walletId);
+    return state ? state.tokens.map((t) => ({ ...t })) : [];
+  },
+
+  async mintServiceToken(
+    walletId: string,
+    itemType: MintableItemType,
+    itemId: bigint,
+    itemName: string,
+    priceVusd: bigint,
+  ): Promise<Result_1> {
+    const state = vusdState.get(walletId);
+    if (!state) {
+      const err: Error_ = {
+        __kind__: "notFound",
+        notFound: "Wallet no encontrada. Conéctala nuevamente.",
+      };
+      return { __kind__: "err", err };
+    }
+    if (state.wallet.balance < priceVusd) {
+      const err: Error_ = {
+        __kind__: "invalidInput",
+        invalidInput: "Saldo vUSD insuficiente para mintear este service token.",
+      };
+      return { __kind__: "err", err };
+    }
+    vusdTokenCounter += 1n;
+    const tokenId = vusdTokenCounter;
+    state.wallet = {
+      ...state.wallet,
+      balance: state.wallet.balance - priceVusd,
+    };
+    const token: MintedServiceToken = {
+      tokenId,
+      walletId,
+      itemType,
+      itemId,
+      itemName,
+      priceVusd,
+      mintedAt: nowNs(),
+    };
+    state.tokens.push(token);
+    return {
+      __kind__: "ok",
+      ok: {
+        tokenId,
+        newBalance: state.wallet.balance,
+        walletId,
       },
     };
   },

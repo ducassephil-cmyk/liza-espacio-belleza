@@ -7,6 +7,24 @@ type Worker =
    servicesIds: vec Id;
    silhouetteVariant: nat;
  };
+type WalletId = text;
+type VusdWallet = 
+ record {
+   balance: nat;
+   createdAt: nat;
+   walletId: WalletId;
+ };
+type VusdMintResult = 
+ record {
+   newBalance: nat;
+   tokenId: nat;
+   walletId: WalletId;
+ };
+type VusdDemoConfig = 
+ record {
+   clpUsdRate: nat;
+   demoTopupAmount: nat;
+ };
 type Value = 
  variant {
    "bool": bool;
@@ -55,10 +73,15 @@ type Result__1 =
    hasMore: bool;
    rows: vec vec Cell;
  };
-type Result_1 = 
+type Result_2 = 
  variant {
    err: Error;
    ok;
+ };
+type Result_1 = 
+ variant {
+   err: Error_;
+   ok: VusdMintResult;
  };
 type Result = 
  variant {
@@ -84,6 +107,21 @@ type Partner =
    id: Id;
    logoText: text;
    name: text;
+ };
+type MintedServiceToken = 
+ record {
+   itemId: nat;
+   itemName: text;
+   itemType: MintableItemType;
+   mintedAt: nat;
+   priceVusd: nat;
+   tokenId: nat;
+   walletId: WalletId;
+ };
+type MintableItemType = 
+ variant {
+   combo;
+   "service";
  };
 type Id = nat;
 type Error_ = 
@@ -149,20 +187,27 @@ type Application =
  };
 service : {
   _initialize_access_control: () -> ();
-  _internet_identity_sign_in_finish: () -> (Result_1);
+  _internet_identity_sign_in_finish: () -> (Result_2);
   _internet_identity_sign_in_start: () -> (blob);
   assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  connectDemoWallet: () -> (VusdWallet);
   execute: (qJson: text) -> (Result__1) query;
   getCallerUserRole: () -> (UserRole) query;
   getCombos: () -> (vec Combo) query;
+  getMintedTokens: (walletId: WalletId) -> (vec MintedServiceToken) query;
   getPartners: () -> (vec Partner) query;
   getProducts: () -> (vec Product) query;
   getServices: () -> (vec Service) query;
   getServicesByCategory: (category: ServiceCategory) -> (vec Service) query;
   getTestimonials: () -> (vec Testimonial) query;
+  getVusdConfig: () -> (VusdDemoConfig) query;
+  getVusdWallet: (walletId: WalletId) -> (opt VusdWallet) query;
   getWorkers: () -> (vec Worker) query;
   isCallerAdmin: () -> (bool) query;
+  mintServiceToken: (walletId: WalletId, itemType: MintableItemType, itemId:
+   nat, itemName: text, priceVusd: nat) -> (Result_1);
   schema: () -> (text) query;
   submitApplication: (name: text, email: text, specialty: text, message:
    text) -> (Result);
+  topupVusd: (walletId: WalletId) -> (VusdWallet);
 }

@@ -12,6 +12,9 @@ import Expose "mo:caffeineai-oql/Expose";
 import Types "types/liza-core";
 import LizaApi "mixins/liza-core-api";
 
+import VusdTypes "types/vusd";
+import VusdApi "mixins/vusd-api";
+
 actor {
   // --- Authorization (pre-existing scaffold; preserved) ---
   let accessControlState : AccessControl.AccessControlState;
@@ -37,6 +40,22 @@ actor {
     partners,
     applications,
     nextApplicationId,
+  );
+
+  // --- vUSD demo stable state (initialized by the migration chain) ---
+  let vusdWallets : Map.Map<VusdTypes.WalletId, VusdTypes.VusdWallet>;
+  let mintedTokens : List.List<VusdTypes.MintedServiceToken>;
+  let nextTokenId : { var next : Nat };
+  let nextWalletId : { var next : Nat };
+  let vusdConfig : VusdTypes.VusdDemoConfig;
+
+  // --- vUSD demo public API ---
+  include VusdApi(
+    vusdWallets,
+    mintedTokens,
+    nextTokenId,
+    nextWalletId,
+    vusdConfig,
   );
 
   // --- OQL: expose primary stored collections for natural-language queries ---
@@ -143,6 +162,29 @@ actor {
           submittedAt = 0;
         })
         .controllerOnly()
+        .build(),
+      vusdWallets.toEntity("vusd_wallet", "VusdWallet", "walletId")
+        .sample({
+          walletId = "";
+          balance = 0;
+          createdAt = 0;
+        })
+        .public_()
+        .build(),
+      mintedTokens.toEntityManual("minted_service_token", "MintedServiceToken", "tokenId")
+        .payload("tokenId", func(t : VusdTypes.MintedServiceToken) : Nat { t.tokenId })
+        .payload("walletId", func(t : VusdTypes.MintedServiceToken) : Text { t.walletId })
+        .payload("itemType", func(t : VusdTypes.MintedServiceToken) : Text {
+          switch (t.itemType) {
+            case (#service) "service";
+            case (#combo) "combo";
+          }
+        })
+        .payload("itemId", func(t : VusdTypes.MintedServiceToken) : Nat { t.itemId })
+        .payload("itemName", func(t : VusdTypes.MintedServiceToken) : Text { t.itemName })
+        .payload("priceVusd", func(t : VusdTypes.MintedServiceToken) : Nat { t.priceVusd })
+        .payload("mintedAt", func(t : VusdTypes.MintedServiceToken) : Nat { t.mintedAt })
+        .public_()
         .build(),
     ];
   });

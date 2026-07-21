@@ -53,6 +53,17 @@ export type Error_ = { 'invalidInput' : string } |
   { 'notFound' : string } |
   { 'unauthorized' : string };
 export type Id = bigint;
+export type MintableItemType = { 'service' : null } |
+  { 'combo' : null };
+export interface MintedServiceToken {
+  'itemId' : bigint,
+  'tokenId' : bigint,
+  'mintedAt' : bigint,
+  'itemName' : string,
+  'itemType' : MintableItemType,
+  'priceVusd' : bigint,
+  'walletId' : WalletId,
+}
 export interface Partner {
   'id' : Id,
   'name' : string,
@@ -70,7 +81,9 @@ export type ProductBadge = { 'new' : null } |
   { 'recommended' : null };
 export type Result = { 'ok' : Application } |
   { 'err' : Error_ };
-export type Result_1 = { 'ok' : null } |
+export type Result_1 = { 'ok' : VusdMintResult } |
+  { 'err' : Error_ };
+export type Result_2 = { 'ok' : null } |
   { 'err' : Error };
 export interface Result__1 { 'hasMore' : boolean, 'rows' : Array<Array<Cell>> }
 export interface Service {
@@ -105,6 +118,21 @@ export type Value = { 'int' : bigint } |
   { 'bool' : boolean } |
   { 'null' : null } |
   { 'text' : string };
+export interface VusdDemoConfig {
+  'demoTopupAmount' : bigint,
+  'clpUsdRate' : bigint,
+}
+export interface VusdMintResult {
+  'tokenId' : bigint,
+  'newBalance' : bigint,
+  'walletId' : WalletId,
+}
+export interface VusdWallet {
+  'balance' : bigint,
+  'createdAt' : bigint,
+  'walletId' : WalletId,
+}
+export type WalletId = string;
 export interface Worker {
   'id' : Id,
   'bio' : string,
@@ -115,21 +143,30 @@ export interface Worker {
 }
 export interface _SERVICE {
   '_initialize_access_control' : ActorMethod<[], undefined>,
-  '_internet_identity_sign_in_finish' : ActorMethod<[], Result_1>,
+  '_internet_identity_sign_in_finish' : ActorMethod<[], Result_2>,
   '_internet_identity_sign_in_start' : ActorMethod<[], Uint8Array>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'connectDemoWallet' : ActorMethod<[], VusdWallet>,
   'execute' : ActorMethod<[string], Result__1>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getCombos' : ActorMethod<[], Array<Combo>>,
+  'getMintedTokens' : ActorMethod<[WalletId], Array<MintedServiceToken>>,
   'getPartners' : ActorMethod<[], Array<Partner>>,
   'getProducts' : ActorMethod<[], Array<Product>>,
   'getServices' : ActorMethod<[], Array<Service>>,
   'getServicesByCategory' : ActorMethod<[ServiceCategory], Array<Service>>,
   'getTestimonials' : ActorMethod<[], Array<Testimonial>>,
+  'getVusdConfig' : ActorMethod<[], VusdDemoConfig>,
+  'getVusdWallet' : ActorMethod<[WalletId], [] | [VusdWallet]>,
   'getWorkers' : ActorMethod<[], Array<Worker>>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'mintServiceToken' : ActorMethod<
+    [WalletId, MintableItemType, bigint, string, bigint],
+    Result_1
+  >,
   'schema' : ActorMethod<[], string>,
   'submitApplication' : ActorMethod<[string, string, string, string], Result>,
+  'topupVusd' : ActorMethod<[WalletId], VusdWallet>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

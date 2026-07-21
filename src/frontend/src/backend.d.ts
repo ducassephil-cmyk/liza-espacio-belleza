@@ -7,10 +7,12 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface Testimonial {
+export interface Product {
     id: Id;
-    clientName: string;
-    comment: string;
+    name: string;
+    description: string;
+    usage: string;
+    badge?: ProductBadge;
 }
 export type Error_ = {
     __kind__: "invalidInput";
@@ -23,6 +25,13 @@ export type Error_ = {
     unauthorized: string;
 };
 export type Timestamp = bigint;
+export type Result_2 = {
+    __kind__: "ok";
+    ok: null;
+} | {
+    __kind__: "err";
+    err: Error_;
+};
 export interface Combo {
     id: Id;
     validity: string;
@@ -43,6 +52,10 @@ export interface Application {
     specialty: string;
     message: string;
 }
+export interface Result__1 {
+    hasMore: boolean;
+    rows: Array<Array<Cell>>;
+}
 export interface Service {
     id: Id;
     durationMins: bigint;
@@ -57,9 +70,10 @@ export interface Service {
     priceCLP: bigint;
     longDescription: string;
 }
-export interface Result__1 {
-    hasMore: boolean;
-    rows: Array<Array<Cell>>;
+export interface VusdMintResult {
+    tokenId: bigint;
+    newBalance: bigint;
+    walletId: WalletId;
 }
 export interface Partner {
     id: Id;
@@ -67,6 +81,13 @@ export interface Partner {
     description: string;
     logoText: string;
 }
+export type Result_1 = {
+    __kind__: "ok";
+    ok: VusdMintResult;
+} | {
+    __kind__: "err";
+    err: Error_;
+};
 export type Error_ = {
     __kind__: "FrontendOriginsNotConfigured";
     FrontendOriginsNotConfigured: null;
@@ -111,13 +132,10 @@ export type Error_ = {
         expected: Array<string>;
     };
 };
-export type Result_1 = {
-    __kind__: "ok";
-    ok: null;
-} | {
-    __kind__: "err";
-    err: Error_;
-};
+export interface VusdDemoConfig {
+    demoTopupAmount: bigint;
+    clpUsdRate: bigint;
+}
 export type Result = {
     __kind__: "ok";
     ok: Application;
@@ -125,11 +143,26 @@ export type Result = {
     __kind__: "err";
     err: Error_;
 };
+export interface MintedServiceToken {
+    itemId: bigint;
+    tokenId: bigint;
+    mintedAt: bigint;
+    itemName: string;
+    itemType: MintableItemType;
+    priceVusd: bigint;
+    walletId: WalletId;
+}
 export interface Cell {
     value: Value;
     name: string;
 }
 export type Id = bigint;
+export interface VusdWallet {
+    balance: bigint;
+    createdAt: bigint;
+    walletId: WalletId;
+}
+export type WalletId = string;
 export type Value = {
     __kind__: "int";
     int: bigint;
@@ -157,17 +190,19 @@ export interface Worker {
     role: string;
     silhouetteVariant: bigint;
 }
-export interface Product {
+export interface Testimonial {
     id: Id;
-    name: string;
-    description: string;
-    usage: string;
-    badge?: ProductBadge;
+    clientName: string;
+    comment: string;
 }
 export enum ComboType {
     untilDecember = "untilDecember",
     monthly = "monthly",
     newClient = "newClient"
+}
+export enum MintableItemType {
+    service = "service",
+    combo = "combo"
 }
 export enum ProductBadge {
     new_ = "new",
@@ -185,16 +220,22 @@ export enum UserRole {
 }
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    connectDemoWallet(): Promise<VusdWallet>;
     execute(qJson: string): Promise<Result__1>;
     getCallerUserRole(): Promise<UserRole>;
     getCombos(): Promise<Array<Combo>>;
+    getMintedTokens(walletId: WalletId): Promise<Array<MintedServiceToken>>;
     getPartners(): Promise<Array<Partner>>;
     getProducts(): Promise<Array<Product>>;
     getServices(): Promise<Array<Service>>;
     getServicesByCategory(category: ServiceCategory): Promise<Array<Service>>;
     getTestimonials(): Promise<Array<Testimonial>>;
+    getVusdConfig(): Promise<VusdDemoConfig>;
+    getVusdWallet(walletId: WalletId): Promise<VusdWallet | null>;
     getWorkers(): Promise<Array<Worker>>;
     isCallerAdmin(): Promise<boolean>;
+    mintServiceToken(walletId: WalletId, itemType: MintableItemType, itemId: bigint, itemName: string, priceVusd: bigint): Promise<Result_1>;
     schema(): Promise<string>;
     submitApplication(name: string, email: string, specialty: string, message: string): Promise<Result>;
+    topupVusd(walletId: WalletId): Promise<VusdWallet>;
 }

@@ -80,3 +80,16 @@ export const PRODUCT_BADGE_LABEL: Record<ProductBadge, string> = {
 export function formatCLP(value: bigint): string {
   return `$${Number(value).toLocaleString("es-CL")}`;
 }
+
+// ---- vUSD demo layer ----
+// Re-export vUSD types and helpers so they're available via @/types.
+// `VusdItemType` is an enum (value), so it must be re-exported as a value,
+// not as a type-only export.
+export type {
+  VusdWallet,
+  MintedServiceToken,
+  VusdMintResult,
+  VusdDemoConfig,
+  VusdMintResultVariant,
+} from "./vusd";
+export { VusdItemType, formatVusd, clpToVusdCents } from "./vusd";

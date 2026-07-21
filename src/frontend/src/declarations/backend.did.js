@@ -29,11 +29,17 @@ export const Error = IDL.Variant({
     'expected' : IDL.Vec(IDL.Text),
   }),
 });
-export const Result_1 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+export const Result_2 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
+});
+export const WalletId = IDL.Text;
+export const VusdWallet = IDL.Record({
+  'balance' : IDL.Nat,
+  'createdAt' : IDL.Nat,
+  'walletId' : WalletId,
 });
 export const Value = IDL.Variant({
   'int' : IDL.Int,
@@ -65,6 +71,19 @@ export const Combo = IDL.Record({
   'cuposTotal' : IDL.Nat,
   'servicesIncluded' : IDL.Vec(Id),
   'priceCLP' : IDL.Nat,
+});
+export const MintableItemType = IDL.Variant({
+  'service' : IDL.Null,
+  'combo' : IDL.Null,
+});
+export const MintedServiceToken = IDL.Record({
+  'itemId' : IDL.Nat,
+  'tokenId' : IDL.Nat,
+  'mintedAt' : IDL.Nat,
+  'itemName' : IDL.Text,
+  'itemType' : MintableItemType,
+  'priceVusd' : IDL.Nat,
+  'walletId' : WalletId,
 });
 export const Partner = IDL.Record({
   'id' : Id,
@@ -107,6 +126,10 @@ export const Testimonial = IDL.Record({
   'clientName' : IDL.Text,
   'comment' : IDL.Text,
 });
+export const VusdDemoConfig = IDL.Record({
+  'demoTopupAmount' : IDL.Nat,
+  'clpUsdRate' : IDL.Nat,
+});
 export const Worker = IDL.Record({
   'id' : Id,
   'bio' : IDL.Text,
@@ -115,6 +138,17 @@ export const Worker = IDL.Record({
   'role' : IDL.Text,
   'silhouetteVariant' : IDL.Nat,
 });
+export const VusdMintResult = IDL.Record({
+  'tokenId' : IDL.Nat,
+  'newBalance' : IDL.Nat,
+  'walletId' : WalletId,
+});
+export const Error_ = IDL.Variant({
+  'invalidInput' : IDL.Text,
+  'notFound' : IDL.Text,
+  'unauthorized' : IDL.Text,
+});
+export const Result_1 = IDL.Variant({ 'ok' : VusdMintResult, 'err' : Error_ });
 export const Timestamp = IDL.Nat;
 export const Application = IDL.Record({
   'id' : Id,
@@ -124,21 +158,22 @@ export const Application = IDL.Record({
   'specialty' : IDL.Text,
   'message' : IDL.Text,
 });
-export const Error_ = IDL.Variant({
-  'invalidInput' : IDL.Text,
-  'notFound' : IDL.Text,
-  'unauthorized' : IDL.Text,
-});
 export const Result = IDL.Variant({ 'ok' : Application, 'err' : Error_ });
 
 export const idlService = IDL.Service({
   '_initialize_access_control' : IDL.Func([], [], []),
-  '_internet_identity_sign_in_finish' : IDL.Func([], [Result_1], []),
+  '_internet_identity_sign_in_finish' : IDL.Func([], [Result_2], []),
   '_internet_identity_sign_in_start' : IDL.Func([], [IDL.Vec(IDL.Nat8)], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'connectDemoWallet' : IDL.Func([], [VusdWallet], []),
   'execute' : IDL.Func([IDL.Text], [Result__1], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCombos' : IDL.Func([], [IDL.Vec(Combo)], ['query']),
+  'getMintedTokens' : IDL.Func(
+      [WalletId],
+      [IDL.Vec(MintedServiceToken)],
+      ['query'],
+    ),
   'getPartners' : IDL.Func([], [IDL.Vec(Partner)], ['query']),
   'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
   'getServices' : IDL.Func([], [IDL.Vec(Service)], ['query']),
@@ -148,14 +183,22 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
+  'getVusdConfig' : IDL.Func([], [VusdDemoConfig], ['query']),
+  'getVusdWallet' : IDL.Func([WalletId], [IDL.Opt(VusdWallet)], ['query']),
   'getWorkers' : IDL.Func([], [IDL.Vec(Worker)], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'mintServiceToken' : IDL.Func(
+      [WalletId, MintableItemType, IDL.Nat, IDL.Text, IDL.Nat],
+      [Result_1],
+      [],
+    ),
   'schema' : IDL.Func([], [IDL.Text], ['query']),
   'submitApplication' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
       [Result],
       [],
     ),
+  'topupVusd' : IDL.Func([WalletId], [VusdWallet], []),
 });
 
 export const idlInitArgs = [];
@@ -182,11 +225,17 @@ export const idlFactory = ({ IDL }) => {
       'expected' : IDL.Vec(IDL.Text),
     }),
   });
-  const Result_1 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+  const Result_2 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const WalletId = IDL.Text;
+  const VusdWallet = IDL.Record({
+    'balance' : IDL.Nat,
+    'createdAt' : IDL.Nat,
+    'walletId' : WalletId,
   });
   const Value = IDL.Variant({
     'int' : IDL.Int,
@@ -218,6 +267,19 @@ export const idlFactory = ({ IDL }) => {
     'cuposTotal' : IDL.Nat,
     'servicesIncluded' : IDL.Vec(Id),
     'priceCLP' : IDL.Nat,
+  });
+  const MintableItemType = IDL.Variant({
+    'service' : IDL.Null,
+    'combo' : IDL.Null,
+  });
+  const MintedServiceToken = IDL.Record({
+    'itemId' : IDL.Nat,
+    'tokenId' : IDL.Nat,
+    'mintedAt' : IDL.Nat,
+    'itemName' : IDL.Text,
+    'itemType' : MintableItemType,
+    'priceVusd' : IDL.Nat,
+    'walletId' : WalletId,
   });
   const Partner = IDL.Record({
     'id' : Id,
@@ -260,6 +322,10 @@ export const idlFactory = ({ IDL }) => {
     'clientName' : IDL.Text,
     'comment' : IDL.Text,
   });
+  const VusdDemoConfig = IDL.Record({
+    'demoTopupAmount' : IDL.Nat,
+    'clpUsdRate' : IDL.Nat,
+  });
   const Worker = IDL.Record({
     'id' : Id,
     'bio' : IDL.Text,
@@ -268,6 +334,17 @@ export const idlFactory = ({ IDL }) => {
     'role' : IDL.Text,
     'silhouetteVariant' : IDL.Nat,
   });
+  const VusdMintResult = IDL.Record({
+    'tokenId' : IDL.Nat,
+    'newBalance' : IDL.Nat,
+    'walletId' : WalletId,
+  });
+  const Error_ = IDL.Variant({
+    'invalidInput' : IDL.Text,
+    'notFound' : IDL.Text,
+    'unauthorized' : IDL.Text,
+  });
+  const Result_1 = IDL.Variant({ 'ok' : VusdMintResult, 'err' : Error_ });
   const Timestamp = IDL.Nat;
   const Application = IDL.Record({
     'id' : Id,
@@ -277,21 +354,22 @@ export const idlFactory = ({ IDL }) => {
     'specialty' : IDL.Text,
     'message' : IDL.Text,
   });
-  const Error_ = IDL.Variant({
-    'invalidInput' : IDL.Text,
-    'notFound' : IDL.Text,
-    'unauthorized' : IDL.Text,
-  });
   const Result = IDL.Variant({ 'ok' : Application, 'err' : Error_ });
   
   return IDL.Service({
     '_initialize_access_control' : IDL.Func([], [], []),
-    '_internet_identity_sign_in_finish' : IDL.Func([], [Result_1], []),
+    '_internet_identity_sign_in_finish' : IDL.Func([], [Result_2], []),
     '_internet_identity_sign_in_start' : IDL.Func([], [IDL.Vec(IDL.Nat8)], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'connectDemoWallet' : IDL.Func([], [VusdWallet], []),
     'execute' : IDL.Func([IDL.Text], [Result__1], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getCombos' : IDL.Func([], [IDL.Vec(Combo)], ['query']),
+    'getMintedTokens' : IDL.Func(
+        [WalletId],
+        [IDL.Vec(MintedServiceToken)],
+        ['query'],
+      ),
     'getPartners' : IDL.Func([], [IDL.Vec(Partner)], ['query']),
     'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
     'getServices' : IDL.Func([], [IDL.Vec(Service)], ['query']),
@@ -301,14 +379,22 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
+    'getVusdConfig' : IDL.Func([], [VusdDemoConfig], ['query']),
+    'getVusdWallet' : IDL.Func([WalletId], [IDL.Opt(VusdWallet)], ['query']),
     'getWorkers' : IDL.Func([], [IDL.Vec(Worker)], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'mintServiceToken' : IDL.Func(
+        [WalletId, MintableItemType, IDL.Nat, IDL.Text, IDL.Nat],
+        [Result_1],
+        [],
+      ),
     'schema' : IDL.Func([], [IDL.Text], ['query']),
     'submitApplication' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
         [Result],
         [],
       ),
+    'topupVusd' : IDL.Func([WalletId], [VusdWallet], []),
   });
 };
 

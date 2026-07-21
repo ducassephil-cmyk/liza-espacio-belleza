@@ -1,5 +1,6 @@
 import { BlackGlassButton } from "@/components/BlackGlassButton";
 import { PrismDivider } from "@/components/PrismDivider";
+import { VusdWalletBadge } from "@/components/VusdWalletBadge";
 import { cn } from "@/lib/utils";
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Calendar, Clock, Mail, MapPin, Menu, Phone, X } from "lucide-react";
@@ -107,7 +108,8 @@ function Navbar() {
         </div>
 
         {/* Desktop CTA */}
-        <div className="hidden lg:block">
+        <div className="hidden items-center gap-2.5 lg:flex">
+          <VusdWalletBadge />
           <BlackGlassButton size="sm" asChild data-ocid="nav.agendar_button">
             <a href={AGENDAPRO_URL} target="_blank" rel="noopener noreferrer">
               <Calendar className="size-3.5" />
@@ -136,7 +138,8 @@ function Navbar() {
             {NAV_LINKS.map((l) => (
               <NavLink key={l.ocid} {...l} onClick={() => setOpen(false)} />
             ))}
-            <div className="mt-3">
+            <div className="mt-3 flex flex-col gap-2.5">
+              <VusdWalletBadge className="w-full justify-center" />
               <BlackGlassButton
                 size="default"
                 asChild

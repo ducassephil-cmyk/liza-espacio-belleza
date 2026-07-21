@@ -1,4 +1,8 @@
+import { MintableItemType } from "@/backend";
 import { BlackGlassButton } from "@/components/BlackGlassButton";
+import { VusdPayButton } from "@/components/VusdPayButton";
+import { VusdPayModal } from "@/components/VusdPayModal";
+import { useMintedTokens, useVusdSession } from "@/hooks/useVusd";
 import { cn } from "@/lib/utils";
 import {
   CUPOS_TIER_LABEL,
@@ -10,6 +14,7 @@ import {
 } from "@/types";
 import { Clock, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 const tierStyles: Record<CuposTier, string> = {
   alto: "text-success",
@@ -34,6 +39,13 @@ export function ServiceCard({
 }) {
   const tier = deriveCuposTier(service.cuposTotal);
   const cuposNum = Number(service.cuposTotal);
+  const { walletId } = useVusdSession();
+  const mintedQuery = useMintedTokens(walletId);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const minted = (mintedQuery.data ?? []).some(
+    (t) => t.itemType === MintableItemType.service && t.itemId === service.id,
+  );
 
   return (
     <motion.article
@@ -48,6 +60,17 @@ export function ServiceCard({
       className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-soft transition-smooth hover:-translate-y-1 hover:shadow-elevated"
       data-ocid={`service.card.${index + 1}`}
     >
+      <VusdPayModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        itemType={MintableItemType.service}
+        itemId={service.id}
+        itemName={service.name}
+        priceCLP={service.priceCLP}
+        onSuccess={() => {
+          void mintedQuery.refetch();
+        }}
+      />
       {/* Prism top accent on hover */}
       <span
         aria-hidden
@@ -108,31 +131,45 @@ export function ServiceCard({
         )}
       </div>
 
-      <div className="mt-auto flex items-end justify-between gap-3 pt-6">
-        <div>
-          <span className="font-display text-2xl text-foreground">
-            {formatCLP(service.priceCLP)}
-          </span>
-          {service.allIncluded && (
-            <span className="ml-2 inline-flex items-center gap-1 text-xs text-prism-rose">
-              <Sparkles className="size-3" />
-              Todo incluido
+      <div className="mt-auto flex flex-col gap-3 pt-6">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <span className="font-display text-2xl text-foreground">
+              {formatCLP(service.priceCLP)}
             </span>
-          )}
+            {service.allIncluded && (
+              <span className="ml-2 inline-flex items-center gap-1 text-xs text-prism-rose">
+                <Sparkles className="size-3" />
+                Todo incluido
+              </span>
+            )}
+          </div>
         </div>
-        <BlackGlassButton
-          size="sm"
-          asChild
-          data-ocid={`service.agendar_button.${index + 1}`}
-        >
-          <a
-            href={service.agendaproUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+        <div className="flex items-center gap-2">
+          <BlackGlassButton
+            size="sm"
+            asChild
+            className="flex-1"
+            data-ocid={`service.agendar_button.${index + 1}`}
           >
-            Agendar
-          </a>
-        </BlackGlassButton>
+            <a
+              href={service.agendaproUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Agendar
+            </a>
+          </BlackGlassButton>
+          <VusdPayButton
+            itemType={MintableItemType.service}
+            itemId={service.id}
+            itemName={service.name}
+            priceCLP={service.priceCLP}
+            onPay={() => setModalOpen(true)}
+            minted={minted}
+            ocidSuffix={`service.${index + 1}`}
+          />
+        </div>
       </div>
     </motion.article>
   );

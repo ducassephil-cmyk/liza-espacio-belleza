@@ -23,12 +23,14 @@ import {
   CalendarClock,
   Handshake,
   Layers,
+  Lock,
   Mail,
   Network,
   Send,
   Sparkles,
   UserRound,
   Wallet,
+  Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useForm } from "react-hook-form";
@@ -133,6 +135,7 @@ export function UnetePage() {
       <CommissionSection />
       <BenefitsSection />
       <PartnersBanner />
+      <VusdProtocolSection />
       <ApplicationForm />
     </div>
   );
@@ -529,17 +532,202 @@ const FALLBACK_PARTNERS = [
   },
   {
     id: 2n,
+    name: "Protocolo DeFi vUSD",
+    description: "USD sintético para reservas",
+    logoText: "vU",
+  },
+  {
+    id: 3n,
     name: "Descuentos Protocolo",
     description: "Insumos y servicios",
     logoText: "DP",
   },
   {
-    id: 3n,
+    id: 4n,
     name: "Red Liza",
     description: "Derivaciones entre aliadas",
     logoText: "LZ",
   },
 ] as const;
+
+// ---- vUSD protocol explainer ----
+
+const VUSD_FEATURES = [
+  {
+    title: "¿Qué es vUSD?",
+    description:
+      "Un USD sintético estable emitido por el protocolo DeFi partner. 1 vUSD equivale a 1 USD, así de simple: un valor estable pensado para pagos y reservas.",
+    icon: Wallet,
+    accent: "text-prism-cyan",
+  },
+  {
+    title: "¿Qué es un mint service?",
+    description:
+      "Al reservar con vUSD se mintea un service token digital que representa tu reserva. Es una representación visual de tu pago, no un NFT real.",
+    icon: Sparkles,
+    accent: "text-prism-gold",
+  },
+  {
+    title: "Reservas sin fricción",
+    description:
+      "Paga y reserva en segundos desde tu wallet demo. Sin formularios largos ni transferencias bancarias: conectas, confirmas y listo.",
+    icon: Zap,
+    accent: "text-prism-cyan",
+  },
+  {
+    title: "Demo segura",
+    description:
+      "Esta es una demostración visual del flujo. No hay transacciones reales on-chain ni riesgo para tu dinero: todo ocurre en memoria dentro del sitio.",
+    icon: Lock,
+    accent: "text-prism-gold",
+  },
+] as const;
+
+function VusdProtocolSection() {
+  const scrollToServices = () => {
+    if (typeof document !== "undefined") {
+      window.location.href = "/servicios";
+    }
+  };
+
+  return (
+    <section
+      id="vusd"
+      data-ocid="unete.vusd.section"
+      className="relative overflow-hidden bg-background"
+    >
+      {/* Soft prism-cyan/gold glow accents — vUSD visual identity */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -top-24 right-1/4 size-96 rounded-full opacity-30 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle, oklch(var(--prism-cyan) / 0.22), transparent 70%)",
+        }}
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -bottom-32 left-1/4 size-96 rounded-full opacity-30 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle, oklch(var(--prism-gold) / 0.18), transparent 70%)",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <SectionReveal direction="up" className="mx-auto max-w-2xl text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-prism-cyan">
+            Partner DeFi · vUSD
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-foreground sm:text-4xl">
+            Paga con vUSD: el protocolo DeFi partner de Liza
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+            Liza se asocia con un protocolo DeFi que emite{" "}
+            <span className="text-prism-cyan">vUSD</span>, un token sintético
+            que representa{" "}
+            <span className="text-prism-gold">1 vUSD = 1 USD</span>. Permite
+            pagar y reservar servicios de forma digital, minteando un{" "}
+            <span className="text-prism-cyan">service token</span> que
+            representa tu reserva. Una forma moderna, simple y sin fricción de
+            asegurar tu hora.
+          </p>
+        </SectionReveal>
+
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {VUSD_FEATURES.map((f, i) => (
+            <SectionReveal key={f.title} direction="up" delay={revealDelay(i)}>
+              <div
+                data-ocid={`unete.vusd.card.${i + 1}`}
+                className="group relative h-full overflow-hidden rounded-2xl border border-border bg-glass p-6 shadow-glass transition-smooth hover:-translate-y-1 hover:border-prism-cyan/40"
+              >
+                {/* Prism-cyan/gold top accent on hover */}
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-px scale-x-0 bg-[length:200%_100%] opacity-0 transition-all duration-500 group-hover:scale-x-100 group-hover:opacity-100"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(90deg, oklch(var(--prism-cyan)), oklch(var(--prism-gold)))",
+                  }}
+                />
+                <span
+                  aria-hidden
+                  className="inline-flex size-11 items-center justify-center rounded-xl border border-prism-cyan/25 bg-prism-cyan/10 transition-smooth group-hover:border-prism-cyan/50"
+                >
+                  <f.icon className={`size-5 ${f.accent}`} />
+                </span>
+                <h3 className="mt-5 font-display text-lg text-foreground">
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {f.description}
+                </p>
+              </div>
+            </SectionReveal>
+          ))}
+        </div>
+
+        {/* Benefits highlight strip */}
+        <SectionReveal direction="up" delay={0.2} className="mt-10">
+          <div
+            data-ocid="unete.vusd.benefits_panel"
+            className="relative overflow-hidden rounded-2xl border border-prism-cyan/30 bg-card p-7 shadow-soft sm:p-9"
+          >
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[length:200%_100%] animate-prism-shimmer"
+              style={{
+                backgroundImage:
+                  "linear-gradient(90deg, oklch(var(--prism-cyan)), oklch(var(--prism-gold)), oklch(var(--prism-cyan)))",
+              }}
+            />
+            <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-xl">
+                <p className="font-mono text-xs uppercase tracking-[0.25em] text-prism-gold">
+                  Beneficios de pagar con vUSD
+                </p>
+                <h3 className="mt-2 font-display text-xl text-foreground sm:text-2xl">
+                  Reservas sin fricción, mint de service token
+                </h3>
+                <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span
+                      aria-hidden
+                      className="mt-1.5 size-1.5 shrink-0 rounded-full bg-prism-cyan"
+                    />
+                    Paga y reserva en segundos desde tu wallet demo.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span
+                      aria-hidden
+                      className="mt-1.5 size-1.5 shrink-0 rounded-full bg-prism-gold"
+                    />
+                    Recibe un service token visual que representa tu reserva.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span
+                      aria-hidden
+                      className="mt-1.5 size-1.5 shrink-0 rounded-full bg-prism-cyan"
+                    />
+                    Sin transferencias bancarias ni formularios largos.
+                  </li>
+                </ul>
+              </div>
+              <BlackGlassButton
+                size="lg"
+                onClick={scrollToServices}
+                data-ocid="unete.vusd.probar_demo_button"
+              >
+                <Sparkles className="size-4" />
+                Probar demo de vUSD
+              </BlackGlassButton>
+            </div>
+          </div>
+        </SectionReveal>
+      </div>
+    </section>
+  );
+}
 
 // ---- Application form ----
 

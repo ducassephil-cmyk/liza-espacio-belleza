@@ -5689,7 +5689,7 @@ function expand_message_xof(msg, DST, lenInBytes, k2, H2) {
     throw new Error("expand_message_xof: invalid lenInBytes");
   return H2.create({ dkLen: lenInBytes }).update(msg).update(i2osp(lenInBytes, 2)).update(DST).update(i2osp(DST.length, 1)).digest();
 }
-function hash_to_field(msg, count, options) {
+function hash_to_field(msg, count2, options) {
   _validateObject(options, {
     p: "bigint",
     m: "number",
@@ -5700,10 +5700,10 @@ function hash_to_field(msg, count, options) {
   if (!isHash(options.hash))
     throw new Error("expected valid hash");
   abytes(msg);
-  anum(count);
+  anum(count2);
   const log2p = p2.toString(2).length;
   const L2 = Math.ceil((log2p + k2) / 8);
-  const len_in_bytes = count * m2 * L2;
+  const len_in_bytes = count2 * m2 * L2;
   let prb;
   if (expand === "xmd") {
     prb = expand_message_xmd(msg, DST, len_in_bytes, hash);
@@ -5714,8 +5714,8 @@ function hash_to_field(msg, count, options) {
   } else {
     throw new Error('expand must be "xmd" or "xof"');
   }
-  const u2 = new Array(count);
-  for (let i = 0; i < count; i++) {
+  const u2 = new Array(count2);
+  for (let i = 0; i < count2; i++) {
     const e = new Array(m2);
     for (let j2 = 0; j2 < m2; j2++) {
       const elm_offset = L2 * (j2 + i * m2);
@@ -12160,7 +12160,7 @@ function requireMs() {
     options = options || {};
     var type = typeof val;
     if (type === "string" && val.length > 0) {
-      return parse(val);
+      return parse2(val);
     } else if (type === "number" && isFinite(val)) {
       return options.long ? fmtLong(val) : fmtShort(val);
     }
@@ -12168,7 +12168,7 @@ function requireMs() {
       "val is not a non-empty string or a valid number. val=" + JSON.stringify(val)
     );
   };
-  function parse(str) {
+  function parse2(str) {
     str = String(str);
     if (str.length > 100) {
       return;
@@ -18799,9 +18799,9 @@ function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
 }
 function mapChildren(children, func, context) {
   if (null == children) return children;
-  var result = [], count = 0;
+  var result = [], count2 = 0;
   mapIntoArray(children, result, "", "", function(child) {
-    return func.call(context, child, count++);
+    return func.call(context, child, count2++);
   });
   return result;
 }
@@ -21079,8 +21079,8 @@ class AuthClient {
     const expiration = getExpirationFlag();
     if (expiration === null)
       return false;
-    const nowNs = BigInt(Date.now()) * BigInt(1e6);
-    return nowNs < expiration;
+    const nowNs2 = BigInt(Date.now()) * BigInt(1e6);
+    return nowNs2 < expiration;
   }
   /**
    * Opens the identity provider, requests a delegation, and returns the authenticated identity.
@@ -23160,14 +23160,14 @@ function getListener(inst, registrationName) {
 var canUseDOM = !("undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement), passiveBrowserEventsSupported = false;
 if (canUseDOM)
   try {
-    var options = {};
-    Object.defineProperty(options, "passive", {
+    var options$1 = {};
+    Object.defineProperty(options$1, "passive", {
       get: function() {
         passiveBrowserEventsSupported = true;
       }
     });
-    window.addEventListener("test", options, options);
-    window.removeEventListener("test", options, options);
+    window.addEventListener("test", options$1, options$1);
+    window.removeEventListener("test", options$1, options$1);
   } catch (e) {
     passiveBrowserEventsSupported = false;
   }
@@ -23705,9 +23705,9 @@ function markUpdateLaneFromFiberToRoot(sourceFiber, update, lane) {
   sourceFiber.lanes |= lane;
   var alternate = sourceFiber.alternate;
   null !== alternate && (alternate.lanes |= lane);
-  for (var isHidden = false, parent = sourceFiber.return; null !== parent; )
-    parent.childLanes |= lane, alternate = parent.alternate, null !== alternate && (alternate.childLanes |= lane), 22 === parent.tag && (sourceFiber = parent.stateNode, null === sourceFiber || sourceFiber._visibility & 1 || (isHidden = true)), sourceFiber = parent, parent = parent.return;
-  return 3 === sourceFiber.tag ? (parent = sourceFiber.stateNode, isHidden && null !== update && (isHidden = 31 - clz32(lane), sourceFiber = parent.hiddenUpdates, alternate = sourceFiber[isHidden], null === alternate ? sourceFiber[isHidden] = [update] : alternate.push(update), update.lane = lane | 536870912), parent) : null;
+  for (var isHidden2 = false, parent = sourceFiber.return; null !== parent; )
+    parent.childLanes |= lane, alternate = parent.alternate, null !== alternate && (alternate.childLanes |= lane), 22 === parent.tag && (sourceFiber = parent.stateNode, null === sourceFiber || sourceFiber._visibility & 1 || (isHidden2 = true)), sourceFiber = parent, parent = parent.return;
+  return 3 === sourceFiber.tag ? (parent = sourceFiber.stateNode, isHidden2 && null !== update && (isHidden2 = 31 - clz32(lane), sourceFiber = parent.hiddenUpdates, alternate = sourceFiber[isHidden2], null === alternate ? sourceFiber[isHidden2] = [update] : alternate.push(update), update.lane = lane | 536870912), parent) : null;
 }
 function getRootForUpdatedFiber(sourceFiber) {
   if (50 < nestedUpdateCount)
@@ -35603,6 +35603,9 @@ function composeRefs$1(...refs) {
     }
   };
 }
+function useComposedRefs$1(...refs) {
+  return reactExports.useCallback(composeRefs$1(...refs), refs);
+}
 var REACT_LAZY_TYPE = Symbol.for("react.lazy");
 var use = React$4[" use ".trim().toString()];
 function isPromiseLike(value) {
@@ -35612,15 +35615,15 @@ function isLazyComponent(element) {
   return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
 }
 // @__NO_SIDE_EFFECTS__
-function createSlot(ownerName) {
-  const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
+function createSlot$1(ownerName) {
+  const SlotClone = /* @__PURE__ */ createSlotClone$1(ownerName);
   const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
     let { children, ...slotProps } = props;
     if (isLazyComponent(children) && typeof use === "function") {
       children = use(children._payload);
     }
     const childrenArray = reactExports.Children.toArray(children);
-    const slottable = childrenArray.find(isSlottable);
+    const slottable = childrenArray.find(isSlottable$1);
     if (slottable) {
       const newElement = slottable.props.children;
       const newChildren = childrenArray.map((child) => {
@@ -35638,17 +35641,17 @@ function createSlot(ownerName) {
   Slot2.displayName = `${ownerName}.Slot`;
   return Slot2;
 }
-var Slot = /* @__PURE__ */ createSlot("Slot");
+var Slot$1 = /* @__PURE__ */ createSlot$1("Slot");
 // @__NO_SIDE_EFFECTS__
-function createSlotClone(ownerName) {
+function createSlotClone$1(ownerName) {
   const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
     let { children, ...slotProps } = props;
     if (isLazyComponent(children) && typeof use === "function") {
       children = use(children._payload);
     }
     if (reactExports.isValidElement(children)) {
-      const childrenRef = getElementRef(children);
-      const props2 = mergeProps(slotProps, children.props);
+      const childrenRef = getElementRef$2(children);
+      const props2 = mergeProps$1(slotProps, children.props);
       if (children.type !== reactExports.Fragment) {
         props2.ref = forwardedRef ? composeRefs$1(forwardedRef, childrenRef) : childrenRef;
       }
@@ -35659,11 +35662,11 @@ function createSlotClone(ownerName) {
   SlotClone.displayName = `${ownerName}.SlotClone`;
   return SlotClone;
 }
-var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
-function isSlottable(child) {
-  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
+var SLOTTABLE_IDENTIFIER$1 = Symbol("radix.slottable");
+function isSlottable$1(child) {
+  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER$1;
 }
-function mergeProps(slotProps, childProps) {
+function mergeProps$1(slotProps, childProps) {
   const overrideProps = { ...childProps };
   for (const propName in childProps) {
     const slotPropValue = slotProps[propName];
@@ -35687,7 +35690,7 @@ function mergeProps(slotProps, childProps) {
   }
   return { ...slotProps, ...overrideProps };
 }
-function getElementRef(element) {
+function getElementRef$2(element) {
   var _a2, _b2;
   let getter = (_a2 = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a2.get;
   let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
@@ -35764,7 +35767,7 @@ function BlackGlassButton({
   children,
   ...props
 }) {
-  const Comp = asChild ? Slot : "button";
+  const Comp = asChild ? Slot$1 : "button";
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     Comp,
     {
@@ -35804,6 +35807,4122 @@ function PrismDivider({
       }
     )
   ] });
+}
+function composeEventHandlers(originalEventHandler, ourEventHandler, { checkForDefaultPrevented = true } = {}) {
+  return function handleEvent(event) {
+    originalEventHandler == null ? void 0 : originalEventHandler(event);
+    if (checkForDefaultPrevented === false || !event.defaultPrevented) {
+      return ourEventHandler == null ? void 0 : ourEventHandler(event);
+    }
+  };
+}
+function createContext2(rootComponentName, defaultContext) {
+  const Context = reactExports.createContext(defaultContext);
+  const Provider = (props) => {
+    const { children, ...context } = props;
+    const value = reactExports.useMemo(() => context, Object.values(context));
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Context.Provider, { value, children });
+  };
+  Provider.displayName = rootComponentName + "Provider";
+  function useContext2(consumerName) {
+    const context = reactExports.useContext(Context);
+    if (context) return context;
+    if (defaultContext !== void 0) return defaultContext;
+    throw new Error(`\`${consumerName}\` must be used within \`${rootComponentName}\``);
+  }
+  return [Provider, useContext2];
+}
+function createContextScope(scopeName, createContextScopeDeps = []) {
+  let defaultContexts = [];
+  function createContext3(rootComponentName, defaultContext) {
+    const BaseContext = reactExports.createContext(defaultContext);
+    const index2 = defaultContexts.length;
+    defaultContexts = [...defaultContexts, defaultContext];
+    const Provider = (props) => {
+      var _a2;
+      const { scope, children, ...context } = props;
+      const Context = ((_a2 = scope == null ? void 0 : scope[scopeName]) == null ? void 0 : _a2[index2]) || BaseContext;
+      const value = reactExports.useMemo(() => context, Object.values(context));
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Context.Provider, { value, children });
+    };
+    Provider.displayName = rootComponentName + "Provider";
+    function useContext2(consumerName, scope) {
+      var _a2;
+      const Context = ((_a2 = scope == null ? void 0 : scope[scopeName]) == null ? void 0 : _a2[index2]) || BaseContext;
+      const context = reactExports.useContext(Context);
+      if (context) return context;
+      if (defaultContext !== void 0) return defaultContext;
+      throw new Error(`\`${consumerName}\` must be used within \`${rootComponentName}\``);
+    }
+    return [Provider, useContext2];
+  }
+  const createScope = () => {
+    const scopeContexts = defaultContexts.map((defaultContext) => {
+      return reactExports.createContext(defaultContext);
+    });
+    return function useScope(scope) {
+      const contexts = (scope == null ? void 0 : scope[scopeName]) || scopeContexts;
+      return reactExports.useMemo(
+        () => ({ [`__scope${scopeName}`]: { ...scope, [scopeName]: contexts } }),
+        [scope, contexts]
+      );
+    };
+  };
+  createScope.scopeName = scopeName;
+  return [createContext3, composeContextScopes(createScope, ...createContextScopeDeps)];
+}
+function composeContextScopes(...scopes) {
+  const baseScope = scopes[0];
+  if (scopes.length === 1) return baseScope;
+  const createScope = () => {
+    const scopeHooks = scopes.map((createScope2) => ({
+      useScope: createScope2(),
+      scopeName: createScope2.scopeName
+    }));
+    return function useComposedScopes(overrideScopes) {
+      const nextScopes = scopeHooks.reduce((nextScopes2, { useScope, scopeName }) => {
+        const scopeProps = useScope(overrideScopes);
+        const currentScope = scopeProps[`__scope${scopeName}`];
+        return { ...nextScopes2, ...currentScope };
+      }, {});
+      return reactExports.useMemo(() => ({ [`__scope${baseScope.scopeName}`]: nextScopes }), [nextScopes]);
+    };
+  };
+  createScope.scopeName = baseScope.scopeName;
+  return createScope;
+}
+var useLayoutEffect2 = (globalThis == null ? void 0 : globalThis.document) ? reactExports.useLayoutEffect : () => {
+};
+var useReactId = React$4[" useId ".trim().toString()] || (() => void 0);
+var count$1 = 0;
+function useId(deterministicId) {
+  const [id2, setId] = reactExports.useState(useReactId());
+  useLayoutEffect2(() => {
+    setId((reactId) => reactId ?? String(count$1++));
+  }, [deterministicId]);
+  return deterministicId || (id2 ? `radix-${id2}` : "");
+}
+var useInsertionEffect = React$4[" useInsertionEffect ".trim().toString()] || useLayoutEffect2;
+function useControllableState({
+  prop,
+  defaultProp,
+  onChange = () => {
+  },
+  caller
+}) {
+  const [uncontrolledProp, setUncontrolledProp, onChangeRef] = useUncontrolledState({
+    defaultProp,
+    onChange
+  });
+  const isControlled = prop !== void 0;
+  const value = isControlled ? prop : uncontrolledProp;
+  {
+    const isControlledRef = reactExports.useRef(prop !== void 0);
+    reactExports.useEffect(() => {
+      const wasControlled = isControlledRef.current;
+      if (wasControlled !== isControlled) {
+        const from = wasControlled ? "controlled" : "uncontrolled";
+        const to = isControlled ? "controlled" : "uncontrolled";
+        console.warn(
+          `${caller} is changing from ${from} to ${to}. Components should not switch from controlled to uncontrolled (or vice versa). Decide between using a controlled or uncontrolled value for the lifetime of the component.`
+        );
+      }
+      isControlledRef.current = isControlled;
+    }, [isControlled, caller]);
+  }
+  const setValue = reactExports.useCallback(
+    (nextValue) => {
+      var _a2;
+      if (isControlled) {
+        const value2 = isFunction$2(nextValue) ? nextValue(prop) : nextValue;
+        if (value2 !== prop) {
+          (_a2 = onChangeRef.current) == null ? void 0 : _a2.call(onChangeRef, value2);
+        }
+      } else {
+        setUncontrolledProp(nextValue);
+      }
+    },
+    [isControlled, prop, setUncontrolledProp, onChangeRef]
+  );
+  return [value, setValue];
+}
+function useUncontrolledState({
+  defaultProp,
+  onChange
+}) {
+  const [value, setValue] = reactExports.useState(defaultProp);
+  const prevValueRef = reactExports.useRef(value);
+  const onChangeRef = reactExports.useRef(onChange);
+  useInsertionEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  reactExports.useEffect(() => {
+    var _a2;
+    if (prevValueRef.current !== value) {
+      (_a2 = onChangeRef.current) == null ? void 0 : _a2.call(onChangeRef, value);
+      prevValueRef.current = value;
+    }
+  }, [value, prevValueRef]);
+  return [value, setValue, onChangeRef];
+}
+function isFunction$2(value) {
+  return typeof value === "function";
+}
+// @__NO_SIDE_EFFECTS__
+function createSlot(ownerName) {
+  const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
+  const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    const childrenArray = reactExports.Children.toArray(children);
+    const slottable = childrenArray.find(isSlottable);
+    if (slottable) {
+      const newElement = slottable.props.children;
+      const newChildren = childrenArray.map((child) => {
+        if (child === slottable) {
+          if (reactExports.Children.count(newElement) > 1) return reactExports.Children.only(null);
+          return reactExports.isValidElement(newElement) ? newElement.props.children : null;
+        } else {
+          return child;
+        }
+      });
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children: reactExports.isValidElement(newElement) ? reactExports.cloneElement(newElement, void 0, newChildren) : null });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children });
+  });
+  Slot2.displayName = `${ownerName}.Slot`;
+  return Slot2;
+}
+// @__NO_SIDE_EFFECTS__
+function createSlotClone(ownerName) {
+  const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    if (reactExports.isValidElement(children)) {
+      const childrenRef = getElementRef$1(children);
+      const props2 = mergeProps(slotProps, children.props);
+      if (children.type !== reactExports.Fragment) {
+        props2.ref = forwardedRef ? composeRefs$1(forwardedRef, childrenRef) : childrenRef;
+      }
+      return reactExports.cloneElement(children, props2);
+    }
+    return reactExports.Children.count(children) > 1 ? reactExports.Children.only(null) : null;
+  });
+  SlotClone.displayName = `${ownerName}.SlotClone`;
+  return SlotClone;
+}
+var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
+function isSlottable(child) {
+  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
+}
+function mergeProps(slotProps, childProps) {
+  const overrideProps = { ...childProps };
+  for (const propName in childProps) {
+    const slotPropValue = slotProps[propName];
+    const childPropValue = childProps[propName];
+    const isHandler = /^on[A-Z]/.test(propName);
+    if (isHandler) {
+      if (slotPropValue && childPropValue) {
+        overrideProps[propName] = (...args) => {
+          const result = childPropValue(...args);
+          slotPropValue(...args);
+          return result;
+        };
+      } else if (slotPropValue) {
+        overrideProps[propName] = slotPropValue;
+      }
+    } else if (propName === "style") {
+      overrideProps[propName] = { ...slotPropValue, ...childPropValue };
+    } else if (propName === "className") {
+      overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
+    }
+  }
+  return { ...slotProps, ...overrideProps };
+}
+function getElementRef$1(element) {
+  var _a2, _b2;
+  let getter = (_a2 = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a2.get;
+  let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.ref;
+  }
+  getter = (_b2 = Object.getOwnPropertyDescriptor(element, "ref")) == null ? void 0 : _b2.get;
+  mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.props.ref;
+  }
+  return element.props.ref || element.ref;
+}
+var NODES$1 = [
+  "a",
+  "button",
+  "div",
+  "form",
+  "h2",
+  "h3",
+  "img",
+  "input",
+  "label",
+  "li",
+  "nav",
+  "ol",
+  "p",
+  "select",
+  "span",
+  "svg",
+  "ul"
+];
+var Primitive$1 = NODES$1.reduce((primitive, node) => {
+  const Slot2 = /* @__PURE__ */ createSlot(`Primitive.${node}`);
+  const Node2 = reactExports.forwardRef((props, forwardedRef) => {
+    const { asChild, ...primitiveProps } = props;
+    const Comp = asChild ? Slot2 : node;
+    if (typeof window !== "undefined") {
+      window[Symbol.for("radix-ui")] = true;
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Comp, { ...primitiveProps, ref: forwardedRef });
+  });
+  Node2.displayName = `Primitive.${node}`;
+  return { ...primitive, [node]: Node2 };
+}, {});
+function dispatchDiscreteCustomEvent(target, event) {
+  if (target) reactDomExports.flushSync(() => target.dispatchEvent(event));
+}
+function useCallbackRef$1(callback) {
+  const callbackRef = reactExports.useRef(callback);
+  reactExports.useEffect(() => {
+    callbackRef.current = callback;
+  });
+  return reactExports.useMemo(() => (...args) => {
+    var _a2;
+    return (_a2 = callbackRef.current) == null ? void 0 : _a2.call(callbackRef, ...args);
+  }, []);
+}
+function useEscapeKeydown(onEscapeKeyDownProp, ownerDocument = globalThis == null ? void 0 : globalThis.document) {
+  const onEscapeKeyDown = useCallbackRef$1(onEscapeKeyDownProp);
+  reactExports.useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onEscapeKeyDown(event);
+      }
+    };
+    ownerDocument.addEventListener("keydown", handleKeyDown, { capture: true });
+    return () => ownerDocument.removeEventListener("keydown", handleKeyDown, { capture: true });
+  }, [onEscapeKeyDown, ownerDocument]);
+}
+var DISMISSABLE_LAYER_NAME = "DismissableLayer";
+var CONTEXT_UPDATE = "dismissableLayer.update";
+var POINTER_DOWN_OUTSIDE = "dismissableLayer.pointerDownOutside";
+var FOCUS_OUTSIDE = "dismissableLayer.focusOutside";
+var originalBodyPointerEvents;
+var DismissableLayerContext = reactExports.createContext({
+  layers: /* @__PURE__ */ new Set(),
+  layersWithOutsidePointerEventsDisabled: /* @__PURE__ */ new Set(),
+  branches: /* @__PURE__ */ new Set()
+});
+var DismissableLayer = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const {
+      disableOutsidePointerEvents = false,
+      onEscapeKeyDown,
+      onPointerDownOutside,
+      onFocusOutside,
+      onInteractOutside,
+      onDismiss,
+      ...layerProps
+    } = props;
+    const context = reactExports.useContext(DismissableLayerContext);
+    const [node, setNode] = reactExports.useState(null);
+    const ownerDocument = (node == null ? void 0 : node.ownerDocument) ?? (globalThis == null ? void 0 : globalThis.document);
+    const [, force] = reactExports.useState({});
+    const composedRefs = useComposedRefs$1(forwardedRef, (node2) => setNode(node2));
+    const layers = Array.from(context.layers);
+    const [highestLayerWithOutsidePointerEventsDisabled] = [...context.layersWithOutsidePointerEventsDisabled].slice(-1);
+    const highestLayerWithOutsidePointerEventsDisabledIndex = layers.indexOf(highestLayerWithOutsidePointerEventsDisabled);
+    const index2 = node ? layers.indexOf(node) : -1;
+    const isBodyPointerEventsDisabled = context.layersWithOutsidePointerEventsDisabled.size > 0;
+    const isPointerEventsEnabled = index2 >= highestLayerWithOutsidePointerEventsDisabledIndex;
+    const pointerDownOutside = usePointerDownOutside((event) => {
+      const target = event.target;
+      const isPointerDownOnBranch = [...context.branches].some((branch) => branch.contains(target));
+      if (!isPointerEventsEnabled || isPointerDownOnBranch) return;
+      onPointerDownOutside == null ? void 0 : onPointerDownOutside(event);
+      onInteractOutside == null ? void 0 : onInteractOutside(event);
+      if (!event.defaultPrevented) onDismiss == null ? void 0 : onDismiss();
+    }, ownerDocument);
+    const focusOutside = useFocusOutside((event) => {
+      const target = event.target;
+      const isFocusInBranch = [...context.branches].some((branch) => branch.contains(target));
+      if (isFocusInBranch) return;
+      onFocusOutside == null ? void 0 : onFocusOutside(event);
+      onInteractOutside == null ? void 0 : onInteractOutside(event);
+      if (!event.defaultPrevented) onDismiss == null ? void 0 : onDismiss();
+    }, ownerDocument);
+    useEscapeKeydown((event) => {
+      const isHighestLayer = index2 === context.layers.size - 1;
+      if (!isHighestLayer) return;
+      onEscapeKeyDown == null ? void 0 : onEscapeKeyDown(event);
+      if (!event.defaultPrevented && onDismiss) {
+        event.preventDefault();
+        onDismiss();
+      }
+    }, ownerDocument);
+    reactExports.useEffect(() => {
+      if (!node) return;
+      if (disableOutsidePointerEvents) {
+        if (context.layersWithOutsidePointerEventsDisabled.size === 0) {
+          originalBodyPointerEvents = ownerDocument.body.style.pointerEvents;
+          ownerDocument.body.style.pointerEvents = "none";
+        }
+        context.layersWithOutsidePointerEventsDisabled.add(node);
+      }
+      context.layers.add(node);
+      dispatchUpdate();
+      return () => {
+        if (disableOutsidePointerEvents && context.layersWithOutsidePointerEventsDisabled.size === 1) {
+          ownerDocument.body.style.pointerEvents = originalBodyPointerEvents;
+        }
+      };
+    }, [node, ownerDocument, disableOutsidePointerEvents, context]);
+    reactExports.useEffect(() => {
+      return () => {
+        if (!node) return;
+        context.layers.delete(node);
+        context.layersWithOutsidePointerEventsDisabled.delete(node);
+        dispatchUpdate();
+      };
+    }, [node, context]);
+    reactExports.useEffect(() => {
+      const handleUpdate = () => force({});
+      document.addEventListener(CONTEXT_UPDATE, handleUpdate);
+      return () => document.removeEventListener(CONTEXT_UPDATE, handleUpdate);
+    }, []);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive$1.div,
+      {
+        ...layerProps,
+        ref: composedRefs,
+        style: {
+          pointerEvents: isBodyPointerEventsDisabled ? isPointerEventsEnabled ? "auto" : "none" : void 0,
+          ...props.style
+        },
+        onFocusCapture: composeEventHandlers(props.onFocusCapture, focusOutside.onFocusCapture),
+        onBlurCapture: composeEventHandlers(props.onBlurCapture, focusOutside.onBlurCapture),
+        onPointerDownCapture: composeEventHandlers(
+          props.onPointerDownCapture,
+          pointerDownOutside.onPointerDownCapture
+        )
+      }
+    );
+  }
+);
+DismissableLayer.displayName = DISMISSABLE_LAYER_NAME;
+var BRANCH_NAME = "DismissableLayerBranch";
+var DismissableLayerBranch = reactExports.forwardRef((props, forwardedRef) => {
+  const context = reactExports.useContext(DismissableLayerContext);
+  const ref = reactExports.useRef(null);
+  const composedRefs = useComposedRefs$1(forwardedRef, ref);
+  reactExports.useEffect(() => {
+    const node = ref.current;
+    if (node) {
+      context.branches.add(node);
+      return () => {
+        context.branches.delete(node);
+      };
+    }
+  }, [context.branches]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Primitive$1.div, { ...props, ref: composedRefs });
+});
+DismissableLayerBranch.displayName = BRANCH_NAME;
+function usePointerDownOutside(onPointerDownOutside, ownerDocument = globalThis == null ? void 0 : globalThis.document) {
+  const handlePointerDownOutside = useCallbackRef$1(onPointerDownOutside);
+  const isPointerInsideReactTreeRef = reactExports.useRef(false);
+  const handleClickRef = reactExports.useRef(() => {
+  });
+  reactExports.useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (event.target && !isPointerInsideReactTreeRef.current) {
+        let handleAndDispatchPointerDownOutsideEvent2 = function() {
+          handleAndDispatchCustomEvent(
+            POINTER_DOWN_OUTSIDE,
+            handlePointerDownOutside,
+            eventDetail,
+            { discrete: true }
+          );
+        };
+        const eventDetail = { originalEvent: event };
+        if (event.pointerType === "touch") {
+          ownerDocument.removeEventListener("click", handleClickRef.current);
+          handleClickRef.current = handleAndDispatchPointerDownOutsideEvent2;
+          ownerDocument.addEventListener("click", handleClickRef.current, { once: true });
+        } else {
+          handleAndDispatchPointerDownOutsideEvent2();
+        }
+      } else {
+        ownerDocument.removeEventListener("click", handleClickRef.current);
+      }
+      isPointerInsideReactTreeRef.current = false;
+    };
+    const timerId = window.setTimeout(() => {
+      ownerDocument.addEventListener("pointerdown", handlePointerDown);
+    }, 0);
+    return () => {
+      window.clearTimeout(timerId);
+      ownerDocument.removeEventListener("pointerdown", handlePointerDown);
+      ownerDocument.removeEventListener("click", handleClickRef.current);
+    };
+  }, [ownerDocument, handlePointerDownOutside]);
+  return {
+    // ensures we check React component tree (not just DOM tree)
+    onPointerDownCapture: () => isPointerInsideReactTreeRef.current = true
+  };
+}
+function useFocusOutside(onFocusOutside, ownerDocument = globalThis == null ? void 0 : globalThis.document) {
+  const handleFocusOutside = useCallbackRef$1(onFocusOutside);
+  const isFocusInsideReactTreeRef = reactExports.useRef(false);
+  reactExports.useEffect(() => {
+    const handleFocus = (event) => {
+      if (event.target && !isFocusInsideReactTreeRef.current) {
+        const eventDetail = { originalEvent: event };
+        handleAndDispatchCustomEvent(FOCUS_OUTSIDE, handleFocusOutside, eventDetail, {
+          discrete: false
+        });
+      }
+    };
+    ownerDocument.addEventListener("focusin", handleFocus);
+    return () => ownerDocument.removeEventListener("focusin", handleFocus);
+  }, [ownerDocument, handleFocusOutside]);
+  return {
+    onFocusCapture: () => isFocusInsideReactTreeRef.current = true,
+    onBlurCapture: () => isFocusInsideReactTreeRef.current = false
+  };
+}
+function dispatchUpdate() {
+  const event = new CustomEvent(CONTEXT_UPDATE);
+  document.dispatchEvent(event);
+}
+function handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
+  const target = detail.originalEvent.target;
+  const event = new CustomEvent(name, { bubbles: false, cancelable: true, detail });
+  if (handler) target.addEventListener(name, handler, { once: true });
+  if (discrete) {
+    dispatchDiscreteCustomEvent(target, event);
+  } else {
+    target.dispatchEvent(event);
+  }
+}
+var AUTOFOCUS_ON_MOUNT = "focusScope.autoFocusOnMount";
+var AUTOFOCUS_ON_UNMOUNT = "focusScope.autoFocusOnUnmount";
+var EVENT_OPTIONS = { bubbles: false, cancelable: true };
+var FOCUS_SCOPE_NAME = "FocusScope";
+var FocusScope = reactExports.forwardRef((props, forwardedRef) => {
+  const {
+    loop = false,
+    trapped = false,
+    onMountAutoFocus: onMountAutoFocusProp,
+    onUnmountAutoFocus: onUnmountAutoFocusProp,
+    ...scopeProps
+  } = props;
+  const [container, setContainer] = reactExports.useState(null);
+  const onMountAutoFocus = useCallbackRef$1(onMountAutoFocusProp);
+  const onUnmountAutoFocus = useCallbackRef$1(onUnmountAutoFocusProp);
+  const lastFocusedElementRef = reactExports.useRef(null);
+  const composedRefs = useComposedRefs$1(forwardedRef, (node) => setContainer(node));
+  const focusScope = reactExports.useRef({
+    paused: false,
+    pause() {
+      this.paused = true;
+    },
+    resume() {
+      this.paused = false;
+    }
+  }).current;
+  reactExports.useEffect(() => {
+    if (trapped) {
+      let handleFocusIn2 = function(event) {
+        if (focusScope.paused || !container) return;
+        const target = event.target;
+        if (container.contains(target)) {
+          lastFocusedElementRef.current = target;
+        } else {
+          focus(lastFocusedElementRef.current, { select: true });
+        }
+      }, handleFocusOut2 = function(event) {
+        if (focusScope.paused || !container) return;
+        const relatedTarget = event.relatedTarget;
+        if (relatedTarget === null) return;
+        if (!container.contains(relatedTarget)) {
+          focus(lastFocusedElementRef.current, { select: true });
+        }
+      }, handleMutations2 = function(mutations) {
+        const focusedElement = document.activeElement;
+        if (focusedElement !== document.body) return;
+        for (const mutation of mutations) {
+          if (mutation.removedNodes.length > 0) focus(container);
+        }
+      };
+      document.addEventListener("focusin", handleFocusIn2);
+      document.addEventListener("focusout", handleFocusOut2);
+      const mutationObserver = new MutationObserver(handleMutations2);
+      if (container) mutationObserver.observe(container, { childList: true, subtree: true });
+      return () => {
+        document.removeEventListener("focusin", handleFocusIn2);
+        document.removeEventListener("focusout", handleFocusOut2);
+        mutationObserver.disconnect();
+      };
+    }
+  }, [trapped, container, focusScope.paused]);
+  reactExports.useEffect(() => {
+    if (container) {
+      focusScopesStack.add(focusScope);
+      const previouslyFocusedElement = document.activeElement;
+      const hasFocusedCandidate = container.contains(previouslyFocusedElement);
+      if (!hasFocusedCandidate) {
+        const mountEvent = new CustomEvent(AUTOFOCUS_ON_MOUNT, EVENT_OPTIONS);
+        container.addEventListener(AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
+        container.dispatchEvent(mountEvent);
+        if (!mountEvent.defaultPrevented) {
+          focusFirst(removeLinks(getTabbableCandidates(container)), { select: true });
+          if (document.activeElement === previouslyFocusedElement) {
+            focus(container);
+          }
+        }
+      }
+      return () => {
+        container.removeEventListener(AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
+        setTimeout(() => {
+          const unmountEvent = new CustomEvent(AUTOFOCUS_ON_UNMOUNT, EVENT_OPTIONS);
+          container.addEventListener(AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
+          container.dispatchEvent(unmountEvent);
+          if (!unmountEvent.defaultPrevented) {
+            focus(previouslyFocusedElement ?? document.body, { select: true });
+          }
+          container.removeEventListener(AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
+          focusScopesStack.remove(focusScope);
+        }, 0);
+      };
+    }
+  }, [container, onMountAutoFocus, onUnmountAutoFocus, focusScope]);
+  const handleKeyDown = reactExports.useCallback(
+    (event) => {
+      if (!loop && !trapped) return;
+      if (focusScope.paused) return;
+      const isTabKey = event.key === "Tab" && !event.altKey && !event.ctrlKey && !event.metaKey;
+      const focusedElement = document.activeElement;
+      if (isTabKey && focusedElement) {
+        const container2 = event.currentTarget;
+        const [first, last2] = getTabbableEdges(container2);
+        const hasTabbableElementsInside = first && last2;
+        if (!hasTabbableElementsInside) {
+          if (focusedElement === container2) event.preventDefault();
+        } else {
+          if (!event.shiftKey && focusedElement === last2) {
+            event.preventDefault();
+            if (loop) focus(first, { select: true });
+          } else if (event.shiftKey && focusedElement === first) {
+            event.preventDefault();
+            if (loop) focus(last2, { select: true });
+          }
+        }
+      }
+    },
+    [loop, trapped, focusScope.paused]
+  );
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Primitive$1.div, { tabIndex: -1, ...scopeProps, ref: composedRefs, onKeyDown: handleKeyDown });
+});
+FocusScope.displayName = FOCUS_SCOPE_NAME;
+function focusFirst(candidates, { select = false } = {}) {
+  const previouslyFocusedElement = document.activeElement;
+  for (const candidate of candidates) {
+    focus(candidate, { select });
+    if (document.activeElement !== previouslyFocusedElement) return;
+  }
+}
+function getTabbableEdges(container) {
+  const candidates = getTabbableCandidates(container);
+  const first = findVisible(candidates, container);
+  const last2 = findVisible(candidates.reverse(), container);
+  return [first, last2];
+}
+function getTabbableCandidates(container) {
+  const nodes = [];
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
+    acceptNode: (node) => {
+      const isHiddenInput = node.tagName === "INPUT" && node.type === "hidden";
+      if (node.disabled || node.hidden || isHiddenInput) return NodeFilter.FILTER_SKIP;
+      return node.tabIndex >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+    }
+  });
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  return nodes;
+}
+function findVisible(elements, container) {
+  for (const element of elements) {
+    if (!isHidden(element, { upTo: container })) return element;
+  }
+}
+function isHidden(node, { upTo }) {
+  if (getComputedStyle(node).visibility === "hidden") return true;
+  while (node) {
+    if (upTo !== void 0 && node === upTo) return false;
+    if (getComputedStyle(node).display === "none") return true;
+    node = node.parentElement;
+  }
+  return false;
+}
+function isSelectableInput(element) {
+  return element instanceof HTMLInputElement && "select" in element;
+}
+function focus(element, { select = false } = {}) {
+  if (element && element.focus) {
+    const previouslyFocusedElement = document.activeElement;
+    element.focus({ preventScroll: true });
+    if (element !== previouslyFocusedElement && isSelectableInput(element) && select)
+      element.select();
+  }
+}
+var focusScopesStack = createFocusScopesStack();
+function createFocusScopesStack() {
+  let stack = [];
+  return {
+    add(focusScope) {
+      const activeFocusScope = stack[0];
+      if (focusScope !== activeFocusScope) {
+        activeFocusScope == null ? void 0 : activeFocusScope.pause();
+      }
+      stack = arrayRemove(stack, focusScope);
+      stack.unshift(focusScope);
+    },
+    remove(focusScope) {
+      var _a2;
+      stack = arrayRemove(stack, focusScope);
+      (_a2 = stack[0]) == null ? void 0 : _a2.resume();
+    }
+  };
+}
+function arrayRemove(array, item) {
+  const updatedArray = [...array];
+  const index2 = updatedArray.indexOf(item);
+  if (index2 !== -1) {
+    updatedArray.splice(index2, 1);
+  }
+  return updatedArray;
+}
+function removeLinks(items) {
+  return items.filter((item) => item.tagName !== "A");
+}
+var PORTAL_NAME$1 = "Portal";
+var Portal$1 = reactExports.forwardRef((props, forwardedRef) => {
+  var _a2;
+  const { container: containerProp, ...portalProps } = props;
+  const [mounted, setMounted] = reactExports.useState(false);
+  useLayoutEffect2(() => setMounted(true), []);
+  const container = containerProp || mounted && ((_a2 = globalThis == null ? void 0 : globalThis.document) == null ? void 0 : _a2.body);
+  return container ? vt.createPortal(/* @__PURE__ */ jsxRuntimeExports.jsx(Primitive$1.div, { ...portalProps, ref: forwardedRef }), container) : null;
+});
+Portal$1.displayName = PORTAL_NAME$1;
+function useStateMachine(initialState, machine) {
+  return reactExports.useReducer((state, event) => {
+    const nextState = machine[state][event];
+    return nextState ?? state;
+  }, initialState);
+}
+var Presence = (props) => {
+  const { present, children } = props;
+  const presence = usePresence$1(present);
+  const child = typeof children === "function" ? children({ present: presence.isPresent }) : reactExports.Children.only(children);
+  const ref = useComposedRefs$1(presence.ref, getElementRef(child));
+  const forceMount = typeof children === "function";
+  return forceMount || presence.isPresent ? reactExports.cloneElement(child, { ref }) : null;
+};
+Presence.displayName = "Presence";
+function usePresence$1(present) {
+  const [node, setNode] = reactExports.useState();
+  const stylesRef = reactExports.useRef(null);
+  const prevPresentRef = reactExports.useRef(present);
+  const prevAnimationNameRef = reactExports.useRef("none");
+  const initialState = present ? "mounted" : "unmounted";
+  const [state, send] = useStateMachine(initialState, {
+    mounted: {
+      UNMOUNT: "unmounted",
+      ANIMATION_OUT: "unmountSuspended"
+    },
+    unmountSuspended: {
+      MOUNT: "mounted",
+      ANIMATION_END: "unmounted"
+    },
+    unmounted: {
+      MOUNT: "mounted"
+    }
+  });
+  reactExports.useEffect(() => {
+    const currentAnimationName = getAnimationName(stylesRef.current);
+    prevAnimationNameRef.current = state === "mounted" ? currentAnimationName : "none";
+  }, [state]);
+  useLayoutEffect2(() => {
+    const styles = stylesRef.current;
+    const wasPresent = prevPresentRef.current;
+    const hasPresentChanged = wasPresent !== present;
+    if (hasPresentChanged) {
+      const prevAnimationName = prevAnimationNameRef.current;
+      const currentAnimationName = getAnimationName(styles);
+      if (present) {
+        send("MOUNT");
+      } else if (currentAnimationName === "none" || (styles == null ? void 0 : styles.display) === "none") {
+        send("UNMOUNT");
+      } else {
+        const isAnimating = prevAnimationName !== currentAnimationName;
+        if (wasPresent && isAnimating) {
+          send("ANIMATION_OUT");
+        } else {
+          send("UNMOUNT");
+        }
+      }
+      prevPresentRef.current = present;
+    }
+  }, [present, send]);
+  useLayoutEffect2(() => {
+    if (node) {
+      let timeoutId;
+      const ownerWindow = node.ownerDocument.defaultView ?? window;
+      const handleAnimationEnd = (event) => {
+        const currentAnimationName = getAnimationName(stylesRef.current);
+        const isCurrentAnimation = currentAnimationName.includes(CSS.escape(event.animationName));
+        if (event.target === node && isCurrentAnimation) {
+          send("ANIMATION_END");
+          if (!prevPresentRef.current) {
+            const currentFillMode = node.style.animationFillMode;
+            node.style.animationFillMode = "forwards";
+            timeoutId = ownerWindow.setTimeout(() => {
+              if (node.style.animationFillMode === "forwards") {
+                node.style.animationFillMode = currentFillMode;
+              }
+            });
+          }
+        }
+      };
+      const handleAnimationStart = (event) => {
+        if (event.target === node) {
+          prevAnimationNameRef.current = getAnimationName(stylesRef.current);
+        }
+      };
+      node.addEventListener("animationstart", handleAnimationStart);
+      node.addEventListener("animationcancel", handleAnimationEnd);
+      node.addEventListener("animationend", handleAnimationEnd);
+      return () => {
+        ownerWindow.clearTimeout(timeoutId);
+        node.removeEventListener("animationstart", handleAnimationStart);
+        node.removeEventListener("animationcancel", handleAnimationEnd);
+        node.removeEventListener("animationend", handleAnimationEnd);
+      };
+    } else {
+      send("ANIMATION_END");
+    }
+  }, [node, send]);
+  return {
+    isPresent: ["mounted", "unmountSuspended"].includes(state),
+    ref: reactExports.useCallback((node2) => {
+      stylesRef.current = node2 ? getComputedStyle(node2) : null;
+      setNode(node2);
+    }, [])
+  };
+}
+function getAnimationName(styles) {
+  return (styles == null ? void 0 : styles.animationName) || "none";
+}
+function getElementRef(element) {
+  var _a2, _b2;
+  let getter = (_a2 = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a2.get;
+  let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.ref;
+  }
+  getter = (_b2 = Object.getOwnPropertyDescriptor(element, "ref")) == null ? void 0 : _b2.get;
+  mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.props.ref;
+  }
+  return element.props.ref || element.ref;
+}
+var count = 0;
+function useFocusGuards() {
+  reactExports.useEffect(() => {
+    const edgeGuards = document.querySelectorAll("[data-radix-focus-guard]");
+    document.body.insertAdjacentElement("afterbegin", edgeGuards[0] ?? createFocusGuard());
+    document.body.insertAdjacentElement("beforeend", edgeGuards[1] ?? createFocusGuard());
+    count++;
+    return () => {
+      if (count === 1) {
+        document.querySelectorAll("[data-radix-focus-guard]").forEach((node) => node.remove());
+      }
+      count--;
+    };
+  }, []);
+}
+function createFocusGuard() {
+  const element = document.createElement("span");
+  element.setAttribute("data-radix-focus-guard", "");
+  element.tabIndex = 0;
+  element.style.outline = "none";
+  element.style.opacity = "0";
+  element.style.position = "fixed";
+  element.style.pointerEvents = "none";
+  return element;
+}
+var __assign = function() {
+  __assign = Object.assign || function __assign2(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+      s = arguments[i];
+      for (var p2 in s) if (Object.prototype.hasOwnProperty.call(s, p2)) t[p2] = s[p2];
+    }
+    return t;
+  };
+  return __assign.apply(this, arguments);
+};
+function __rest(s, e) {
+  var t = {};
+  for (var p2 in s) if (Object.prototype.hasOwnProperty.call(s, p2) && e.indexOf(p2) < 0)
+    t[p2] = s[p2];
+  if (s != null && typeof Object.getOwnPropertySymbols === "function")
+    for (var i = 0, p2 = Object.getOwnPropertySymbols(s); i < p2.length; i++) {
+      if (e.indexOf(p2[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p2[i]))
+        t[p2[i]] = s[p2[i]];
+    }
+  return t;
+}
+function __spreadArray(to, from, pack) {
+  if (pack || arguments.length === 2) for (var i = 0, l2 = from.length, ar; i < l2; i++) {
+    if (ar || !(i in from)) {
+      if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+      ar[i] = from[i];
+    }
+  }
+  return to.concat(ar || Array.prototype.slice.call(from));
+}
+typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
+  var e = new Error(message);
+  return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+var zeroRightClassName = "right-scroll-bar-position";
+var fullWidthClassName = "width-before-scroll-bar";
+var noScrollbarsClassName = "with-scroll-bars-hidden";
+var removedBarSizeVariable = "--removed-body-scroll-bar-size";
+function assignRef(ref, value) {
+  if (typeof ref === "function") {
+    ref(value);
+  } else if (ref) {
+    ref.current = value;
+  }
+  return ref;
+}
+function useCallbackRef(initialValue, callback) {
+  var ref = reactExports.useState(function() {
+    return {
+      // value
+      value: initialValue,
+      // last callback
+      callback,
+      // "memoized" public interface
+      facade: {
+        get current() {
+          return ref.value;
+        },
+        set current(value) {
+          var last2 = ref.value;
+          if (last2 !== value) {
+            ref.value = value;
+            ref.callback(value, last2);
+          }
+        }
+      }
+    };
+  })[0];
+  ref.callback = callback;
+  return ref.facade;
+}
+var useIsomorphicLayoutEffect$2 = typeof window !== "undefined" ? reactExports.useLayoutEffect : reactExports.useEffect;
+var currentValues = /* @__PURE__ */ new WeakMap();
+function useMergeRefs(refs, defaultValue) {
+  var callbackRef = useCallbackRef(null, function(newValue) {
+    return refs.forEach(function(ref) {
+      return assignRef(ref, newValue);
+    });
+  });
+  useIsomorphicLayoutEffect$2(function() {
+    var oldValue = currentValues.get(callbackRef);
+    if (oldValue) {
+      var prevRefs_1 = new Set(oldValue);
+      var nextRefs_1 = new Set(refs);
+      var current_1 = callbackRef.current;
+      prevRefs_1.forEach(function(ref) {
+        if (!nextRefs_1.has(ref)) {
+          assignRef(ref, null);
+        }
+      });
+      nextRefs_1.forEach(function(ref) {
+        if (!prevRefs_1.has(ref)) {
+          assignRef(ref, current_1);
+        }
+      });
+    }
+    currentValues.set(callbackRef, refs);
+  }, [refs]);
+  return callbackRef;
+}
+function ItoI(a2) {
+  return a2;
+}
+function innerCreateMedium(defaults, middleware) {
+  if (middleware === void 0) {
+    middleware = ItoI;
+  }
+  var buffer = [];
+  var assigned = false;
+  var medium = {
+    read: function() {
+      if (assigned) {
+        throw new Error("Sidecar: could not `read` from an `assigned` medium. `read` could be used only with `useMedium`.");
+      }
+      if (buffer.length) {
+        return buffer[buffer.length - 1];
+      }
+      return defaults;
+    },
+    useMedium: function(data) {
+      var item = middleware(data, assigned);
+      buffer.push(item);
+      return function() {
+        buffer = buffer.filter(function(x2) {
+          return x2 !== item;
+        });
+      };
+    },
+    assignSyncMedium: function(cb) {
+      assigned = true;
+      while (buffer.length) {
+        var cbs = buffer;
+        buffer = [];
+        cbs.forEach(cb);
+      }
+      buffer = {
+        push: function(x2) {
+          return cb(x2);
+        },
+        filter: function() {
+          return buffer;
+        }
+      };
+    },
+    assignMedium: function(cb) {
+      assigned = true;
+      var pendingQueue = [];
+      if (buffer.length) {
+        var cbs = buffer;
+        buffer = [];
+        cbs.forEach(cb);
+        pendingQueue = buffer;
+      }
+      var executeQueue = function() {
+        var cbs2 = pendingQueue;
+        pendingQueue = [];
+        cbs2.forEach(cb);
+      };
+      var cycle = function() {
+        return Promise.resolve().then(executeQueue);
+      };
+      cycle();
+      buffer = {
+        push: function(x2) {
+          pendingQueue.push(x2);
+          cycle();
+        },
+        filter: function(filter2) {
+          pendingQueue = pendingQueue.filter(filter2);
+          return buffer;
+        }
+      };
+    }
+  };
+  return medium;
+}
+function createSidecarMedium(options) {
+  if (options === void 0) {
+    options = {};
+  }
+  var medium = innerCreateMedium(null);
+  medium.options = __assign({ async: true, ssr: false }, options);
+  return medium;
+}
+var SideCar$1 = function(_a2) {
+  var sideCar = _a2.sideCar, rest = __rest(_a2, ["sideCar"]);
+  if (!sideCar) {
+    throw new Error("Sidecar: please provide `sideCar` property to import the right car");
+  }
+  var Target = sideCar.read();
+  if (!Target) {
+    throw new Error("Sidecar medium not found");
+  }
+  return reactExports.createElement(Target, __assign({}, rest));
+};
+SideCar$1.isSideCarExport = true;
+function exportSidecar(medium, exported) {
+  medium.useMedium(exported);
+  return SideCar$1;
+}
+var effectCar = createSidecarMedium();
+var nothing = function() {
+  return;
+};
+var RemoveScroll = reactExports.forwardRef(function(props, parentRef) {
+  var ref = reactExports.useRef(null);
+  var _a2 = reactExports.useState({
+    onScrollCapture: nothing,
+    onWheelCapture: nothing,
+    onTouchMoveCapture: nothing
+  }), callbacks = _a2[0], setCallbacks = _a2[1];
+  var forwardProps = props.forwardProps, children = props.children, className = props.className, removeScrollBar = props.removeScrollBar, enabled = props.enabled, shards = props.shards, sideCar = props.sideCar, noRelative = props.noRelative, noIsolation = props.noIsolation, inert = props.inert, allowPinchZoom = props.allowPinchZoom, _b2 = props.as, Container = _b2 === void 0 ? "div" : _b2, gapMode = props.gapMode, rest = __rest(props, ["forwardProps", "children", "className", "removeScrollBar", "enabled", "shards", "sideCar", "noRelative", "noIsolation", "inert", "allowPinchZoom", "as", "gapMode"]);
+  var SideCar2 = sideCar;
+  var containerRef = useMergeRefs([ref, parentRef]);
+  var containerProps = __assign(__assign({}, rest), callbacks);
+  return reactExports.createElement(
+    reactExports.Fragment,
+    null,
+    enabled && reactExports.createElement(SideCar2, { sideCar: effectCar, removeScrollBar, shards, noRelative, noIsolation, inert, setCallbacks, allowPinchZoom: !!allowPinchZoom, lockRef: ref, gapMode }),
+    forwardProps ? reactExports.cloneElement(reactExports.Children.only(children), __assign(__assign({}, containerProps), { ref: containerRef })) : reactExports.createElement(Container, __assign({}, containerProps, { className, ref: containerRef }), children)
+  );
+});
+RemoveScroll.defaultProps = {
+  enabled: true,
+  removeScrollBar: true,
+  inert: false
+};
+RemoveScroll.classNames = {
+  fullWidth: fullWidthClassName,
+  zeroRight: zeroRightClassName
+};
+var getNonce = function() {
+  if (typeof __webpack_nonce__ !== "undefined") {
+    return __webpack_nonce__;
+  }
+  return void 0;
+};
+function makeStyleTag() {
+  if (!document)
+    return null;
+  var tag = document.createElement("style");
+  tag.type = "text/css";
+  var nonce = getNonce();
+  if (nonce) {
+    tag.setAttribute("nonce", nonce);
+  }
+  return tag;
+}
+function injectStyles(tag, css) {
+  if (tag.styleSheet) {
+    tag.styleSheet.cssText = css;
+  } else {
+    tag.appendChild(document.createTextNode(css));
+  }
+}
+function insertStyleTag(tag) {
+  var head = document.head || document.getElementsByTagName("head")[0];
+  head.appendChild(tag);
+}
+var stylesheetSingleton = function() {
+  var counter = 0;
+  var stylesheet = null;
+  return {
+    add: function(style2) {
+      if (counter == 0) {
+        if (stylesheet = makeStyleTag()) {
+          injectStyles(stylesheet, style2);
+          insertStyleTag(stylesheet);
+        }
+      }
+      counter++;
+    },
+    remove: function() {
+      counter--;
+      if (!counter && stylesheet) {
+        stylesheet.parentNode && stylesheet.parentNode.removeChild(stylesheet);
+        stylesheet = null;
+      }
+    }
+  };
+};
+var styleHookSingleton = function() {
+  var sheet = stylesheetSingleton();
+  return function(styles, isDynamic) {
+    reactExports.useEffect(function() {
+      sheet.add(styles);
+      return function() {
+        sheet.remove();
+      };
+    }, [styles && isDynamic]);
+  };
+};
+var styleSingleton = function() {
+  var useStyle2 = styleHookSingleton();
+  var Sheet2 = function(_a2) {
+    var styles = _a2.styles, dynamic = _a2.dynamic;
+    useStyle2(styles, dynamic);
+    return null;
+  };
+  return Sheet2;
+};
+var zeroGap = {
+  left: 0,
+  top: 0,
+  right: 0,
+  gap: 0
+};
+var parse = function(x2) {
+  return parseInt(x2 || "", 10) || 0;
+};
+var getOffset = function(gapMode) {
+  var cs = window.getComputedStyle(document.body);
+  var left = cs[gapMode === "padding" ? "paddingLeft" : "marginLeft"];
+  var top = cs[gapMode === "padding" ? "paddingTop" : "marginTop"];
+  var right = cs[gapMode === "padding" ? "paddingRight" : "marginRight"];
+  return [parse(left), parse(top), parse(right)];
+};
+var getGapWidth = function(gapMode) {
+  if (gapMode === void 0) {
+    gapMode = "margin";
+  }
+  if (typeof window === "undefined") {
+    return zeroGap;
+  }
+  var offsets = getOffset(gapMode);
+  var documentWidth = document.documentElement.clientWidth;
+  var windowWidth = window.innerWidth;
+  return {
+    left: offsets[0],
+    top: offsets[1],
+    right: offsets[2],
+    gap: Math.max(0, windowWidth - documentWidth + offsets[2] - offsets[0])
+  };
+};
+var Style = styleSingleton();
+var lockAttribute = "data-scroll-locked";
+var getStyles = function(_a2, allowRelative, gapMode, important) {
+  var left = _a2.left, top = _a2.top, right = _a2.right, gap = _a2.gap;
+  if (gapMode === void 0) {
+    gapMode = "margin";
+  }
+  return "\n  .".concat(noScrollbarsClassName, " {\n   overflow: hidden ").concat(important, ";\n   padding-right: ").concat(gap, "px ").concat(important, ";\n  }\n  body[").concat(lockAttribute, "] {\n    overflow: hidden ").concat(important, ";\n    overscroll-behavior: contain;\n    ").concat([
+    allowRelative && "position: relative ".concat(important, ";"),
+    gapMode === "margin" && "\n    padding-left: ".concat(left, "px;\n    padding-top: ").concat(top, "px;\n    padding-right: ").concat(right, "px;\n    margin-left:0;\n    margin-top:0;\n    margin-right: ").concat(gap, "px ").concat(important, ";\n    "),
+    gapMode === "padding" && "padding-right: ".concat(gap, "px ").concat(important, ";")
+  ].filter(Boolean).join(""), "\n  }\n  \n  .").concat(zeroRightClassName, " {\n    right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " {\n    margin-right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(zeroRightClassName, " .").concat(zeroRightClassName, " {\n    right: 0 ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " .").concat(fullWidthClassName, " {\n    margin-right: 0 ").concat(important, ";\n  }\n  \n  body[").concat(lockAttribute, "] {\n    ").concat(removedBarSizeVariable, ": ").concat(gap, "px;\n  }\n");
+};
+var getCurrentUseCounter = function() {
+  var counter = parseInt(document.body.getAttribute(lockAttribute) || "0", 10);
+  return isFinite(counter) ? counter : 0;
+};
+var useLockAttribute = function() {
+  reactExports.useEffect(function() {
+    document.body.setAttribute(lockAttribute, (getCurrentUseCounter() + 1).toString());
+    return function() {
+      var newCounter = getCurrentUseCounter() - 1;
+      if (newCounter <= 0) {
+        document.body.removeAttribute(lockAttribute);
+      } else {
+        document.body.setAttribute(lockAttribute, newCounter.toString());
+      }
+    };
+  }, []);
+};
+var RemoveScrollBar = function(_a2) {
+  var noRelative = _a2.noRelative, noImportant = _a2.noImportant, _b2 = _a2.gapMode, gapMode = _b2 === void 0 ? "margin" : _b2;
+  useLockAttribute();
+  var gap = reactExports.useMemo(function() {
+    return getGapWidth(gapMode);
+  }, [gapMode]);
+  return reactExports.createElement(Style, { styles: getStyles(gap, !noRelative, gapMode, !noImportant ? "!important" : "") });
+};
+var passiveSupported = false;
+if (typeof window !== "undefined") {
+  try {
+    var options = Object.defineProperty({}, "passive", {
+      get: function() {
+        passiveSupported = true;
+        return true;
+      }
+    });
+    window.addEventListener("test", options, options);
+    window.removeEventListener("test", options, options);
+  } catch (err) {
+    passiveSupported = false;
+  }
+}
+var nonPassive = passiveSupported ? { passive: false } : false;
+var alwaysContainsScroll = function(node) {
+  return node.tagName === "TEXTAREA";
+};
+var elementCanBeScrolled = function(node, overflow) {
+  if (!(node instanceof Element)) {
+    return false;
+  }
+  var styles = window.getComputedStyle(node);
+  return (
+    // not-not-scrollable
+    styles[overflow] !== "hidden" && // contains scroll inside self
+    !(styles.overflowY === styles.overflowX && !alwaysContainsScroll(node) && styles[overflow] === "visible")
+  );
+};
+var elementCouldBeVScrolled = function(node) {
+  return elementCanBeScrolled(node, "overflowY");
+};
+var elementCouldBeHScrolled = function(node) {
+  return elementCanBeScrolled(node, "overflowX");
+};
+var locationCouldBeScrolled = function(axis, node) {
+  var ownerDocument = node.ownerDocument;
+  var current = node;
+  do {
+    if (typeof ShadowRoot !== "undefined" && current instanceof ShadowRoot) {
+      current = current.host;
+    }
+    var isScrollable = elementCouldBeScrolled(axis, current);
+    if (isScrollable) {
+      var _a2 = getScrollVariables(axis, current), scrollHeight = _a2[1], clientHeight = _a2[2];
+      if (scrollHeight > clientHeight) {
+        return true;
+      }
+    }
+    current = current.parentNode;
+  } while (current && current !== ownerDocument.body);
+  return false;
+};
+var getVScrollVariables = function(_a2) {
+  var scrollTop = _a2.scrollTop, scrollHeight = _a2.scrollHeight, clientHeight = _a2.clientHeight;
+  return [
+    scrollTop,
+    scrollHeight,
+    clientHeight
+  ];
+};
+var getHScrollVariables = function(_a2) {
+  var scrollLeft = _a2.scrollLeft, scrollWidth = _a2.scrollWidth, clientWidth = _a2.clientWidth;
+  return [
+    scrollLeft,
+    scrollWidth,
+    clientWidth
+  ];
+};
+var elementCouldBeScrolled = function(axis, node) {
+  return axis === "v" ? elementCouldBeVScrolled(node) : elementCouldBeHScrolled(node);
+};
+var getScrollVariables = function(axis, node) {
+  return axis === "v" ? getVScrollVariables(node) : getHScrollVariables(node);
+};
+var getDirectionFactor = function(axis, direction) {
+  return axis === "h" && direction === "rtl" ? -1 : 1;
+};
+var handleScroll = function(axis, endTarget, event, sourceDelta, noOverscroll) {
+  var directionFactor = getDirectionFactor(axis, window.getComputedStyle(endTarget).direction);
+  var delta = directionFactor * sourceDelta;
+  var target = event.target;
+  var targetInLock = endTarget.contains(target);
+  var shouldCancelScroll = false;
+  var isDeltaPositive = delta > 0;
+  var availableScroll = 0;
+  var availableScrollTop = 0;
+  do {
+    if (!target) {
+      break;
+    }
+    var _a2 = getScrollVariables(axis, target), position = _a2[0], scroll_1 = _a2[1], capacity = _a2[2];
+    var elementScroll = scroll_1 - capacity - directionFactor * position;
+    if (position || elementScroll) {
+      if (elementCouldBeScrolled(axis, target)) {
+        availableScroll += elementScroll;
+        availableScrollTop += position;
+      }
+    }
+    var parent_1 = target.parentNode;
+    target = parent_1 && parent_1.nodeType === Node.DOCUMENT_FRAGMENT_NODE ? parent_1.host : parent_1;
+  } while (
+    // portaled content
+    !targetInLock && target !== document.body || // self content
+    targetInLock && (endTarget.contains(target) || endTarget === target)
+  );
+  if (isDeltaPositive && (Math.abs(availableScroll) < 1 || false)) {
+    shouldCancelScroll = true;
+  } else if (!isDeltaPositive && (Math.abs(availableScrollTop) < 1 || false)) {
+    shouldCancelScroll = true;
+  }
+  return shouldCancelScroll;
+};
+var getTouchXY = function(event) {
+  return "changedTouches" in event ? [event.changedTouches[0].clientX, event.changedTouches[0].clientY] : [0, 0];
+};
+var getDeltaXY = function(event) {
+  return [event.deltaX, event.deltaY];
+};
+var extractRef = function(ref) {
+  return ref && "current" in ref ? ref.current : ref;
+};
+var deltaCompare = function(x2, y2) {
+  return x2[0] === y2[0] && x2[1] === y2[1];
+};
+var generateStyle = function(id2) {
+  return "\n  .block-interactivity-".concat(id2, " {pointer-events: none;}\n  .allow-interactivity-").concat(id2, " {pointer-events: all;}\n");
+};
+var idCounter = 0;
+var lockStack = [];
+function RemoveScrollSideCar(props) {
+  var shouldPreventQueue = reactExports.useRef([]);
+  var touchStartRef = reactExports.useRef([0, 0]);
+  var activeAxis = reactExports.useRef();
+  var id2 = reactExports.useState(idCounter++)[0];
+  var Style2 = reactExports.useState(styleSingleton)[0];
+  var lastProps = reactExports.useRef(props);
+  reactExports.useEffect(function() {
+    lastProps.current = props;
+  }, [props]);
+  reactExports.useEffect(function() {
+    if (props.inert) {
+      document.body.classList.add("block-interactivity-".concat(id2));
+      var allow_1 = __spreadArray([props.lockRef.current], (props.shards || []).map(extractRef), true).filter(Boolean);
+      allow_1.forEach(function(el) {
+        return el.classList.add("allow-interactivity-".concat(id2));
+      });
+      return function() {
+        document.body.classList.remove("block-interactivity-".concat(id2));
+        allow_1.forEach(function(el) {
+          return el.classList.remove("allow-interactivity-".concat(id2));
+        });
+      };
+    }
+    return;
+  }, [props.inert, props.lockRef.current, props.shards]);
+  var shouldCancelEvent = reactExports.useCallback(function(event, parent) {
+    if ("touches" in event && event.touches.length === 2 || event.type === "wheel" && event.ctrlKey) {
+      return !lastProps.current.allowPinchZoom;
+    }
+    var touch = getTouchXY(event);
+    var touchStart = touchStartRef.current;
+    var deltaX = "deltaX" in event ? event.deltaX : touchStart[0] - touch[0];
+    var deltaY = "deltaY" in event ? event.deltaY : touchStart[1] - touch[1];
+    var currentAxis;
+    var target = event.target;
+    var moveDirection = Math.abs(deltaX) > Math.abs(deltaY) ? "h" : "v";
+    if ("touches" in event && moveDirection === "h" && target.type === "range") {
+      return false;
+    }
+    var selection = window.getSelection();
+    var anchorNode = selection && selection.anchorNode;
+    var isTouchingSelection = anchorNode ? anchorNode === target || anchorNode.contains(target) : false;
+    if (isTouchingSelection) {
+      return false;
+    }
+    var canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
+    if (!canBeScrolledInMainDirection) {
+      return true;
+    }
+    if (canBeScrolledInMainDirection) {
+      currentAxis = moveDirection;
+    } else {
+      currentAxis = moveDirection === "v" ? "h" : "v";
+      canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
+    }
+    if (!canBeScrolledInMainDirection) {
+      return false;
+    }
+    if (!activeAxis.current && "changedTouches" in event && (deltaX || deltaY)) {
+      activeAxis.current = currentAxis;
+    }
+    if (!currentAxis) {
+      return true;
+    }
+    var cancelingAxis = activeAxis.current || currentAxis;
+    return handleScroll(cancelingAxis, parent, event, cancelingAxis === "h" ? deltaX : deltaY);
+  }, []);
+  var shouldPrevent = reactExports.useCallback(function(_event) {
+    var event = _event;
+    if (!lockStack.length || lockStack[lockStack.length - 1] !== Style2) {
+      return;
+    }
+    var delta = "deltaY" in event ? getDeltaXY(event) : getTouchXY(event);
+    var sourceEvent = shouldPreventQueue.current.filter(function(e) {
+      return e.name === event.type && (e.target === event.target || event.target === e.shadowParent) && deltaCompare(e.delta, delta);
+    })[0];
+    if (sourceEvent && sourceEvent.should) {
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+      return;
+    }
+    if (!sourceEvent) {
+      var shardNodes = (lastProps.current.shards || []).map(extractRef).filter(Boolean).filter(function(node) {
+        return node.contains(event.target);
+      });
+      var shouldStop = shardNodes.length > 0 ? shouldCancelEvent(event, shardNodes[0]) : !lastProps.current.noIsolation;
+      if (shouldStop) {
+        if (event.cancelable) {
+          event.preventDefault();
+        }
+      }
+    }
+  }, []);
+  var shouldCancel = reactExports.useCallback(function(name, delta, target, should) {
+    var event = { name, delta, target, should, shadowParent: getOutermostShadowParent(target) };
+    shouldPreventQueue.current.push(event);
+    setTimeout(function() {
+      shouldPreventQueue.current = shouldPreventQueue.current.filter(function(e) {
+        return e !== event;
+      });
+    }, 1);
+  }, []);
+  var scrollTouchStart = reactExports.useCallback(function(event) {
+    touchStartRef.current = getTouchXY(event);
+    activeAxis.current = void 0;
+  }, []);
+  var scrollWheel = reactExports.useCallback(function(event) {
+    shouldCancel(event.type, getDeltaXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
+  }, []);
+  var scrollTouchMove = reactExports.useCallback(function(event) {
+    shouldCancel(event.type, getTouchXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
+  }, []);
+  reactExports.useEffect(function() {
+    lockStack.push(Style2);
+    props.setCallbacks({
+      onScrollCapture: scrollWheel,
+      onWheelCapture: scrollWheel,
+      onTouchMoveCapture: scrollTouchMove
+    });
+    document.addEventListener("wheel", shouldPrevent, nonPassive);
+    document.addEventListener("touchmove", shouldPrevent, nonPassive);
+    document.addEventListener("touchstart", scrollTouchStart, nonPassive);
+    return function() {
+      lockStack = lockStack.filter(function(inst) {
+        return inst !== Style2;
+      });
+      document.removeEventListener("wheel", shouldPrevent, nonPassive);
+      document.removeEventListener("touchmove", shouldPrevent, nonPassive);
+      document.removeEventListener("touchstart", scrollTouchStart, nonPassive);
+    };
+  }, []);
+  var removeScrollBar = props.removeScrollBar, inert = props.inert;
+  return reactExports.createElement(
+    reactExports.Fragment,
+    null,
+    inert ? reactExports.createElement(Style2, { styles: generateStyle(id2) }) : null,
+    removeScrollBar ? reactExports.createElement(RemoveScrollBar, { noRelative: props.noRelative, gapMode: props.gapMode }) : null
+  );
+}
+function getOutermostShadowParent(node) {
+  var shadowParent = null;
+  while (node !== null) {
+    if (node instanceof ShadowRoot) {
+      shadowParent = node.host;
+      node = node.host;
+    }
+    node = node.parentNode;
+  }
+  return shadowParent;
+}
+const SideCar = exportSidecar(effectCar, RemoveScrollSideCar);
+var ReactRemoveScroll = reactExports.forwardRef(function(props, ref) {
+  return reactExports.createElement(RemoveScroll, __assign({}, props, { ref, sideCar: SideCar }));
+});
+ReactRemoveScroll.classNames = RemoveScroll.classNames;
+var getDefaultParent = function(originalTarget) {
+  if (typeof document === "undefined") {
+    return null;
+  }
+  var sampleTarget = Array.isArray(originalTarget) ? originalTarget[0] : originalTarget;
+  return sampleTarget.ownerDocument.body;
+};
+var counterMap = /* @__PURE__ */ new WeakMap();
+var uncontrolledNodes = /* @__PURE__ */ new WeakMap();
+var markerMap = {};
+var lockCount = 0;
+var unwrapHost = function(node) {
+  return node && (node.host || unwrapHost(node.parentNode));
+};
+var correctTargets = function(parent, targets) {
+  return targets.map(function(target) {
+    if (parent.contains(target)) {
+      return target;
+    }
+    var correctedTarget = unwrapHost(target);
+    if (correctedTarget && parent.contains(correctedTarget)) {
+      return correctedTarget;
+    }
+    console.error("aria-hidden", target, "in not contained inside", parent, ". Doing nothing");
+    return null;
+  }).filter(function(x2) {
+    return Boolean(x2);
+  });
+};
+var applyAttributeToOthers = function(originalTarget, parentNode, markerName, controlAttribute) {
+  var targets = correctTargets(parentNode, Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
+  if (!markerMap[markerName]) {
+    markerMap[markerName] = /* @__PURE__ */ new WeakMap();
+  }
+  var markerCounter = markerMap[markerName];
+  var hiddenNodes = [];
+  var elementsToKeep = /* @__PURE__ */ new Set();
+  var elementsToStop = new Set(targets);
+  var keep = function(el) {
+    if (!el || elementsToKeep.has(el)) {
+      return;
+    }
+    elementsToKeep.add(el);
+    keep(el.parentNode);
+  };
+  targets.forEach(keep);
+  var deep = function(parent) {
+    if (!parent || elementsToStop.has(parent)) {
+      return;
+    }
+    Array.prototype.forEach.call(parent.children, function(node) {
+      if (elementsToKeep.has(node)) {
+        deep(node);
+      } else {
+        try {
+          var attr = node.getAttribute(controlAttribute);
+          var alreadyHidden = attr !== null && attr !== "false";
+          var counterValue = (counterMap.get(node) || 0) + 1;
+          var markerValue = (markerCounter.get(node) || 0) + 1;
+          counterMap.set(node, counterValue);
+          markerCounter.set(node, markerValue);
+          hiddenNodes.push(node);
+          if (counterValue === 1 && alreadyHidden) {
+            uncontrolledNodes.set(node, true);
+          }
+          if (markerValue === 1) {
+            node.setAttribute(markerName, "true");
+          }
+          if (!alreadyHidden) {
+            node.setAttribute(controlAttribute, "true");
+          }
+        } catch (e) {
+          console.error("aria-hidden: cannot operate on ", node, e);
+        }
+      }
+    });
+  };
+  deep(parentNode);
+  elementsToKeep.clear();
+  lockCount++;
+  return function() {
+    hiddenNodes.forEach(function(node) {
+      var counterValue = counterMap.get(node) - 1;
+      var markerValue = markerCounter.get(node) - 1;
+      counterMap.set(node, counterValue);
+      markerCounter.set(node, markerValue);
+      if (!counterValue) {
+        if (!uncontrolledNodes.has(node)) {
+          node.removeAttribute(controlAttribute);
+        }
+        uncontrolledNodes.delete(node);
+      }
+      if (!markerValue) {
+        node.removeAttribute(markerName);
+      }
+    });
+    lockCount--;
+    if (!lockCount) {
+      counterMap = /* @__PURE__ */ new WeakMap();
+      counterMap = /* @__PURE__ */ new WeakMap();
+      uncontrolledNodes = /* @__PURE__ */ new WeakMap();
+      markerMap = {};
+    }
+  };
+};
+var hideOthers = function(originalTarget, parentNode, markerName) {
+  if (markerName === void 0) {
+    markerName = "data-aria-hidden";
+  }
+  var targets = Array.from(Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
+  var activeParentNode = getDefaultParent(originalTarget);
+  if (!activeParentNode) {
+    return function() {
+      return null;
+    };
+  }
+  targets.push.apply(targets, Array.from(activeParentNode.querySelectorAll("[aria-live], script")));
+  return applyAttributeToOthers(targets, activeParentNode, markerName, "aria-hidden");
+};
+var DIALOG_NAME = "Dialog";
+var [createDialogContext] = createContextScope(DIALOG_NAME);
+var [DialogProvider, useDialogContext] = createDialogContext(DIALOG_NAME);
+var Dialog$1 = (props) => {
+  const {
+    __scopeDialog,
+    children,
+    open: openProp,
+    defaultOpen,
+    onOpenChange,
+    modal = true
+  } = props;
+  const triggerRef = reactExports.useRef(null);
+  const contentRef = reactExports.useRef(null);
+  const [open, setOpen] = useControllableState({
+    prop: openProp,
+    defaultProp: defaultOpen ?? false,
+    onChange: onOpenChange,
+    caller: DIALOG_NAME
+  });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    DialogProvider,
+    {
+      scope: __scopeDialog,
+      triggerRef,
+      contentRef,
+      contentId: useId(),
+      titleId: useId(),
+      descriptionId: useId(),
+      open,
+      onOpenChange: setOpen,
+      onOpenToggle: reactExports.useCallback(() => setOpen((prevOpen) => !prevOpen), [setOpen]),
+      modal,
+      children
+    }
+  );
+};
+Dialog$1.displayName = DIALOG_NAME;
+var TRIGGER_NAME = "DialogTrigger";
+var DialogTrigger = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeDialog, ...triggerProps } = props;
+    const context = useDialogContext(TRIGGER_NAME, __scopeDialog);
+    const composedTriggerRef = useComposedRefs$1(forwardedRef, context.triggerRef);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive$1.button,
+      {
+        type: "button",
+        "aria-haspopup": "dialog",
+        "aria-expanded": context.open,
+        "aria-controls": context.contentId,
+        "data-state": getState(context.open),
+        ...triggerProps,
+        ref: composedTriggerRef,
+        onClick: composeEventHandlers(props.onClick, context.onOpenToggle)
+      }
+    );
+  }
+);
+DialogTrigger.displayName = TRIGGER_NAME;
+var PORTAL_NAME = "DialogPortal";
+var [PortalProvider, usePortalContext] = createDialogContext(PORTAL_NAME, {
+  forceMount: void 0
+});
+var DialogPortal$1 = (props) => {
+  const { __scopeDialog, forceMount, children, container } = props;
+  const context = useDialogContext(PORTAL_NAME, __scopeDialog);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(PortalProvider, { scope: __scopeDialog, forceMount, children: reactExports.Children.map(children, (child) => /* @__PURE__ */ jsxRuntimeExports.jsx(Presence, { present: forceMount || context.open, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Portal$1, { asChild: true, container, children: child }) })) });
+};
+DialogPortal$1.displayName = PORTAL_NAME;
+var OVERLAY_NAME = "DialogOverlay";
+var DialogOverlay$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const portalContext = usePortalContext(OVERLAY_NAME, props.__scopeDialog);
+    const { forceMount = portalContext.forceMount, ...overlayProps } = props;
+    const context = useDialogContext(OVERLAY_NAME, props.__scopeDialog);
+    return context.modal ? /* @__PURE__ */ jsxRuntimeExports.jsx(Presence, { present: forceMount || context.open, children: /* @__PURE__ */ jsxRuntimeExports.jsx(DialogOverlayImpl, { ...overlayProps, ref: forwardedRef }) }) : null;
+  }
+);
+DialogOverlay$1.displayName = OVERLAY_NAME;
+var Slot = /* @__PURE__ */ createSlot("DialogOverlay.RemoveScroll");
+var DialogOverlayImpl = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeDialog, ...overlayProps } = props;
+    const context = useDialogContext(OVERLAY_NAME, __scopeDialog);
+    return (
+      // Make sure `Content` is scrollable even when it doesn't live inside `RemoveScroll`
+      // ie. when `Overlay` and `Content` are siblings
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ReactRemoveScroll, { as: Slot, allowPinchZoom: true, shards: [context.contentRef], children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Primitive$1.div,
+        {
+          "data-state": getState(context.open),
+          ...overlayProps,
+          ref: forwardedRef,
+          style: { pointerEvents: "auto", ...overlayProps.style }
+        }
+      ) })
+    );
+  }
+);
+var CONTENT_NAME = "DialogContent";
+var DialogContent$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const portalContext = usePortalContext(CONTENT_NAME, props.__scopeDialog);
+    const { forceMount = portalContext.forceMount, ...contentProps } = props;
+    const context = useDialogContext(CONTENT_NAME, props.__scopeDialog);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Presence, { present: forceMount || context.open, children: context.modal ? /* @__PURE__ */ jsxRuntimeExports.jsx(DialogContentModal, { ...contentProps, ref: forwardedRef }) : /* @__PURE__ */ jsxRuntimeExports.jsx(DialogContentNonModal, { ...contentProps, ref: forwardedRef }) });
+  }
+);
+DialogContent$1.displayName = CONTENT_NAME;
+var DialogContentModal = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const context = useDialogContext(CONTENT_NAME, props.__scopeDialog);
+    const contentRef = reactExports.useRef(null);
+    const composedRefs = useComposedRefs$1(forwardedRef, context.contentRef, contentRef);
+    reactExports.useEffect(() => {
+      const content = contentRef.current;
+      if (content) return hideOthers(content);
+    }, []);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DialogContentImpl,
+      {
+        ...props,
+        ref: composedRefs,
+        trapFocus: context.open,
+        disableOutsidePointerEvents: true,
+        onCloseAutoFocus: composeEventHandlers(props.onCloseAutoFocus, (event) => {
+          var _a2;
+          event.preventDefault();
+          (_a2 = context.triggerRef.current) == null ? void 0 : _a2.focus();
+        }),
+        onPointerDownOutside: composeEventHandlers(props.onPointerDownOutside, (event) => {
+          const originalEvent = event.detail.originalEvent;
+          const ctrlLeftClick = originalEvent.button === 0 && originalEvent.ctrlKey === true;
+          const isRightClick = originalEvent.button === 2 || ctrlLeftClick;
+          if (isRightClick) event.preventDefault();
+        }),
+        onFocusOutside: composeEventHandlers(
+          props.onFocusOutside,
+          (event) => event.preventDefault()
+        )
+      }
+    );
+  }
+);
+var DialogContentNonModal = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const context = useDialogContext(CONTENT_NAME, props.__scopeDialog);
+    const hasInteractedOutsideRef = reactExports.useRef(false);
+    const hasPointerDownOutsideRef = reactExports.useRef(false);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DialogContentImpl,
+      {
+        ...props,
+        ref: forwardedRef,
+        trapFocus: false,
+        disableOutsidePointerEvents: false,
+        onCloseAutoFocus: (event) => {
+          var _a2, _b2;
+          (_a2 = props.onCloseAutoFocus) == null ? void 0 : _a2.call(props, event);
+          if (!event.defaultPrevented) {
+            if (!hasInteractedOutsideRef.current) (_b2 = context.triggerRef.current) == null ? void 0 : _b2.focus();
+            event.preventDefault();
+          }
+          hasInteractedOutsideRef.current = false;
+          hasPointerDownOutsideRef.current = false;
+        },
+        onInteractOutside: (event) => {
+          var _a2, _b2;
+          (_a2 = props.onInteractOutside) == null ? void 0 : _a2.call(props, event);
+          if (!event.defaultPrevented) {
+            hasInteractedOutsideRef.current = true;
+            if (event.detail.originalEvent.type === "pointerdown") {
+              hasPointerDownOutsideRef.current = true;
+            }
+          }
+          const target = event.target;
+          const targetIsTrigger = (_b2 = context.triggerRef.current) == null ? void 0 : _b2.contains(target);
+          if (targetIsTrigger) event.preventDefault();
+          if (event.detail.originalEvent.type === "focusin" && hasPointerDownOutsideRef.current) {
+            event.preventDefault();
+          }
+        }
+      }
+    );
+  }
+);
+var DialogContentImpl = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeDialog, trapFocus, onOpenAutoFocus, onCloseAutoFocus, ...contentProps } = props;
+    const context = useDialogContext(CONTENT_NAME, __scopeDialog);
+    const contentRef = reactExports.useRef(null);
+    const composedRefs = useComposedRefs$1(forwardedRef, contentRef);
+    useFocusGuards();
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        FocusScope,
+        {
+          asChild: true,
+          loop: true,
+          trapped: trapFocus,
+          onMountAutoFocus: onOpenAutoFocus,
+          onUnmountAutoFocus: onCloseAutoFocus,
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            DismissableLayer,
+            {
+              role: "dialog",
+              id: context.contentId,
+              "aria-describedby": context.descriptionId,
+              "aria-labelledby": context.titleId,
+              "data-state": getState(context.open),
+              ...contentProps,
+              ref: composedRefs,
+              onDismiss: () => context.onOpenChange(false)
+            }
+          )
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TitleWarning, { titleId: context.titleId }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(DescriptionWarning, { contentRef, descriptionId: context.descriptionId })
+      ] })
+    ] });
+  }
+);
+var TITLE_NAME = "DialogTitle";
+var DialogTitle$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeDialog, ...titleProps } = props;
+    const context = useDialogContext(TITLE_NAME, __scopeDialog);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Primitive$1.h2, { id: context.titleId, ...titleProps, ref: forwardedRef });
+  }
+);
+DialogTitle$1.displayName = TITLE_NAME;
+var DESCRIPTION_NAME = "DialogDescription";
+var DialogDescription$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeDialog, ...descriptionProps } = props;
+    const context = useDialogContext(DESCRIPTION_NAME, __scopeDialog);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Primitive$1.p, { id: context.descriptionId, ...descriptionProps, ref: forwardedRef });
+  }
+);
+DialogDescription$1.displayName = DESCRIPTION_NAME;
+var CLOSE_NAME = "DialogClose";
+var DialogClose = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeDialog, ...closeProps } = props;
+    const context = useDialogContext(CLOSE_NAME, __scopeDialog);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive$1.button,
+      {
+        type: "button",
+        ...closeProps,
+        ref: forwardedRef,
+        onClick: composeEventHandlers(props.onClick, () => context.onOpenChange(false))
+      }
+    );
+  }
+);
+DialogClose.displayName = CLOSE_NAME;
+function getState(open) {
+  return open ? "open" : "closed";
+}
+var TITLE_WARNING_NAME = "DialogTitleWarning";
+var [WarningProvider, useWarningContext] = createContext2(TITLE_WARNING_NAME, {
+  contentName: CONTENT_NAME,
+  titleName: TITLE_NAME,
+  docsSlug: "dialog"
+});
+var TitleWarning = ({ titleId }) => {
+  const titleWarningContext = useWarningContext(TITLE_WARNING_NAME);
+  const MESSAGE = `\`${titleWarningContext.contentName}\` requires a \`${titleWarningContext.titleName}\` for the component to be accessible for screen reader users.
+
+If you want to hide the \`${titleWarningContext.titleName}\`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/${titleWarningContext.docsSlug}`;
+  reactExports.useEffect(() => {
+    if (titleId) {
+      const hasTitle = document.getElementById(titleId);
+      if (!hasTitle) console.error(MESSAGE);
+    }
+  }, [MESSAGE, titleId]);
+  return null;
+};
+var DESCRIPTION_WARNING_NAME = "DialogDescriptionWarning";
+var DescriptionWarning = ({ contentRef, descriptionId }) => {
+  const descriptionWarningContext = useWarningContext(DESCRIPTION_WARNING_NAME);
+  const MESSAGE = `Warning: Missing \`Description\` or \`aria-describedby={undefined}\` for {${descriptionWarningContext.contentName}}.`;
+  reactExports.useEffect(() => {
+    var _a2;
+    const describedById = (_a2 = contentRef.current) == null ? void 0 : _a2.getAttribute("aria-describedby");
+    if (descriptionId && describedById) {
+      const hasDescription = document.getElementById(descriptionId);
+      if (!hasDescription) console.warn(MESSAGE);
+    }
+  }, [MESSAGE, contentRef, descriptionId]);
+  return null;
+};
+var Root$1 = Dialog$1;
+var Trigger = DialogTrigger;
+var Portal = DialogPortal$1;
+var Overlay = DialogOverlay$1;
+var Content = DialogContent$1;
+var Title = DialogTitle$1;
+var Description = DialogDescription$1;
+var Close = DialogClose;
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+const toCamelCase = (string) => string.replace(
+  /^([A-Z])|[\s-_]+(\w)/g,
+  (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase()
+);
+const toPascalCase = (string) => {
+  const camelCase = toCamelCase(string);
+  return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
+};
+const mergeClasses = (...classes) => classes.filter((className, index2, array) => {
+  return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index2;
+}).join(" ").trim();
+const hasA11yProp = (props) => {
+  for (const prop in props) {
+    if (prop.startsWith("aria-") || prop === "role" || prop === "title") {
+      return true;
+    }
+  }
+};
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+var defaultAttributes = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: 24,
+  height: 24,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round"
+};
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const Icon = reactExports.forwardRef(
+  ({
+    color: color2 = "currentColor",
+    size = 24,
+    strokeWidth = 2,
+    absoluteStrokeWidth,
+    className = "",
+    children,
+    iconNode,
+    ...rest
+  }, ref) => reactExports.createElement(
+    "svg",
+    {
+      ref,
+      ...defaultAttributes,
+      width: size,
+      height: size,
+      stroke: color2,
+      strokeWidth: absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
+      className: mergeClasses("lucide", className),
+      ...!children && !hasA11yProp(rest) && { "aria-hidden": "true" },
+      ...rest
+    },
+    [
+      ...iconNode.map(([tag, attrs]) => reactExports.createElement(tag, attrs)),
+      ...Array.isArray(children) ? children : [children]
+    ]
+  )
+);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const createLucideIcon = (iconName, iconNode) => {
+  const Component2 = reactExports.forwardRef(
+    ({ className, ...props }, ref) => reactExports.createElement(Icon, {
+      ref,
+      iconNode,
+      className: mergeClasses(
+        `lucide-${toKebabCase(toPascalCase(iconName))}`,
+        `lucide-${iconName}`,
+        className
+      ),
+      ...props
+    })
+  );
+  Component2.displayName = toPascalCase(iconName);
+  return Component2;
+};
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$s = [
+  ["path", { d: "M5 12h14", key: "1ays0h" }],
+  ["path", { d: "m12 5 7 7-7 7", key: "xquz4c" }]
+];
+const ArrowRight = createLucideIcon("arrow-right", __iconNode$s);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$r = [
+  [
+    "path",
+    {
+      d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
+      key: "3c2336"
+    }
+  ],
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+];
+const BadgeCheck = createLucideIcon("badge-check", __iconNode$r);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$q = [
+  ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
+  ["path", { d: "M16 2v4", key: "4m81vk" }],
+  ["path", { d: "M8 2v4", key: "1cmpym" }],
+  ["path", { d: "M3 10h5", key: "r794hk" }],
+  ["path", { d: "M17.5 17.5 16 16.3V14", key: "akvzfd" }],
+  ["circle", { cx: "16", cy: "16", r: "6", key: "qoo3c4" }]
+];
+const CalendarClock = createLucideIcon("calendar-clock", __iconNode$q);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$p = [
+  ["path", { d: "M8 2v4", key: "1cmpym" }],
+  ["path", { d: "M16 2v4", key: "4m81vk" }],
+  ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
+  ["path", { d: "M3 10h18", key: "8toen8" }]
+];
+const Calendar = createLucideIcon("calendar", __iconNode$p);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$o = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
+const Check = createLucideIcon("check", __iconNode$o);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$n = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$n);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$m = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+];
+const CircleCheck = createLucideIcon("circle-check", __iconNode$m);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$l = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
+];
+const Clock = createLucideIcon("clock", __iconNode$l);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$k = [
+  ["path", { d: "m11 17 2 2a1 1 0 1 0 3-3", key: "efffak" }],
+  [
+    "path",
+    {
+      d: "m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4",
+      key: "9pr0kb"
+    }
+  ],
+  ["path", { d: "m21 3 1 11h-2", key: "1tisrp" }],
+  ["path", { d: "M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3", key: "1uvwmv" }],
+  ["path", { d: "M3 4h8", key: "1ep09j" }]
+];
+const Handshake = createLucideIcon("handshake", __iconNode$k);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$j = [
+  [
+    "path",
+    {
+      d: "M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",
+      key: "c3ymky"
+    }
+  ]
+];
+const Heart = createLucideIcon("heart", __iconNode$j);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$i = [
+  [
+    "path",
+    {
+      d: "M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z",
+      key: "zw3jo"
+    }
+  ],
+  [
+    "path",
+    {
+      d: "M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12",
+      key: "1wduqc"
+    }
+  ],
+  [
+    "path",
+    {
+      d: "M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17",
+      key: "kqbvx6"
+    }
+  ]
+];
+const Layers = createLucideIcon("layers", __iconNode$i);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$h = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
+const LoaderCircle = createLucideIcon("loader-circle", __iconNode$h);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$g = [
+  ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2", key: "1w4ew1" }],
+  ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
+];
+const Lock = createLucideIcon("lock", __iconNode$g);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$f = [
+  ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
+  ["path", { d: "M21 12H9", key: "dn1m92" }],
+  ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
+];
+const LogOut = createLucideIcon("log-out", __iconNode$f);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$e = [
+  ["path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7", key: "132q7q" }],
+  ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", key: "izxlao" }]
+];
+const Mail = createLucideIcon("mail", __iconNode$e);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$d = [
+  [
+    "path",
+    {
+      d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
+      key: "1r0f0z"
+    }
+  ],
+  ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }]
+];
+const MapPin = createLucideIcon("map-pin", __iconNode$d);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$c = [
+  ["path", { d: "M4 12h16", key: "1lakjw" }],
+  ["path", { d: "M4 18h16", key: "19g7jn" }],
+  ["path", { d: "M4 6h16", key: "1o0s65" }]
+];
+const Menu = createLucideIcon("menu", __iconNode$c);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$b = [
+  ["rect", { x: "16", y: "16", width: "6", height: "6", rx: "1", key: "4q2zg0" }],
+  ["rect", { x: "2", y: "16", width: "6", height: "6", rx: "1", key: "8cvhb9" }],
+  ["rect", { x: "9", y: "2", width: "6", height: "6", rx: "1", key: "1egb70" }],
+  ["path", { d: "M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3", key: "1jsf9p" }],
+  ["path", { d: "M12 12V8", key: "2874zd" }]
+];
+const Network = createLucideIcon("network", __iconNode$b);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$a = [
+  [
+    "path",
+    {
+      d: "M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384",
+      key: "9njp5v"
+    }
+  ]
+];
+const Phone = createLucideIcon("phone", __iconNode$a);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$9 = [
+  [
+    "path",
+    {
+      d: "M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z",
+      key: "1ffxy3"
+    }
+  ],
+  ["path", { d: "m21.854 2.147-10.94 10.939", key: "12cjpa" }]
+];
+const Send = createLucideIcon("send", __iconNode$9);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$8 = [
+  [
+    "path",
+    {
+      d: "M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z",
+      key: "4pj2yx"
+    }
+  ],
+  ["path", { d: "M20 3v4", key: "1olli1" }],
+  ["path", { d: "M22 5h-4", key: "1gvqau" }],
+  ["path", { d: "M4 17v2", key: "vumght" }],
+  ["path", { d: "M5 18H3", key: "zchphs" }]
+];
+const Sparkles = createLucideIcon("sparkles", __iconNode$8);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$7 = [
+  [
+    "path",
+    {
+      d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
+      key: "r04s7s"
+    }
+  ]
+];
+const Star = createLucideIcon("star", __iconNode$7);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$6 = [
+  [
+    "path",
+    {
+      d: "M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z",
+      key: "vktsd0"
+    }
+  ],
+  ["circle", { cx: "7.5", cy: "7.5", r: ".5", fill: "currentColor", key: "kqv944" }]
+];
+const Tag = createLucideIcon("tag", __iconNode$6);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$5 = [
+  ["circle", { cx: "12", cy: "8", r: "5", key: "1hypcn" }],
+  ["path", { d: "M20 21a8 8 0 0 0-16 0", key: "rfgkzh" }]
+];
+const UserRound = createLucideIcon("user-round", __iconNode$5);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$4 = [
+  ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
+  ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
+  ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
+  ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
+];
+const Users = createLucideIcon("users", __iconNode$4);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$3 = [
+  [
+    "path",
+    {
+      d: "M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1",
+      key: "18etb6"
+    }
+  ],
+  ["path", { d: "M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4", key: "xoc0q4" }]
+];
+const Wallet = createLucideIcon("wallet", __iconNode$3);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$2 = [
+  ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
+  ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
+];
+const X = createLucideIcon("x", __iconNode$2);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$1 = [
+  [
+    "path",
+    {
+      d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z",
+      key: "cbrjhi"
+    }
+  ]
+];
+const Wrench = createLucideIcon("wrench", __iconNode$1);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode = [
+  [
+    "path",
+    {
+      d: "M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z",
+      key: "1xq2db"
+    }
+  ]
+];
+const Zap = createLucideIcon("zap", __iconNode);
+function Sheet({ ...props }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Root$1, { "data-slot": "sheet", ...props });
+}
+function SheetTrigger({
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Trigger, { "data-slot": "sheet-trigger", ...props });
+}
+function SheetPortal({
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Portal, { "data-slot": "sheet-portal", ...props });
+}
+function SheetOverlay({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Overlay,
+    {
+      "data-slot": "sheet-overlay",
+      className: cn(
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function SheetContent({
+  className,
+  children,
+  side = "right",
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(SheetPortal, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(SheetOverlay, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Content,
+      {
+        "data-slot": "sheet-content",
+        className: cn(
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+          side === "right" && "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
+          side === "left" && "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
+          side === "top" && "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
+          side === "bottom" && "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
+          className
+        ),
+        ...props,
+        children: [
+          children,
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Close, { className: "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "size-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sr-only", children: "Close" })
+          ] })
+        ]
+      }
+    )
+  ] });
+}
+function SheetHeader({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "div",
+    {
+      "data-slot": "sheet-header",
+      className: cn("flex flex-col gap-1.5 p-4", className),
+      ...props
+    }
+  );
+}
+function SheetTitle({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Title,
+    {
+      "data-slot": "sheet-title",
+      className: cn("text-foreground font-semibold", className),
+      ...props
+    }
+  );
+}
+const Error$1 = Variant({
+  "FrontendOriginsNotConfigured": Null,
+  "MixedSsoSources": Record({
+    "otherKeys": Vec(Text),
+    "ssoKeys": Vec(Text)
+  }),
+  "Stale": Record({ "ageNs": Nat }),
+  "MalformedCandid": Null,
+  "AmbiguousAttribute": Record({
+    "field": Text,
+    "sources": Vec(Text)
+  }),
+  "NoAttributes": Null,
+  "UnknownNonce": Null,
+  "UntrustedSsoSource": Record({ "domain": Text }),
+  "MissingField": Text,
+  "FrontendOriginMismatch": Record({
+    "got": Text,
+    "expected": Vec(Text)
+  })
+});
+const Result_2 = Variant({ "ok": Null, "err": Error$1 });
+const UserRole$1 = Variant({
+  "admin": Null,
+  "user": Null,
+  "guest": Null
+});
+const WalletId = Text;
+const VusdWallet = Record({
+  "balance": Nat,
+  "createdAt": Nat,
+  "walletId": WalletId
+});
+const Value = Variant({
+  "int": Int,
+  "nat": Nat,
+  "float": Float64,
+  "bool": Bool,
+  "null": Null,
+  "text": Text
+});
+const Cell = Record({ "value": Value, "name": Text });
+const Result__1 = Record({
+  "hasMore": Bool,
+  "rows": Vec(Vec(Cell))
+});
+const Id = Nat;
+const ComboType$1 = Variant({
+  "untilDecember": Null,
+  "monthly": Null,
+  "newClient": Null
+});
+const Combo = Record({
+  "id": Id,
+  "validity": Text,
+  "regularPriceCLP": Nat,
+  "agendaproUrl": Text,
+  "name": Text,
+  "description": Text,
+  "comboType": ComboType$1,
+  "cuposTotal": Nat,
+  "servicesIncluded": Vec(Id),
+  "priceCLP": Nat
+});
+const MintableItemType$1 = Variant({
+  "service": Null,
+  "combo": Null
+});
+const MintedServiceToken = Record({
+  "itemId": Nat,
+  "tokenId": Nat,
+  "mintedAt": Nat,
+  "itemName": Text,
+  "itemType": MintableItemType$1,
+  "priceVusd": Nat,
+  "walletId": WalletId
+});
+const Partner = Record({
+  "id": Id,
+  "name": Text,
+  "description": Text,
+  "logoText": Text
+});
+const ProductBadge$1 = Variant({
+  "new": Null,
+  "recommended": Null
+});
+const Product = Record({
+  "id": Id,
+  "name": Text,
+  "description": Text,
+  "usage": Text,
+  "badge": Opt(ProductBadge$1)
+});
+const ServiceCategory$1 = Variant({
+  "especial": Null,
+  "corporal": Null,
+  "facial": Null
+});
+const Service = Record({
+  "id": Id,
+  "durationMins": Nat,
+  "agendaproUrl": Text,
+  "techniques": Vec(Text),
+  "toolsIncluded": Vec(Text),
+  "allIncluded": Bool,
+  "name": Text,
+  "description": Text,
+  "cuposTotal": Nat,
+  "category": ServiceCategory$1,
+  "priceCLP": Nat,
+  "longDescription": Text
+});
+const Testimonial = Record({
+  "id": Id,
+  "clientName": Text,
+  "comment": Text
+});
+const VusdDemoConfig = Record({
+  "demoTopupAmount": Nat,
+  "clpUsdRate": Nat
+});
+const Worker = Record({
+  "id": Id,
+  "bio": Text,
+  "servicesIds": Vec(Id),
+  "name": Text,
+  "role": Text,
+  "silhouetteVariant": Nat
+});
+const VusdMintResult = Record({
+  "tokenId": Nat,
+  "newBalance": Nat,
+  "walletId": WalletId
+});
+const Error_ = Variant({
+  "invalidInput": Text,
+  "notFound": Text,
+  "unauthorized": Text
+});
+const Result_1 = Variant({ "ok": VusdMintResult, "err": Error_ });
+const Timestamp = Nat;
+const Application = Record({
+  "id": Id,
+  "name": Text,
+  "submittedAt": Timestamp,
+  "email": Text,
+  "specialty": Text,
+  "message": Text
+});
+const Result = Variant({ "ok": Application, "err": Error_ });
+Service$1({
+  "_initialize_access_control": Func([], [], []),
+  "_internet_identity_sign_in_finish": Func([], [Result_2], []),
+  "_internet_identity_sign_in_start": Func([], [Vec(Nat8)], []),
+  "assignCallerUserRole": Func([Principal2, UserRole$1], [], []),
+  "connectDemoWallet": Func([], [VusdWallet], []),
+  "execute": Func([Text], [Result__1], ["query"]),
+  "getCallerUserRole": Func([], [UserRole$1], ["query"]),
+  "getCombos": Func([], [Vec(Combo)], ["query"]),
+  "getMintedTokens": Func(
+    [WalletId],
+    [Vec(MintedServiceToken)],
+    ["query"]
+  ),
+  "getPartners": Func([], [Vec(Partner)], ["query"]),
+  "getProducts": Func([], [Vec(Product)], ["query"]),
+  "getServices": Func([], [Vec(Service)], ["query"]),
+  "getServicesByCategory": Func(
+    [ServiceCategory$1],
+    [Vec(Service)],
+    ["query"]
+  ),
+  "getTestimonials": Func([], [Vec(Testimonial)], ["query"]),
+  "getVusdConfig": Func([], [VusdDemoConfig], ["query"]),
+  "getVusdWallet": Func([WalletId], [Opt(VusdWallet)], ["query"]),
+  "getWorkers": Func([], [Vec(Worker)], ["query"]),
+  "isCallerAdmin": Func([], [Bool], ["query"]),
+  "mintServiceToken": Func(
+    [WalletId, MintableItemType$1, Nat, Text, Nat],
+    [Result_1],
+    []
+  ),
+  "schema": Func([], [Text], ["query"]),
+  "submitApplication": Func(
+    [Text, Text, Text, Text],
+    [Result],
+    []
+  ),
+  "topupVusd": Func([WalletId], [VusdWallet], [])
+});
+const idlFactory = ({ IDL: IDL2 }) => {
+  const Error2 = IDL2.Variant({
+    "FrontendOriginsNotConfigured": IDL2.Null,
+    "MixedSsoSources": IDL2.Record({
+      "otherKeys": IDL2.Vec(IDL2.Text),
+      "ssoKeys": IDL2.Vec(IDL2.Text)
+    }),
+    "Stale": IDL2.Record({ "ageNs": IDL2.Nat }),
+    "MalformedCandid": IDL2.Null,
+    "AmbiguousAttribute": IDL2.Record({
+      "field": IDL2.Text,
+      "sources": IDL2.Vec(IDL2.Text)
+    }),
+    "NoAttributes": IDL2.Null,
+    "UnknownNonce": IDL2.Null,
+    "UntrustedSsoSource": IDL2.Record({ "domain": IDL2.Text }),
+    "MissingField": IDL2.Text,
+    "FrontendOriginMismatch": IDL2.Record({
+      "got": IDL2.Text,
+      "expected": IDL2.Vec(IDL2.Text)
+    })
+  });
+  const Result_22 = IDL2.Variant({ "ok": IDL2.Null, "err": Error2 });
+  const UserRole2 = IDL2.Variant({
+    "admin": IDL2.Null,
+    "user": IDL2.Null,
+    "guest": IDL2.Null
+  });
+  const WalletId2 = IDL2.Text;
+  const VusdWallet2 = IDL2.Record({
+    "balance": IDL2.Nat,
+    "createdAt": IDL2.Nat,
+    "walletId": WalletId2
+  });
+  const Value2 = IDL2.Variant({
+    "int": IDL2.Int,
+    "nat": IDL2.Nat,
+    "float": IDL2.Float64,
+    "bool": IDL2.Bool,
+    "null": IDL2.Null,
+    "text": IDL2.Text
+  });
+  const Cell2 = IDL2.Record({ "value": Value2, "name": IDL2.Text });
+  const Result__12 = IDL2.Record({
+    "hasMore": IDL2.Bool,
+    "rows": IDL2.Vec(IDL2.Vec(Cell2))
+  });
+  const Id2 = IDL2.Nat;
+  const ComboType2 = IDL2.Variant({
+    "untilDecember": IDL2.Null,
+    "monthly": IDL2.Null,
+    "newClient": IDL2.Null
+  });
+  const Combo2 = IDL2.Record({
+    "id": Id2,
+    "validity": IDL2.Text,
+    "regularPriceCLP": IDL2.Nat,
+    "agendaproUrl": IDL2.Text,
+    "name": IDL2.Text,
+    "description": IDL2.Text,
+    "comboType": ComboType2,
+    "cuposTotal": IDL2.Nat,
+    "servicesIncluded": IDL2.Vec(Id2),
+    "priceCLP": IDL2.Nat
+  });
+  const MintableItemType2 = IDL2.Variant({
+    "service": IDL2.Null,
+    "combo": IDL2.Null
+  });
+  const MintedServiceToken2 = IDL2.Record({
+    "itemId": IDL2.Nat,
+    "tokenId": IDL2.Nat,
+    "mintedAt": IDL2.Nat,
+    "itemName": IDL2.Text,
+    "itemType": MintableItemType2,
+    "priceVusd": IDL2.Nat,
+    "walletId": WalletId2
+  });
+  const Partner2 = IDL2.Record({
+    "id": Id2,
+    "name": IDL2.Text,
+    "description": IDL2.Text,
+    "logoText": IDL2.Text
+  });
+  const ProductBadge2 = IDL2.Variant({
+    "new": IDL2.Null,
+    "recommended": IDL2.Null
+  });
+  const Product2 = IDL2.Record({
+    "id": Id2,
+    "name": IDL2.Text,
+    "description": IDL2.Text,
+    "usage": IDL2.Text,
+    "badge": IDL2.Opt(ProductBadge2)
+  });
+  const ServiceCategory2 = IDL2.Variant({
+    "especial": IDL2.Null,
+    "corporal": IDL2.Null,
+    "facial": IDL2.Null
+  });
+  const Service2 = IDL2.Record({
+    "id": Id2,
+    "durationMins": IDL2.Nat,
+    "agendaproUrl": IDL2.Text,
+    "techniques": IDL2.Vec(IDL2.Text),
+    "toolsIncluded": IDL2.Vec(IDL2.Text),
+    "allIncluded": IDL2.Bool,
+    "name": IDL2.Text,
+    "description": IDL2.Text,
+    "cuposTotal": IDL2.Nat,
+    "category": ServiceCategory2,
+    "priceCLP": IDL2.Nat,
+    "longDescription": IDL2.Text
+  });
+  const Testimonial2 = IDL2.Record({
+    "id": Id2,
+    "clientName": IDL2.Text,
+    "comment": IDL2.Text
+  });
+  const VusdDemoConfig2 = IDL2.Record({
+    "demoTopupAmount": IDL2.Nat,
+    "clpUsdRate": IDL2.Nat
+  });
+  const Worker2 = IDL2.Record({
+    "id": Id2,
+    "bio": IDL2.Text,
+    "servicesIds": IDL2.Vec(Id2),
+    "name": IDL2.Text,
+    "role": IDL2.Text,
+    "silhouetteVariant": IDL2.Nat
+  });
+  const VusdMintResult2 = IDL2.Record({
+    "tokenId": IDL2.Nat,
+    "newBalance": IDL2.Nat,
+    "walletId": WalletId2
+  });
+  const Error_2 = IDL2.Variant({
+    "invalidInput": IDL2.Text,
+    "notFound": IDL2.Text,
+    "unauthorized": IDL2.Text
+  });
+  const Result_12 = IDL2.Variant({ "ok": VusdMintResult2, "err": Error_2 });
+  const Timestamp2 = IDL2.Nat;
+  const Application2 = IDL2.Record({
+    "id": Id2,
+    "name": IDL2.Text,
+    "submittedAt": Timestamp2,
+    "email": IDL2.Text,
+    "specialty": IDL2.Text,
+    "message": IDL2.Text
+  });
+  const Result2 = IDL2.Variant({ "ok": Application2, "err": Error_2 });
+  return IDL2.Service({
+    "_initialize_access_control": IDL2.Func([], [], []),
+    "_internet_identity_sign_in_finish": IDL2.Func([], [Result_22], []),
+    "_internet_identity_sign_in_start": IDL2.Func([], [IDL2.Vec(IDL2.Nat8)], []),
+    "assignCallerUserRole": IDL2.Func([IDL2.Principal, UserRole2], [], []),
+    "connectDemoWallet": IDL2.Func([], [VusdWallet2], []),
+    "execute": IDL2.Func([IDL2.Text], [Result__12], ["query"]),
+    "getCallerUserRole": IDL2.Func([], [UserRole2], ["query"]),
+    "getCombos": IDL2.Func([], [IDL2.Vec(Combo2)], ["query"]),
+    "getMintedTokens": IDL2.Func(
+      [WalletId2],
+      [IDL2.Vec(MintedServiceToken2)],
+      ["query"]
+    ),
+    "getPartners": IDL2.Func([], [IDL2.Vec(Partner2)], ["query"]),
+    "getProducts": IDL2.Func([], [IDL2.Vec(Product2)], ["query"]),
+    "getServices": IDL2.Func([], [IDL2.Vec(Service2)], ["query"]),
+    "getServicesByCategory": IDL2.Func(
+      [ServiceCategory2],
+      [IDL2.Vec(Service2)],
+      ["query"]
+    ),
+    "getTestimonials": IDL2.Func([], [IDL2.Vec(Testimonial2)], ["query"]),
+    "getVusdConfig": IDL2.Func([], [VusdDemoConfig2], ["query"]),
+    "getVusdWallet": IDL2.Func([WalletId2], [IDL2.Opt(VusdWallet2)], ["query"]),
+    "getWorkers": IDL2.Func([], [IDL2.Vec(Worker2)], ["query"]),
+    "isCallerAdmin": IDL2.Func([], [IDL2.Bool], ["query"]),
+    "mintServiceToken": IDL2.Func(
+      [WalletId2, MintableItemType2, IDL2.Nat, IDL2.Text, IDL2.Nat],
+      [Result_12],
+      []
+    ),
+    "schema": IDL2.Func([], [IDL2.Text], ["query"]),
+    "submitApplication": IDL2.Func(
+      [IDL2.Text, IDL2.Text, IDL2.Text, IDL2.Text],
+      [Result2],
+      []
+    ),
+    "topupVusd": IDL2.Func([WalletId2], [VusdWallet2], [])
+  });
+};
+function record_opt_to_undefined(arg) {
+  return arg == null ? void 0 : arg;
+}
+var ComboType = /* @__PURE__ */ ((ComboType2) => {
+  ComboType2["untilDecember"] = "untilDecember";
+  ComboType2["monthly"] = "monthly";
+  ComboType2["newClient"] = "newClient";
+  return ComboType2;
+})(ComboType || {});
+var MintableItemType = /* @__PURE__ */ ((MintableItemType2) => {
+  MintableItemType2["service"] = "service";
+  MintableItemType2["combo"] = "combo";
+  return MintableItemType2;
+})(MintableItemType || {});
+var ProductBadge = /* @__PURE__ */ ((ProductBadge2) => {
+  ProductBadge2["new_"] = "new";
+  ProductBadge2["recommended"] = "recommended";
+  return ProductBadge2;
+})(ProductBadge || {});
+var ServiceCategory = /* @__PURE__ */ ((ServiceCategory2) => {
+  ServiceCategory2["especial"] = "especial";
+  ServiceCategory2["corporal"] = "corporal";
+  ServiceCategory2["facial"] = "facial";
+  return ServiceCategory2;
+})(ServiceCategory || {});
+var UserRole = /* @__PURE__ */ ((UserRole2) => {
+  UserRole2["admin"] = "admin";
+  UserRole2["user"] = "user";
+  UserRole2["guest"] = "guest";
+  return UserRole2;
+})(UserRole || {});
+class Backend {
+  constructor(actor, _uploadFile, _downloadFile, processError2) {
+    this.actor = actor;
+    this._uploadFile = _uploadFile;
+    this._downloadFile = _downloadFile;
+    this.processError = processError2;
+  }
+  async _initialize_access_control() {
+    if (this.processError) {
+      try {
+        const result = await this.actor._initialize_access_control();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor._initialize_access_control();
+      return result;
+    }
+  }
+  async _internet_identity_sign_in_finish() {
+    if (this.processError) {
+      try {
+        const result = await this.actor._internet_identity_sign_in_finish();
+        return from_candid_Result_2_n1(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor._internet_identity_sign_in_finish();
+      return from_candid_Result_2_n1(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async _internet_identity_sign_in_start() {
+    if (this.processError) {
+      try {
+        const result = await this.actor._internet_identity_sign_in_start();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor._internet_identity_sign_in_start();
+      return result;
+    }
+  }
+  async assignCallerUserRole(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n5(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n5(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async connectDemoWallet() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.connectDemoWallet();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.connectDemoWallet();
+      return result;
+    }
+  }
+  async execute(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.execute(arg0);
+        return from_candid_Result__1_n7(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.execute(arg0);
+      return from_candid_Result__1_n7(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getCallerUserRole() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getCallerUserRole();
+        return from_candid_UserRole_n15(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getCallerUserRole();
+      return from_candid_UserRole_n15(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getCombos() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getCombos();
+        return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getCombos();
+      return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getMintedTokens(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getMintedTokens(arg0);
+        return from_candid_vec_n22(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getMintedTokens(arg0);
+      return from_candid_vec_n22(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getPartners() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getPartners();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getPartners();
+      return result;
+    }
+  }
+  async getProducts() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getProducts();
+        return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getProducts();
+      return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getServices() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getServices();
+        return from_candid_vec_n33(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getServices();
+      return from_candid_vec_n33(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getServicesByCategory(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getServicesByCategory(to_candid_ServiceCategory_n38(this._uploadFile, this._downloadFile, arg0));
+        return from_candid_vec_n33(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getServicesByCategory(to_candid_ServiceCategory_n38(this._uploadFile, this._downloadFile, arg0));
+      return from_candid_vec_n33(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getTestimonials() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getTestimonials();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getTestimonials();
+      return result;
+    }
+  }
+  async getVusdConfig() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getVusdConfig();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getVusdConfig();
+      return result;
+    }
+  }
+  async getVusdWallet(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getVusdWallet(arg0);
+        return from_candid_opt_n40(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getVusdWallet(arg0);
+      return from_candid_opt_n40(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getWorkers() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getWorkers();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getWorkers();
+      return result;
+    }
+  }
+  async isCallerAdmin() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.isCallerAdmin();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.isCallerAdmin();
+      return result;
+    }
+  }
+  async mintServiceToken(arg0, arg1, arg2, arg3, arg4) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.mintServiceToken(arg0, to_candid_MintableItemType_n41(this._uploadFile, this._downloadFile, arg1), arg2, arg3, arg4);
+        return from_candid_Result_1_n43(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.mintServiceToken(arg0, to_candid_MintableItemType_n41(this._uploadFile, this._downloadFile, arg1), arg2, arg3, arg4);
+      return from_candid_Result_1_n43(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async schema() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.schema();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.schema();
+      return result;
+    }
+  }
+  async submitApplication(arg0, arg1, arg2, arg3) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.submitApplication(arg0, arg1, arg2, arg3);
+        return from_candid_Result_n47(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.submitApplication(arg0, arg1, arg2, arg3);
+      return from_candid_Result_n47(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async topupVusd(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.topupVusd(arg0);
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.topupVusd(arg0);
+      return result;
+    }
+  }
+}
+function from_candid_Cell_n11(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n12(_uploadFile, _downloadFile, value);
+}
+function from_candid_ComboType_n20(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n21(_uploadFile, _downloadFile, value);
+}
+function from_candid_Combo_n18(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n19(_uploadFile, _downloadFile, value);
+}
+function from_candid_Error__n45(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n46(_uploadFile, _downloadFile, value);
+}
+function from_candid_Error_n3(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n4(_uploadFile, _downloadFile, value);
+}
+function from_candid_MintableItemType_n25(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n26(_uploadFile, _downloadFile, value);
+}
+function from_candid_MintedServiceToken_n23(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n24(_uploadFile, _downloadFile, value);
+}
+function from_candid_ProductBadge_n31(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n32(_uploadFile, _downloadFile, value);
+}
+function from_candid_Product_n28(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n29(_uploadFile, _downloadFile, value);
+}
+function from_candid_Result_1_n43(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n44(_uploadFile, _downloadFile, value);
+}
+function from_candid_Result_2_n1(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n2(_uploadFile, _downloadFile, value);
+}
+function from_candid_Result__1_n7(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n8(_uploadFile, _downloadFile, value);
+}
+function from_candid_Result_n47(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n48(_uploadFile, _downloadFile, value);
+}
+function from_candid_ServiceCategory_n36(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n37(_uploadFile, _downloadFile, value);
+}
+function from_candid_Service_n34(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n35(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n15(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n16(_uploadFile, _downloadFile, value);
+}
+function from_candid_Value_n13(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n14(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n30(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : from_candid_ProductBadge_n31(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n40(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : value[0];
+}
+function from_candid_record_n12(_uploadFile, _downloadFile, value) {
+  return {
+    value: from_candid_Value_n13(_uploadFile, _downloadFile, value.value),
+    name: value.name
+  };
+}
+function from_candid_record_n19(_uploadFile, _downloadFile, value) {
+  return {
+    id: value.id,
+    validity: value.validity,
+    regularPriceCLP: value.regularPriceCLP,
+    agendaproUrl: value.agendaproUrl,
+    name: value.name,
+    description: value.description,
+    comboType: from_candid_ComboType_n20(_uploadFile, _downloadFile, value.comboType),
+    cuposTotal: value.cuposTotal,
+    servicesIncluded: value.servicesIncluded,
+    priceCLP: value.priceCLP
+  };
+}
+function from_candid_record_n24(_uploadFile, _downloadFile, value) {
+  return {
+    itemId: value.itemId,
+    tokenId: value.tokenId,
+    mintedAt: value.mintedAt,
+    itemName: value.itemName,
+    itemType: from_candid_MintableItemType_n25(_uploadFile, _downloadFile, value.itemType),
+    priceVusd: value.priceVusd,
+    walletId: value.walletId
+  };
+}
+function from_candid_record_n29(_uploadFile, _downloadFile, value) {
+  return {
+    id: value.id,
+    name: value.name,
+    description: value.description,
+    usage: value.usage,
+    badge: record_opt_to_undefined(from_candid_opt_n30(_uploadFile, _downloadFile, value.badge))
+  };
+}
+function from_candid_record_n35(_uploadFile, _downloadFile, value) {
+  return {
+    id: value.id,
+    durationMins: value.durationMins,
+    agendaproUrl: value.agendaproUrl,
+    techniques: value.techniques,
+    toolsIncluded: value.toolsIncluded,
+    allIncluded: value.allIncluded,
+    name: value.name,
+    description: value.description,
+    cuposTotal: value.cuposTotal,
+    category: from_candid_ServiceCategory_n36(_uploadFile, _downloadFile, value.category),
+    priceCLP: value.priceCLP,
+    longDescription: value.longDescription
+  };
+}
+function from_candid_record_n8(_uploadFile, _downloadFile, value) {
+  return {
+    hasMore: value.hasMore,
+    rows: from_candid_vec_n9(_uploadFile, _downloadFile, value.rows)
+  };
+}
+function from_candid_variant_n14(_uploadFile, _downloadFile, value) {
+  return "int" in value ? {
+    __kind__: "int",
+    int: value.int
+  } : "nat" in value ? {
+    __kind__: "nat",
+    nat: value.nat
+  } : "float" in value ? {
+    __kind__: "float",
+    float: value.float
+  } : "bool" in value ? {
+    __kind__: "bool",
+    bool: value.bool
+  } : "null" in value ? {
+    __kind__: "null",
+    null: value.null
+  } : "text" in value ? {
+    __kind__: "text",
+    text: value.text
+  } : value;
+}
+function from_candid_variant_n16(_uploadFile, _downloadFile, value) {
+  return "admin" in value ? "admin" : "user" in value ? "user" : "guest" in value ? "guest" : value;
+}
+function from_candid_variant_n2(_uploadFile, _downloadFile, value) {
+  return "ok" in value ? {
+    __kind__: "ok",
+    ok: value.ok
+  } : "err" in value ? {
+    __kind__: "err",
+    err: from_candid_Error_n3(_uploadFile, _downloadFile, value.err)
+  } : value;
+}
+function from_candid_variant_n21(_uploadFile, _downloadFile, value) {
+  return "untilDecember" in value ? "untilDecember" : "monthly" in value ? "monthly" : "newClient" in value ? "newClient" : value;
+}
+function from_candid_variant_n26(_uploadFile, _downloadFile, value) {
+  return "service" in value ? "service" : "combo" in value ? "combo" : value;
+}
+function from_candid_variant_n32(_uploadFile, _downloadFile, value) {
+  return "new" in value ? ProductBadge.new : "recommended" in value ? "recommended" : value;
+}
+function from_candid_variant_n37(_uploadFile, _downloadFile, value) {
+  return "especial" in value ? "especial" : "corporal" in value ? "corporal" : "facial" in value ? "facial" : value;
+}
+function from_candid_variant_n4(_uploadFile, _downloadFile, value) {
+  return "FrontendOriginsNotConfigured" in value ? {
+    __kind__: "FrontendOriginsNotConfigured",
+    FrontendOriginsNotConfigured: value.FrontendOriginsNotConfigured
+  } : "MixedSsoSources" in value ? {
+    __kind__: "MixedSsoSources",
+    MixedSsoSources: value.MixedSsoSources
+  } : "Stale" in value ? {
+    __kind__: "Stale",
+    Stale: value.Stale
+  } : "MalformedCandid" in value ? {
+    __kind__: "MalformedCandid",
+    MalformedCandid: value.MalformedCandid
+  } : "AmbiguousAttribute" in value ? {
+    __kind__: "AmbiguousAttribute",
+    AmbiguousAttribute: value.AmbiguousAttribute
+  } : "NoAttributes" in value ? {
+    __kind__: "NoAttributes",
+    NoAttributes: value.NoAttributes
+  } : "UnknownNonce" in value ? {
+    __kind__: "UnknownNonce",
+    UnknownNonce: value.UnknownNonce
+  } : "UntrustedSsoSource" in value ? {
+    __kind__: "UntrustedSsoSource",
+    UntrustedSsoSource: value.UntrustedSsoSource
+  } : "MissingField" in value ? {
+    __kind__: "MissingField",
+    MissingField: value.MissingField
+  } : "FrontendOriginMismatch" in value ? {
+    __kind__: "FrontendOriginMismatch",
+    FrontendOriginMismatch: value.FrontendOriginMismatch
+  } : value;
+}
+function from_candid_variant_n44(_uploadFile, _downloadFile, value) {
+  return "ok" in value ? {
+    __kind__: "ok",
+    ok: value.ok
+  } : "err" in value ? {
+    __kind__: "err",
+    err: from_candid_Error__n45(_uploadFile, _downloadFile, value.err)
+  } : value;
+}
+function from_candid_variant_n46(_uploadFile, _downloadFile, value) {
+  return "invalidInput" in value ? {
+    __kind__: "invalidInput",
+    invalidInput: value.invalidInput
+  } : "notFound" in value ? {
+    __kind__: "notFound",
+    notFound: value.notFound
+  } : "unauthorized" in value ? {
+    __kind__: "unauthorized",
+    unauthorized: value.unauthorized
+  } : value;
+}
+function from_candid_variant_n48(_uploadFile, _downloadFile, value) {
+  return "ok" in value ? {
+    __kind__: "ok",
+    ok: value.ok
+  } : "err" in value ? {
+    __kind__: "err",
+    err: from_candid_Error__n45(_uploadFile, _downloadFile, value.err)
+  } : value;
+}
+function from_candid_vec_n10(_uploadFile, _downloadFile, value) {
+  return value.map((x2) => from_candid_Cell_n11(_uploadFile, _downloadFile, x2));
+}
+function from_candid_vec_n17(_uploadFile, _downloadFile, value) {
+  return value.map((x2) => from_candid_Combo_n18(_uploadFile, _downloadFile, x2));
+}
+function from_candid_vec_n22(_uploadFile, _downloadFile, value) {
+  return value.map((x2) => from_candid_MintedServiceToken_n23(_uploadFile, _downloadFile, x2));
+}
+function from_candid_vec_n27(_uploadFile, _downloadFile, value) {
+  return value.map((x2) => from_candid_Product_n28(_uploadFile, _downloadFile, x2));
+}
+function from_candid_vec_n33(_uploadFile, _downloadFile, value) {
+  return value.map((x2) => from_candid_Service_n34(_uploadFile, _downloadFile, x2));
+}
+function from_candid_vec_n9(_uploadFile, _downloadFile, value) {
+  return value.map((x2) => from_candid_vec_n10(_uploadFile, _downloadFile, x2));
+}
+function to_candid_MintableItemType_n41(_uploadFile, _downloadFile, value) {
+  return to_candid_variant_n42(_uploadFile, _downloadFile, value);
+}
+function to_candid_ServiceCategory_n38(_uploadFile, _downloadFile, value) {
+  return to_candid_variant_n39(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserRole_n5(_uploadFile, _downloadFile, value) {
+  return to_candid_variant_n6(_uploadFile, _downloadFile, value);
+}
+function to_candid_variant_n39(_uploadFile, _downloadFile, value) {
+  return value == "especial" ? {
+    especial: null
+  } : value == "corporal" ? {
+    corporal: null
+  } : value == "facial" ? {
+    facial: null
+  } : value;
+}
+function to_candid_variant_n42(_uploadFile, _downloadFile, value) {
+  return value == "service" ? {
+    service: null
+  } : value == "combo" ? {
+    combo: null
+  } : value;
+}
+function to_candid_variant_n6(_uploadFile, _downloadFile, value) {
+  return value == "admin" ? {
+    admin: null
+  } : value == "user" ? {
+    user: null
+  } : value == "guest" ? {
+    guest: null
+  } : value;
+}
+function createActor(canisterId, _uploadFile, _downloadFile, options = {}) {
+  const agent = options.agent || HttpAgent.createSync({
+    ...options.agentOptions
+  });
+  if (options.agent && options.agentOptions) {
+    console.warn("Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.");
+  }
+  const actor = Actor.createActor(idlFactory, {
+    agent,
+    canisterId,
+    ...options.actorOptions
+  });
+  return new Backend(actor, _uploadFile, _downloadFile, options.processError);
+}
+const VUSD_CONFIG = {
+  clpUsdRate: 950n,
+  // 950 CLP = 1 USD = 1 vUSD
+  demoTopupAmount: 100000n
+  // 1000.00 vUSD per topup
+};
+const VUSD_INITIAL_BALANCE = 100000n;
+const vusdState = /* @__PURE__ */ new Map();
+let vusdTokenCounter = 0n;
+function nowNs() {
+  return BigInt(Date.now()) * 1000000n;
+}
+function genWalletId() {
+  const hex2 = Math.random().toString(16).slice(2, 10).padEnd(8, "0");
+  return `0xvUSD${hex2}`;
+}
+const mockBackend = {
+  async _initialize_access_control() {
+    return void 0;
+  },
+  async _internet_identity_sign_in_finish() {
+    return { __kind__: "ok", ok: null };
+  },
+  async _internet_identity_sign_in_start() {
+    return new Uint8Array([1, 2, 3, 4]);
+  },
+  async assignCallerUserRole() {
+    return void 0;
+  },
+  async execute() {
+    return { hasMore: false, rows: [] };
+  },
+  async getCallerUserRole() {
+    return UserRole.guest;
+  },
+  async getCombos() {
+    return [
+      {
+        id: 0n,
+        name: "Bienvenida Liza",
+        description: "Combo para nuevas clientas: limpieza facial + hidratación corporal.",
+        servicesIncluded: [0n, 5n],
+        priceCLP: 70000n,
+        regularPriceCLP: 85000n,
+        validity: "Primera visita",
+        comboType: ComboType.newClient,
+        cuposTotal: 6n,
+        agendaproUrl: "https://agendapro.com/cl/liza/combo-bienvenida"
+      },
+      {
+        id: 1n,
+        name: "Rutina Mensual Facial",
+        description: "Limpieza facial + radiofrecuencia, una vez al mes.",
+        servicesIncluded: [0n, 1n],
+        priceCLP: 75000n,
+        regularPriceCLP: 90000n,
+        validity: "Mensual, renovable",
+        comboType: ComboType.monthly,
+        cuposTotal: 6n,
+        agendaproUrl: "https://agendapro.com/cl/liza/combo-mensual"
+      },
+      {
+        id: 2n,
+        name: "Verano hasta Diciembre",
+        description: "Drenaje linfático + masaje reafirmante + hidratación corporal.",
+        servicesIncluded: [2n, 3n, 5n],
+        priceCLP: 130000n,
+        regularPriceCLP: 160000n,
+        validity: "Válido hasta el 31 de diciembre",
+        comboType: ComboType.untilDecember,
+        cuposTotal: 4n,
+        agendaproUrl: "https://agendapro.com/cl/liza/combo-verano"
+      }
+    ];
+  },
+  async getPartners() {
+    return [
+      {
+        id: 0n,
+        name: "Flow",
+        description: "Pagos en cuotas simples y rápidas, con descuentos exclusivos para clientas del protocolo Liza.",
+        logoText: "Flow"
+      },
+      {
+        id: 1n,
+        name: "Protocolo DeFi vUSD",
+        description: "Protocolo DeFi que emite vUSD, un USD sintético estable, para pagos y reservas sin fricción.",
+        logoText: "vU"
+      }
+    ];
+  },
+  async getProducts() {
+    return [
+      {
+        id: 0n,
+        name: "Sérum Facial Hidratante Liza",
+        description: "Sérum facial con ácido hialurónico para uso diario.",
+        usage: "Aplicar sobre piel limpia mañana y noche, antes del hidratante.",
+        badge: ProductBadge.new_
+      },
+      {
+        id: 1n,
+        name: "Crema Corporal Tensora",
+        description: "Crema corporal reafirmante con activos tensoros.",
+        usage: "Aplicar diariamente sobre la piel seca con masaje ascendente.",
+        badge: ProductBadge.recommended
+      },
+      {
+        id: 2n,
+        name: "Mascarilla Purificante",
+        description: "Mascarilla facial purificante con arcilla blanca.",
+        usage: "Usar 1-2 veces por semana sobre piel limpia, dejar 10 minutos y enjuagar."
+      }
+    ];
+  },
+  async getServices() {
+    return [
+      {
+        id: 0n,
+        name: "Limpieza Facial Profunda",
+        description: "Limpieza profunda con extracción y mascarilla.",
+        longDescription: "Limpieza facial completa que incluye doble limpieza, vaporización, extracción de impurezas, mascarilla purificante e hidratación final. Ideal para todo tipo de piel.",
+        durationMins: 60n,
+        priceCLP: 35000n,
+        category: ServiceCategory.facial,
+        techniques: ["Doble limpieza", "Extracción manual", "Vaporización"],
+        toolsIncluded: ["Mascarilla purificante", "Tónico", "Hidratante"],
+        allIncluded: true,
+        cuposTotal: 12n,
+        agendaproUrl: "https://agendapro.com/cl/liza/limpieza-facial"
+      },
+      {
+        id: 1n,
+        name: "Radiofrecuencia Facial",
+        description: "Tratamiento de firmeza con radiofrecuencia.",
+        longDescription: "Sesión de radiofrecuencia facial que estimula la producción de colágeno, reafirma la piel y atenúa líneas de expresión. Incluye limpieza previa y crioterapia final.",
+        durationMins: 75n,
+        priceCLP: 55000n,
+        category: ServiceCategory.facial,
+        techniques: [
+          "Radiofrecuencia monopolar",
+          "Crioterapia",
+          "Aplicación de suero"
+        ],
+        toolsIncluded: ["Gel conductor", "Suero de colágeno"],
+        allIncluded: true,
+        cuposTotal: 6n,
+        agendaproUrl: "https://agendapro.com/cl/liza/radiofrecuencia-facial"
+      },
+      {
+        id: 2n,
+        name: "Drenaje Linfático Manual",
+        description: "Masaje corporal de drenaje linfático.",
+        longDescription: "Técnica de masaje manual suave que estimula el sistema linfático, reduce retención de líquidos y favorece la desintoxicación corporal.",
+        durationMins: 60n,
+        priceCLP: 40000n,
+        category: ServiceCategory.corporal,
+        techniques: ["Drenaje linfático manual", "Movimientos lentos y rítmicos"],
+        toolsIncluded: ["Aceite corporal ligero"],
+        allIncluded: false,
+        cuposTotal: 12n,
+        agendaproUrl: "https://agendapro.com/cl/liza/drenaje-linfatico"
+      },
+      {
+        id: 3n,
+        name: "Masaje Reafirmante Corporal",
+        description: "Masaje reafirmante con tecnología.",
+        longDescription: "Tratamiento corporal que combina masaje reafirmante con aparatología para mejorar la firmeza y textura de la piel. Sesión de 90 minutos con productos profesionales.",
+        durationMins: 90n,
+        priceCLP: 70000n,
+        category: ServiceCategory.corporal,
+        techniques: [
+          "Masaje reafirmante",
+          "Aparatología",
+          "Aplicación de crema tensora"
+        ],
+        toolsIncluded: ["Crema tensora", "Gel conductor", "Mascarilla corporal"],
+        allIncluded: true,
+        cuposTotal: 4n,
+        agendaproUrl: "https://agendapro.com/cl/liza/masaje-reafirmante"
+      },
+      {
+        id: 4n,
+        name: "Tratamiento Anti-Celulítico",
+        description: "Protocolo intensivo anti-celulítico.",
+        longDescription: "Protocolo intensivo que combina masaje modelador, aparatología y productos activos para reducir la apariencia de la celulitis. Recomendado en sesiones consecutivas.",
+        durationMins: 90n,
+        priceCLP: 80000n,
+        category: ServiceCategory.especial,
+        techniques: [
+          "Masaje modelador",
+          "Radiofrecuencia corporal",
+          "Aplicación de activos"
+        ],
+        toolsIncluded: [
+          "Crema activa anti-celulítica",
+          "Gel conductor",
+          "Film oclusivo"
+        ],
+        allIncluded: true,
+        cuposTotal: 4n,
+        agendaproUrl: "https://agendapro.com/cl/liza/anti-celulitico"
+      },
+      {
+        id: 5n,
+        name: "Hidratación Corporal Premium",
+        description: "Hidratación corporal profunda con envoltura.",
+        longDescription: "Tratamiento de hidratación corporal que incluye exfoliación, mascarilla hidratante y envoltura oclusiva para pieles resecas. Finaliza con masaje de absorción.",
+        durationMins: 75n,
+        priceCLP: 50000n,
+        category: ServiceCategory.corporal,
+        techniques: [
+          "Exfoliación corporal",
+          "Envoltura hidratante",
+          "Masaje de absorción"
+        ],
+        toolsIncluded: ["Exfoliante", "Mascarilla hidratante", "Crema de cierre"],
+        allIncluded: true,
+        cuposTotal: 6n,
+        agendaproUrl: "https://agendapro.com/cl/liza/hidratacion-corporal"
+      }
+    ];
+  },
+  async getServicesByCategory(category) {
+    const all = await this.getServices();
+    return all.filter((s) => s.category === category);
+  },
+  async getTestimonials() {
+    return [
+      {
+        id: 0n,
+        clientName: "María José",
+        comment: "La limpieza facial con Gregoria dejó mi piel renovada. Súper recomendable."
+      },
+      {
+        id: 1n,
+        clientName: "Constanza",
+        comment: "El combo mensual facial es lo mejor que he hecho por mi piel este año."
+      },
+      {
+        id: 2n,
+        clientName: "Paulina",
+        comment: "El drenaje linfático con Camila me ayudó muchísimo con la retención de líquidos."
+      }
+    ];
+  },
+  async getWorkers() {
+    return [
+      {
+        id: 0n,
+        name: "Gregoria Mendoza",
+        role: "Especialista en cuidados faciales",
+        bio: "Con más de 10 años de experiencia, Gregoria lidera los tratamientos faciales de Liza, especializándose en limpieza profunda, radiofrecuencia y protocolos anti-edad.",
+        servicesIds: [0n, 1n],
+        silhouetteVariant: 0n
+      },
+      {
+        id: 1n,
+        name: "Camila Rojas",
+        role: "Terapeuta corporal",
+        bio: "Camila es terapeuta corporal certificada en drenaje linfático y masajes reafirmantes. Su enfoque combina técnica y relajación.",
+        servicesIds: [2n, 3n, 5n],
+        silhouetteVariant: 1n
+      },
+      {
+        id: 2n,
+        name: "Daniela Soto",
+        role: "Especialista en tratamientos especiales",
+        bio: "Daniela se especializa en protocolos anti-celulíticos y tratamientos intensivos con aparatología. Acompaña a cada clienta en su proceso.",
+        servicesIds: [4n],
+        silhouetteVariant: 2n
+      },
+      {
+        id: 3n,
+        name: "Francisca Vera",
+        role: "Esteticista integral",
+        bio: "Francisca cubre tratamientos faciales y corporales, con foco en hidratación y bienestar general. Atiende también a clientas nuevas.",
+        servicesIds: [0n, 2n, 5n],
+        silhouetteVariant: 3n
+      }
+    ];
+  },
+  async isCallerAdmin() {
+    return false;
+  },
+  async schema() {
+    return "{}";
+  },
+  async submitApplication(name, email, specialty, message) {
+    return {
+      __kind__: "ok",
+      ok: {
+        id: 0n,
+        name,
+        email,
+        specialty,
+        message,
+        submittedAt: 0n
+      }
+    };
+  },
+  // ---- vUSD demo methods (mock implementations) ----
+  // These mirror the generated backendInterface vUSD methods. The useVusd
+  // hooks probe the actor at runtime and fall back to this in-memory mock
+  // when the real actor is unavailable (e.g. local dev without a canister).
+  async getVusdConfig() {
+    return { ...VUSD_CONFIG };
+  },
+  async getVusdWallet(walletId) {
+    const state = vusdState.get(walletId);
+    return state ? { ...state.wallet, balance: state.wallet.balance } : null;
+  },
+  async connectDemoWallet() {
+    const walletId = genWalletId();
+    const wallet = {
+      walletId,
+      balance: VUSD_INITIAL_BALANCE,
+      createdAt: nowNs()
+    };
+    vusdState.set(walletId, { wallet, tokens: [] });
+    return { ...wallet };
+  },
+  async topupVusd(walletId) {
+    const state = vusdState.get(walletId);
+    if (!state) {
+      throw new Error("Wallet no encontrada. Conéctala nuevamente.");
+    }
+    state.wallet = {
+      ...state.wallet,
+      balance: state.wallet.balance + VUSD_CONFIG.demoTopupAmount
+    };
+    return { ...state.wallet };
+  },
+  async getMintedTokens(walletId) {
+    const state = vusdState.get(walletId);
+    return state ? state.tokens.map((t) => ({ ...t })) : [];
+  },
+  async mintServiceToken(walletId, itemType, itemId, itemName, priceVusd) {
+    const state = vusdState.get(walletId);
+    if (!state) {
+      const err = {
+        __kind__: "notFound",
+        notFound: "Wallet no encontrada. Conéctala nuevamente."
+      };
+      return { __kind__: "err", err };
+    }
+    if (state.wallet.balance < priceVusd) {
+      const err = {
+        __kind__: "invalidInput",
+        invalidInput: "Saldo vUSD insuficiente para mintear este service token."
+      };
+      return { __kind__: "err", err };
+    }
+    vusdTokenCounter += 1n;
+    const tokenId = vusdTokenCounter;
+    state.wallet = {
+      ...state.wallet,
+      balance: state.wallet.balance - priceVusd
+    };
+    const token = {
+      tokenId,
+      walletId,
+      itemType,
+      itemId,
+      itemName,
+      priceVusd,
+      mintedAt: nowNs()
+    };
+    state.tokens.push(token);
+    return {
+      __kind__: "ok",
+      ok: {
+        tokenId,
+        newBalance: state.wallet.balance,
+        walletId
+      }
+    };
+  }
+};
+const WALLET_STORAGE_KEY = "liza_vusd_wallet";
+function useVusdSession() {
+  const [walletId, setWalletIdState] = reactExports.useState(null);
+  reactExports.useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(WALLET_STORAGE_KEY);
+      if (stored) setWalletIdState(stored);
+    } catch {
+    }
+  }, []);
+  const setWalletId = reactExports.useCallback((id2) => {
+    setWalletIdState(id2);
+    try {
+      if (id2) {
+        window.localStorage.setItem(WALLET_STORAGE_KEY, id2);
+      } else {
+        window.localStorage.removeItem(WALLET_STORAGE_KEY);
+      }
+    } catch {
+    }
+  }, []);
+  const clearWalletId = reactExports.useCallback(() => setWalletId(null), [setWalletId]);
+  return { walletId, setWalletId, clearWalletId };
+}
+function isVusdActor(actor) {
+  if (!actor || typeof actor !== "object") return false;
+  const a2 = actor;
+  return typeof a2.getVusdConfig === "function" && typeof a2.getVusdWallet === "function" && typeof a2.connectDemoWallet === "function" && typeof a2.topupVusd === "function" && typeof a2.getMintedTokens === "function" && typeof a2.mintServiceToken === "function";
+}
+function resolveVusdActor(actor) {
+  return isVusdActor(actor) ? actor : mockBackend;
+}
+function useVusdConfig() {
+  const { actor, isFetching } = useActor(createActor);
+  return useQuery({
+    queryKey: ["vusd-config"],
+    queryFn: async () => {
+      const a2 = resolveVusdActor(actor);
+      return a2.getVusdConfig();
+    },
+    enabled: !isFetching
+  });
+}
+function useVusdWallet(walletId) {
+  const { actor, isFetching } = useActor(createActor);
+  return useQuery({
+    queryKey: ["vusd-wallet", walletId],
+    queryFn: async () => {
+      if (!walletId) return null;
+      const a2 = resolveVusdActor(actor);
+      return a2.getVusdWallet(walletId);
+    },
+    enabled: !!walletId && !isFetching
+  });
+}
+function useMintedTokens(walletId) {
+  const { actor, isFetching } = useActor(createActor);
+  return useQuery({
+    queryKey: ["vusd-minted-tokens", walletId],
+    queryFn: async () => {
+      if (!walletId) return [];
+      const a2 = resolveVusdActor(actor);
+      return a2.getMintedTokens(walletId);
+    },
+    enabled: !!walletId && !isFetching
+  });
+}
+function useConnectDemoWallet() {
+  const { actor } = useActor(createActor);
+  const queryClient2 = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const a2 = resolveVusdActor(actor);
+      return a2.connectDemoWallet();
+    },
+    onSuccess: (wallet) => {
+      queryClient2.invalidateQueries({
+        queryKey: ["vusd-wallet", wallet.walletId]
+      });
+      queryClient2.invalidateQueries({
+        queryKey: ["vusd-minted-tokens", wallet.walletId]
+      });
+    }
+  });
+}
+function useTopupVusd() {
+  const { actor } = useActor(createActor);
+  const queryClient2 = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ walletId }) => {
+      const a2 = resolveVusdActor(actor);
+      return a2.topupVusd(walletId);
+    },
+    onSuccess: (wallet) => {
+      queryClient2.invalidateQueries({
+        queryKey: ["vusd-wallet", wallet.walletId]
+      });
+    }
+  });
+}
+function useMintServiceToken() {
+  const { actor } = useActor(createActor);
+  const queryClient2 = useQueryClient();
+  return useMutation({
+    mutationFn: async (input) => {
+      const a2 = resolveVusdActor(actor);
+      const res = await a2.mintServiceToken(
+        input.walletId,
+        input.itemType,
+        input.itemId,
+        input.itemName,
+        input.priceVusd
+      );
+      if (res.__kind__ === "err") {
+        throw new Error("Saldo vUSD insuficiente");
+      }
+      return res.ok;
+    },
+    onSuccess: (result) => {
+      queryClient2.invalidateQueries({
+        queryKey: ["vusd-wallet", result.walletId]
+      });
+      queryClient2.invalidateQueries({
+        queryKey: ["vusd-minted-tokens", result.walletId]
+      });
+    }
+  });
+}
+function formatVusd(balanceCents) {
+  const cents = Number(balanceCents);
+  const value = cents / 100;
+  const formatted = value.toLocaleString("es-CL", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  return `${formatted} vUSD`;
+}
+function clpToVusdCents(clp, clpUsdRate) {
+  if (clpUsdRate <= 0n) return 0n;
+  return clp / clpUsdRate * 100n;
+}
+function deriveCuposTier(cuposTotal) {
+  const n = Number(cuposTotal);
+  if (n <= 0) return "agotado";
+  if (n <= 3) return "bajo";
+  if (n <= 8) return "medio";
+  return "alto";
+}
+const CUPOS_TIER_LABEL = {
+  alto: "Cupos disponibles",
+  medio: "Cupos limitados",
+  bajo: "Últimos cupos",
+  agotado: "Cupos agotados"
+};
+const SERVICE_CATEGORY_LABEL = {
+  facial: "Facial",
+  corporal: "Corporal",
+  especial: "Especial"
+};
+const COMBO_TYPE_LABEL = {
+  untilDecember: "Válido hasta diciembre",
+  monthly: "Mensual",
+  newClient: "Nuevos clientes"
+};
+const PRODUCT_BADGE_LABEL = {
+  new: "Nuevo",
+  recommended: "Recomendado"
+};
+function formatCLP(value) {
+  return `$${Number(value).toLocaleString("es-CL")}`;
 }
 var prefix = "Invariant failed";
 function invariant$1(condition, message) {
@@ -38425,7 +42544,7 @@ class RouterCore {
       });
     };
     this.parseLocation = (locationToParse, previousLocation) => {
-      const parse = ({
+      const parse2 = ({
         pathname,
         search,
         hash,
@@ -38442,10 +42561,10 @@ class RouterCore {
           state: replaceEqualDeep(previousLocation == null ? void 0 : previousLocation.state, state)
         };
       };
-      const location2 = parse(locationToParse);
+      const location2 = parse2(locationToParse);
       const { __tempLocation, __tempKey } = location2.state;
       if (__tempLocation && (!__tempKey || __tempKey === this.tempLocationKey)) {
-        const parsedTempLocation = parse(__tempLocation);
+        const parsedTempLocation = parse2(__tempLocation);
         parsedTempLocation.state.key = location2.state.key;
         parsedTempLocation.state.__TSR_key = location2.state.__TSR_key;
         delete parsedTempLocation.state.__tempLocation;
@@ -41023,473 +45142,214 @@ function useLocation(opts) {
     select: (state) => state.location
   });
 }
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-const toCamelCase = (string) => string.replace(
-  /^([A-Z])|[\s-_]+(\w)/g,
-  (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase()
-);
-const toPascalCase = (string) => {
-  const camelCase = toCamelCase(string);
-  return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
-};
-const mergeClasses = (...classes) => classes.filter((className, index2, array) => {
-  return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index2;
-}).join(" ").trim();
-const hasA11yProp = (props) => {
-  for (const prop in props) {
-    if (prop.startsWith("aria-") || prop === "role" || prop === "title") {
-      return true;
-    }
-  }
-};
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-var defaultAttributes = {
-  xmlns: "http://www.w3.org/2000/svg",
-  width: 24,
-  height: 24,
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 2,
-  strokeLinecap: "round",
-  strokeLinejoin: "round"
-};
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const Icon = reactExports.forwardRef(
-  ({
-    color: color2 = "currentColor",
-    size = 24,
-    strokeWidth = 2,
-    absoluteStrokeWidth,
-    className = "",
-    children,
-    iconNode,
-    ...rest
-  }, ref) => reactExports.createElement(
-    "svg",
+const NS_PER_MS$1 = 1000000n;
+function formatDateFromNs$1(ns) {
+  const ms2 = Number(ns / NS_PER_MS$1);
+  return new Date(ms2).toLocaleDateString("es-CL", {
+    dateStyle: "medium"
+  });
+}
+function VusdTokenIcon$1({ className }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "span",
     {
-      ref,
-      ...defaultAttributes,
-      width: size,
-      height: size,
-      stroke: color2,
-      strokeWidth: absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
-      className: mergeClasses("lucide", className),
-      ...!children && !hasA11yProp(rest) && { "aria-hidden": "true" },
-      ...rest
-    },
-    [
-      ...iconNode.map(([tag, attrs]) => reactExports.createElement(tag, attrs)),
-      ...Array.isArray(children) ? children : [children]
-    ]
-  )
-);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const createLucideIcon = (iconName, iconNode) => {
-  const Component2 = reactExports.forwardRef(
-    ({ className, ...props }, ref) => reactExports.createElement(Icon, {
-      ref,
-      iconNode,
-      className: mergeClasses(
-        `lucide-${toKebabCase(toPascalCase(iconName))}`,
-        `lucide-${iconName}`,
+      "aria-hidden": true,
+      className: cn(
+        "relative inline-flex size-4 items-center justify-center rounded-full",
         className
       ),
-      ...props
-    })
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "span",
+          {
+            className: "absolute inset-0 rounded-full",
+            style: {
+              background: "linear-gradient(135deg, oklch(var(--prism-cyan)), oklch(var(--prism-gold)))"
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "relative font-mono text-[0.55rem] font-bold text-background", children: "v" })
+      ]
+    }
   );
-  Component2.displayName = toPascalCase(iconName);
-  return Component2;
-};
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$o = [
-  ["path", { d: "M5 12h14", key: "1ays0h" }],
-  ["path", { d: "m12 5 7 7-7 7", key: "xquz4c" }]
-];
-const ArrowRight = createLucideIcon("arrow-right", __iconNode$o);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$n = [
-  [
-    "path",
-    {
-      d: "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z",
-      key: "3c2336"
+}
+function VusdWalletBadge({ className }) {
+  var _a2;
+  const { walletId, setWalletId, clearWalletId } = useVusdSession();
+  const walletQuery = useVusdWallet(walletId);
+  const mintedQuery = useMintedTokens(walletId);
+  const connectMutation = useConnectDemoWallet();
+  const topupMutation = useTopupVusd();
+  const [open, setOpen] = reactExports.useState(false);
+  const balance = ((_a2 = walletQuery.data) == null ? void 0 : _a2.balance) ?? 0n;
+  const minted = mintedQuery.data ?? [];
+  const connected = !!walletId;
+  const handleTriggerClick = () => {
+    if (!connected) {
+      connectMutation.mutate(void 0, {
+        onSuccess: (wallet) => {
+          setWalletId(wallet.walletId);
+          setOpen(true);
+        }
+      });
+    } else {
+      setOpen(true);
     }
-  ],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
-];
-const BadgeCheck = createLucideIcon("badge-check", __iconNode$n);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$m = [
-  ["path", { d: "M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5", key: "1osxxc" }],
-  ["path", { d: "M16 2v4", key: "4m81vk" }],
-  ["path", { d: "M8 2v4", key: "1cmpym" }],
-  ["path", { d: "M3 10h5", key: "r794hk" }],
-  ["path", { d: "M17.5 17.5 16 16.3V14", key: "akvzfd" }],
-  ["circle", { cx: "16", cy: "16", r: "6", key: "qoo3c4" }]
-];
-const CalendarClock = createLucideIcon("calendar-clock", __iconNode$m);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$l = [
-  ["path", { d: "M8 2v4", key: "1cmpym" }],
-  ["path", { d: "M16 2v4", key: "4m81vk" }],
-  ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
-  ["path", { d: "M3 10h18", key: "8toen8" }]
-];
-const Calendar = createLucideIcon("calendar", __iconNode$l);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$k = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
-const Check = createLucideIcon("check", __iconNode$k);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$j = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$j);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$i = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
-];
-const CircleCheck = createLucideIcon("circle-check", __iconNode$i);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$h = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
-];
-const Clock = createLucideIcon("clock", __iconNode$h);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$g = [
-  ["path", { d: "m11 17 2 2a1 1 0 1 0 3-3", key: "efffak" }],
-  [
-    "path",
-    {
-      d: "m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4",
-      key: "9pr0kb"
-    }
-  ],
-  ["path", { d: "m21 3 1 11h-2", key: "1tisrp" }],
-  ["path", { d: "M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3", key: "1uvwmv" }],
-  ["path", { d: "M3 4h8", key: "1ep09j" }]
-];
-const Handshake = createLucideIcon("handshake", __iconNode$g);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$f = [
-  [
-    "path",
-    {
-      d: "M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",
-      key: "c3ymky"
-    }
-  ]
-];
-const Heart = createLucideIcon("heart", __iconNode$f);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$e = [
-  [
-    "path",
-    {
-      d: "M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z",
-      key: "zw3jo"
-    }
-  ],
-  [
-    "path",
-    {
-      d: "M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12",
-      key: "1wduqc"
-    }
-  ],
-  [
-    "path",
-    {
-      d: "M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17",
-      key: "kqbvx6"
-    }
-  ]
-];
-const Layers = createLucideIcon("layers", __iconNode$e);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$d = [
-  ["path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7", key: "132q7q" }],
-  ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", key: "izxlao" }]
-];
-const Mail = createLucideIcon("mail", __iconNode$d);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$c = [
-  [
-    "path",
-    {
-      d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
-      key: "1r0f0z"
-    }
-  ],
-  ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }]
-];
-const MapPin = createLucideIcon("map-pin", __iconNode$c);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$b = [
-  ["path", { d: "M4 12h16", key: "1lakjw" }],
-  ["path", { d: "M4 18h16", key: "19g7jn" }],
-  ["path", { d: "M4 6h16", key: "1o0s65" }]
-];
-const Menu = createLucideIcon("menu", __iconNode$b);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$a = [
-  ["rect", { x: "16", y: "16", width: "6", height: "6", rx: "1", key: "4q2zg0" }],
-  ["rect", { x: "2", y: "16", width: "6", height: "6", rx: "1", key: "8cvhb9" }],
-  ["rect", { x: "9", y: "2", width: "6", height: "6", rx: "1", key: "1egb70" }],
-  ["path", { d: "M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3", key: "1jsf9p" }],
-  ["path", { d: "M12 12V8", key: "2874zd" }]
-];
-const Network = createLucideIcon("network", __iconNode$a);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$9 = [
-  [
-    "path",
-    {
-      d: "M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384",
-      key: "9njp5v"
-    }
-  ]
-];
-const Phone = createLucideIcon("phone", __iconNode$9);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$8 = [
-  [
-    "path",
-    {
-      d: "M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z",
-      key: "1ffxy3"
-    }
-  ],
-  ["path", { d: "m21.854 2.147-10.94 10.939", key: "12cjpa" }]
-];
-const Send = createLucideIcon("send", __iconNode$8);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$7 = [
-  [
-    "path",
-    {
-      d: "M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z",
-      key: "4pj2yx"
-    }
-  ],
-  ["path", { d: "M20 3v4", key: "1olli1" }],
-  ["path", { d: "M22 5h-4", key: "1gvqau" }],
-  ["path", { d: "M4 17v2", key: "vumght" }],
-  ["path", { d: "M5 18H3", key: "zchphs" }]
-];
-const Sparkles = createLucideIcon("sparkles", __iconNode$7);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$6 = [
-  [
-    "path",
-    {
-      d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
-      key: "r04s7s"
-    }
-  ]
-];
-const Star = createLucideIcon("star", __iconNode$6);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$5 = [
-  [
-    "path",
-    {
-      d: "M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z",
-      key: "vktsd0"
-    }
-  ],
-  ["circle", { cx: "7.5", cy: "7.5", r: ".5", fill: "currentColor", key: "kqv944" }]
-];
-const Tag = createLucideIcon("tag", __iconNode$5);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$4 = [
-  ["circle", { cx: "12", cy: "8", r: "5", key: "1hypcn" }],
-  ["path", { d: "M20 21a8 8 0 0 0-16 0", key: "rfgkzh" }]
-];
-const UserRound = createLucideIcon("user-round", __iconNode$4);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$3 = [
-  ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
-  ["path", { d: "M16 3.128a4 4 0 0 1 0 7.744", key: "16gr8j" }],
-  ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87", key: "kshegd" }],
-  ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }]
-];
-const Users = createLucideIcon("users", __iconNode$3);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$2 = [
-  [
-    "path",
-    {
-      d: "M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1",
-      key: "18etb6"
-    }
-  ],
-  ["path", { d: "M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4", key: "xoc0q4" }]
-];
-const Wallet = createLucideIcon("wallet", __iconNode$2);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$1 = [
-  ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
-  ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
-];
-const X = createLucideIcon("x", __iconNode$1);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode = [
-  [
-    "path",
-    {
-      d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z",
-      key: "cbrjhi"
-    }
-  ]
-];
-const Wrench = createLucideIcon("wrench", __iconNode);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Sheet, { open, onOpenChange: setOpen, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(SheetTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "button",
+      {
+        type: "button",
+        onClick: handleTriggerClick,
+        "data-ocid": "vusd.wallet_badge",
+        "aria-label": "Abrir billetera vUSD demo",
+        className: cn(
+          "group relative inline-flex h-9 items-center gap-1.5 rounded-full border border-prism-cyan/40 bg-glass px-3 font-mono text-xs font-medium text-glass shadow-soft transition-smooth hover:border-prism-cyan/70 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-prism-cyan/50",
+          className
+        ),
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(VusdTokenIcon$1, { className: "transition-transform group-hover:scale-110" }),
+          connected ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-prism-cyan", children: formatVusd(balance) }) : connectMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-muted-foreground", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(LoaderCircle, { className: "size-3 animate-spin" }),
+            "Conectando"
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-glass", children: "Conectar vUSD" })
+        ]
+      }
+    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      SheetContent,
+      {
+        side: "right",
+        className: "flex flex-col gap-0 p-0",
+        "data-ocid": "vusd.wallet_sheet",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(SheetHeader, { className: "border-b border-border bg-card/60 p-5", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(SheetTitle, { className: "flex items-center gap-2 font-display text-foreground", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(VusdTokenIcon$1, {}),
+              "Billetera vUSD demo"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-xs text-muted-foreground", children: "Demo visual · sin transacciones reales on-chain" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-1 flex-col gap-5 overflow-y-auto p-5", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "relative overflow-hidden rounded-2xl border border-prism-cyan/40 bg-glass p-5 shadow-glass",
+                "data-ocid": "vusd.wallet_balance_card",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "span",
+                    {
+                      "aria-hidden": true,
+                      className: "absolute inset-x-0 top-0 h-px bg-[length:200%_100%] animate-prism-shimmer",
+                      style: { backgroundImage: "var(--gradient-prism)" }
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "span",
+                    {
+                      "aria-hidden": true,
+                      className: "absolute inset-0 opacity-30",
+                      style: {
+                        background: "radial-gradient(circle at top right, oklch(var(--prism-cyan)/0.18), transparent 60%)"
+                      }
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground", children: "Saldo disponible" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-display text-3xl text-prism-cyan", children: formatVusd(balance) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      BlackGlassButton,
+                      {
+                        size: "sm",
+                        onClick: () => {
+                          if (walletId) topupMutation.mutate({ walletId });
+                        },
+                        disabled: topupMutation.isPending || !walletId,
+                        "data-ocid": "vusd.wallet_topup_button",
+                        children: topupMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(LoaderCircle, { className: "size-3.5 animate-spin" }),
+                          "Recargando…"
+                        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "size-3.5" }),
+                          "Recargar saldo demo"
+                        ] })
+                      }
+                    ) })
+                  ] })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-display text-sm text-foreground", children: "Service tokens minted" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono text-xs text-muted-foreground", children: minted.length })
+              ] }),
+              minted.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  className: "mt-3 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 p-6 text-center",
+                  "data-ocid": "vusd.empty_state",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Wallet, { className: "size-6 text-muted-foreground" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "Aún no tienes service tokens minted" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-xs text-muted-foreground", children: "Reserva un servicio o combo con vUSD para verlo aquí." })
+                  ]
+                }
+              ) : /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-3 flex flex-col gap-2.5", children: minted.map((token, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Link,
+                {
+                  to: "/servicios",
+                  "data-ocid": `vusd.minted_token.${i + 1}`,
+                  className: "group flex items-center gap-3 rounded-xl border border-border bg-glass p-3 transition-smooth hover:-translate-y-0.5 hover:border-prism-cyan/50 hover:shadow-soft",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "span",
+                      {
+                        "aria-hidden": true,
+                        className: "relative flex size-9 shrink-0 items-center justify-center rounded-lg border border-prism-cyan/40 bg-prism-cyan/10",
+                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(VusdTokenIcon$1, {})
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 flex-1", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "truncate font-display text-sm text-foreground", children: token.itemName }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "font-mono text-[0.65rem] text-muted-foreground", children: [
+                        "#",
+                        token.tokenId.toString(),
+                        " ·",
+                        " ",
+                        formatDateFromNs$1(token.mintedAt)
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center gap-1 rounded-full border border-prism-cyan/40 bg-prism-cyan/10 px-2 py-0.5 font-mono text-[0.6rem] font-medium text-prism-cyan", children: formatVusd(token.priceVusd) })
+                  ]
+                }
+              ) }, token.tokenId.toString())) })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-border bg-card/60 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                clearWalletId();
+                setOpen(false);
+              },
+              disabled: !connected,
+              "data-ocid": "vusd.disconnect_button",
+              className: "inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground transition-colors hover:text-destructive disabled:opacity-50",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { className: "size-3.5" }),
+                "Desconectar wallet demo"
+              ]
+            }
+          ) })
+        ]
+      }
+    )
+  ] });
+}
 const AGENDAPRO_URL$2 = "https://agendapro.com";
 const NAV_LINKS = [
   { label: "Inicio", to: "/", ocid: "nav.inicio" },
@@ -41582,10 +45442,13 @@ function Navbar() {
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hidden items-center gap-7 lg:flex", children: NAV_LINKS.map((l2) => /* @__PURE__ */ jsxRuntimeExports.jsx(NavLink, { ...l2 }, l2.ocid)) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hidden lg:block", children: /* @__PURE__ */ jsxRuntimeExports.jsx(BlackGlassButton, { size: "sm", asChild: true, "data-ocid": "nav.agendar_button", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: AGENDAPRO_URL$2, target: "_blank", rel: "noopener noreferrer", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "size-3.5" }),
-        "Agenda tu Hora"
-      ] }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden items-center gap-2.5 lg:flex", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(VusdWalletBadge, {}),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(BlackGlassButton, { size: "sm", asChild: true, "data-ocid": "nav.agendar_button", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: AGENDAPRO_URL$2, target: "_blank", rel: "noopener noreferrer", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "size-3.5" }),
+          "Agenda tu Hora"
+        ] }) })
+      ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
@@ -41601,28 +45464,31 @@ function Navbar() {
     ] }),
     open && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-border bg-card/95 backdrop-blur-xl lg:hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4 sm:px-6", children: [
       NAV_LINKS.map((l2) => /* @__PURE__ */ jsxRuntimeExports.jsx(NavLink, { ...l2, onClick: () => setOpen(false) }, l2.ocid)),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        BlackGlassButton,
-        {
-          size: "default",
-          asChild: true,
-          className: "w-full",
-          "data-ocid": "nav.mobile_agendar_button",
-          children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "a",
-            {
-              href: AGENDAPRO_URL$2,
-              target: "_blank",
-              rel: "noopener noreferrer",
-              onClick: () => setOpen(false),
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "size-4" }),
-                "Agenda tu Hora"
-              ]
-            }
-          )
-        }
-      ) })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 flex flex-col gap-2.5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(VusdWalletBadge, { className: "w-full justify-center" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          BlackGlassButton,
+          {
+            size: "default",
+            asChild: true,
+            className: "w-full",
+            "data-ocid": "nav.mobile_agendar_button",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "a",
+              {
+                href: AGENDAPRO_URL$2,
+                target: "_blank",
+                rel: "noopener noreferrer",
+                onClick: () => setOpen(false),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "size-4" }),
+                  "Agenda tu Hora"
+                ]
+              }
+            )
+          }
+        )
+      ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       "span",
@@ -41767,824 +45633,668 @@ function Layout() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(Footer, {})
   ] });
 }
-const Error$1 = Variant({
-  "FrontendOriginsNotConfigured": Null,
-  "MixedSsoSources": Record({
-    "otherKeys": Vec(Text),
-    "ssoKeys": Vec(Text)
-  }),
-  "Stale": Record({ "ageNs": Nat }),
-  "MalformedCandid": Null,
-  "AmbiguousAttribute": Record({
-    "field": Text,
-    "sources": Vec(Text)
-  }),
-  "NoAttributes": Null,
-  "UnknownNonce": Null,
-  "UntrustedSsoSource": Record({ "domain": Text }),
-  "MissingField": Text,
-  "FrontendOriginMismatch": Record({
-    "got": Text,
-    "expected": Vec(Text)
-  })
-});
-const Result_1 = Variant({ "ok": Null, "err": Error$1 });
-const UserRole = Variant({
-  "admin": Null,
-  "user": Null,
-  "guest": Null
-});
-const Value = Variant({
-  "int": Int,
-  "nat": Nat,
-  "float": Float64,
-  "bool": Bool,
-  "null": Null,
-  "text": Text
-});
-const Cell = Record({ "value": Value, "name": Text });
-const Result__1 = Record({
-  "hasMore": Bool,
-  "rows": Vec(Vec(Cell))
-});
-const Id = Nat;
-const ComboType = Variant({
-  "untilDecember": Null,
-  "monthly": Null,
-  "newClient": Null
-});
-const Combo = Record({
-  "id": Id,
-  "validity": Text,
-  "regularPriceCLP": Nat,
-  "agendaproUrl": Text,
-  "name": Text,
-  "description": Text,
-  "comboType": ComboType,
-  "cuposTotal": Nat,
-  "servicesIncluded": Vec(Id),
-  "priceCLP": Nat
-});
-const Partner = Record({
-  "id": Id,
-  "name": Text,
-  "description": Text,
-  "logoText": Text
-});
-const ProductBadge$1 = Variant({
-  "new": Null,
-  "recommended": Null
-});
-const Product = Record({
-  "id": Id,
-  "name": Text,
-  "description": Text,
-  "usage": Text,
-  "badge": Opt(ProductBadge$1)
-});
-const ServiceCategory$1 = Variant({
-  "especial": Null,
-  "corporal": Null,
-  "facial": Null
-});
-const Service = Record({
-  "id": Id,
-  "durationMins": Nat,
-  "agendaproUrl": Text,
-  "techniques": Vec(Text),
-  "toolsIncluded": Vec(Text),
-  "allIncluded": Bool,
-  "name": Text,
-  "description": Text,
-  "cuposTotal": Nat,
-  "category": ServiceCategory$1,
-  "priceCLP": Nat,
-  "longDescription": Text
-});
-const Testimonial = Record({
-  "id": Id,
-  "clientName": Text,
-  "comment": Text
-});
-const Worker = Record({
-  "id": Id,
-  "bio": Text,
-  "servicesIds": Vec(Id),
-  "name": Text,
-  "role": Text,
-  "silhouetteVariant": Nat
-});
-const Timestamp = Nat;
-const Application = Record({
-  "id": Id,
-  "name": Text,
-  "submittedAt": Timestamp,
-  "email": Text,
-  "specialty": Text,
-  "message": Text
-});
-const Error_ = Variant({
-  "invalidInput": Text,
-  "notFound": Text,
-  "unauthorized": Text
-});
-const Result = Variant({ "ok": Application, "err": Error_ });
-Service$1({
-  "_initialize_access_control": Func([], [], []),
-  "_internet_identity_sign_in_finish": Func([], [Result_1], []),
-  "_internet_identity_sign_in_start": Func([], [Vec(Nat8)], []),
-  "assignCallerUserRole": Func([Principal2, UserRole], [], []),
-  "execute": Func([Text], [Result__1], ["query"]),
-  "getCallerUserRole": Func([], [UserRole], ["query"]),
-  "getCombos": Func([], [Vec(Combo)], ["query"]),
-  "getPartners": Func([], [Vec(Partner)], ["query"]),
-  "getProducts": Func([], [Vec(Product)], ["query"]),
-  "getServices": Func([], [Vec(Service)], ["query"]),
-  "getServicesByCategory": Func(
-    [ServiceCategory$1],
-    [Vec(Service)],
-    ["query"]
-  ),
-  "getTestimonials": Func([], [Vec(Testimonial)], ["query"]),
-  "getWorkers": Func([], [Vec(Worker)], ["query"]),
-  "isCallerAdmin": Func([], [Bool], ["query"]),
-  "schema": Func([], [Text], ["query"]),
-  "submitApplication": Func(
-    [Text, Text, Text, Text],
-    [Result],
-    []
-  )
-});
-const idlFactory = ({ IDL: IDL2 }) => {
-  const Error2 = IDL2.Variant({
-    "FrontendOriginsNotConfigured": IDL2.Null,
-    "MixedSsoSources": IDL2.Record({
-      "otherKeys": IDL2.Vec(IDL2.Text),
-      "ssoKeys": IDL2.Vec(IDL2.Text)
-    }),
-    "Stale": IDL2.Record({ "ageNs": IDL2.Nat }),
-    "MalformedCandid": IDL2.Null,
-    "AmbiguousAttribute": IDL2.Record({
-      "field": IDL2.Text,
-      "sources": IDL2.Vec(IDL2.Text)
-    }),
-    "NoAttributes": IDL2.Null,
-    "UnknownNonce": IDL2.Null,
-    "UntrustedSsoSource": IDL2.Record({ "domain": IDL2.Text }),
-    "MissingField": IDL2.Text,
-    "FrontendOriginMismatch": IDL2.Record({
-      "got": IDL2.Text,
-      "expected": IDL2.Vec(IDL2.Text)
-    })
-  });
-  const Result_12 = IDL2.Variant({ "ok": IDL2.Null, "err": Error2 });
-  const UserRole2 = IDL2.Variant({
-    "admin": IDL2.Null,
-    "user": IDL2.Null,
-    "guest": IDL2.Null
-  });
-  const Value2 = IDL2.Variant({
-    "int": IDL2.Int,
-    "nat": IDL2.Nat,
-    "float": IDL2.Float64,
-    "bool": IDL2.Bool,
-    "null": IDL2.Null,
-    "text": IDL2.Text
-  });
-  const Cell2 = IDL2.Record({ "value": Value2, "name": IDL2.Text });
-  const Result__12 = IDL2.Record({
-    "hasMore": IDL2.Bool,
-    "rows": IDL2.Vec(IDL2.Vec(Cell2))
-  });
-  const Id2 = IDL2.Nat;
-  const ComboType2 = IDL2.Variant({
-    "untilDecember": IDL2.Null,
-    "monthly": IDL2.Null,
-    "newClient": IDL2.Null
-  });
-  const Combo2 = IDL2.Record({
-    "id": Id2,
-    "validity": IDL2.Text,
-    "regularPriceCLP": IDL2.Nat,
-    "agendaproUrl": IDL2.Text,
-    "name": IDL2.Text,
-    "description": IDL2.Text,
-    "comboType": ComboType2,
-    "cuposTotal": IDL2.Nat,
-    "servicesIncluded": IDL2.Vec(Id2),
-    "priceCLP": IDL2.Nat
-  });
-  const Partner2 = IDL2.Record({
-    "id": Id2,
-    "name": IDL2.Text,
-    "description": IDL2.Text,
-    "logoText": IDL2.Text
-  });
-  const ProductBadge2 = IDL2.Variant({
-    "new": IDL2.Null,
-    "recommended": IDL2.Null
-  });
-  const Product2 = IDL2.Record({
-    "id": Id2,
-    "name": IDL2.Text,
-    "description": IDL2.Text,
-    "usage": IDL2.Text,
-    "badge": IDL2.Opt(ProductBadge2)
-  });
-  const ServiceCategory2 = IDL2.Variant({
-    "especial": IDL2.Null,
-    "corporal": IDL2.Null,
-    "facial": IDL2.Null
-  });
-  const Service2 = IDL2.Record({
-    "id": Id2,
-    "durationMins": IDL2.Nat,
-    "agendaproUrl": IDL2.Text,
-    "techniques": IDL2.Vec(IDL2.Text),
-    "toolsIncluded": IDL2.Vec(IDL2.Text),
-    "allIncluded": IDL2.Bool,
-    "name": IDL2.Text,
-    "description": IDL2.Text,
-    "cuposTotal": IDL2.Nat,
-    "category": ServiceCategory2,
-    "priceCLP": IDL2.Nat,
-    "longDescription": IDL2.Text
-  });
-  const Testimonial2 = IDL2.Record({
-    "id": Id2,
-    "clientName": IDL2.Text,
-    "comment": IDL2.Text
-  });
-  const Worker2 = IDL2.Record({
-    "id": Id2,
-    "bio": IDL2.Text,
-    "servicesIds": IDL2.Vec(Id2),
-    "name": IDL2.Text,
-    "role": IDL2.Text,
-    "silhouetteVariant": IDL2.Nat
-  });
-  const Timestamp2 = IDL2.Nat;
-  const Application2 = IDL2.Record({
-    "id": Id2,
-    "name": IDL2.Text,
-    "submittedAt": Timestamp2,
-    "email": IDL2.Text,
-    "specialty": IDL2.Text,
-    "message": IDL2.Text
-  });
-  const Error_2 = IDL2.Variant({
-    "invalidInput": IDL2.Text,
-    "notFound": IDL2.Text,
-    "unauthorized": IDL2.Text
-  });
-  const Result2 = IDL2.Variant({ "ok": Application2, "err": Error_2 });
-  return IDL2.Service({
-    "_initialize_access_control": IDL2.Func([], [], []),
-    "_internet_identity_sign_in_finish": IDL2.Func([], [Result_12], []),
-    "_internet_identity_sign_in_start": IDL2.Func([], [IDL2.Vec(IDL2.Nat8)], []),
-    "assignCallerUserRole": IDL2.Func([IDL2.Principal, UserRole2], [], []),
-    "execute": IDL2.Func([IDL2.Text], [Result__12], ["query"]),
-    "getCallerUserRole": IDL2.Func([], [UserRole2], ["query"]),
-    "getCombos": IDL2.Func([], [IDL2.Vec(Combo2)], ["query"]),
-    "getPartners": IDL2.Func([], [IDL2.Vec(Partner2)], ["query"]),
-    "getProducts": IDL2.Func([], [IDL2.Vec(Product2)], ["query"]),
-    "getServices": IDL2.Func([], [IDL2.Vec(Service2)], ["query"]),
-    "getServicesByCategory": IDL2.Func(
-      [ServiceCategory2],
-      [IDL2.Vec(Service2)],
-      ["query"]
-    ),
-    "getTestimonials": IDL2.Func([], [IDL2.Vec(Testimonial2)], ["query"]),
-    "getWorkers": IDL2.Func([], [IDL2.Vec(Worker2)], ["query"]),
-    "isCallerAdmin": IDL2.Func([], [IDL2.Bool], ["query"]),
-    "schema": IDL2.Func([], [IDL2.Text], ["query"]),
-    "submitApplication": IDL2.Func(
-      [IDL2.Text, IDL2.Text, IDL2.Text, IDL2.Text],
-      [Result2],
-      []
+function VusdTokenIcon({ className }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "span",
+    {
+      "aria-hidden": true,
+      className: cn(
+        "relative inline-flex size-4 items-center justify-center rounded-full",
+        className
+      ),
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "span",
+          {
+            className: "absolute inset-0 rounded-full",
+            style: {
+              background: "linear-gradient(135deg, oklch(var(--prism-cyan)), oklch(var(--prism-gold)))"
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "relative font-mono text-[0.55rem] font-bold text-background", children: "v" })
+      ]
+    }
+  );
+}
+function VusdPayButton({
+  itemType: _itemType,
+  itemId: _itemId,
+  itemName: _itemName,
+  priceCLP: _priceCLP,
+  onPay,
+  minted = false,
+  className,
+  ocidSuffix
+}) {
+  const ocid = ocidSuffix ? `vusd.pay_button.${ocidSuffix}` : "vusd.pay_button";
+  if (minted) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "span",
+      {
+        className: cn(
+          "inline-flex h-9 items-center gap-1.5 rounded-full border border-prism-cyan/40 bg-prism-cyan/10 px-3 font-mono text-xs font-medium text-prism-cyan",
+          className
+        ),
+        "data-ocid": `${ocid}.minted_badge`,
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              "aria-hidden": true,
+              className: "size-1.5 animate-prism-pulse rounded-full bg-prism-cyan"
+            }
+          ),
+          "Reservado con vUSD"
+        ]
+      }
+    );
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "button",
+    {
+      type: "button",
+      onClick: onPay,
+      "data-ocid": ocid,
+      "aria-label": `Pagar ${_itemName} con vUSD`,
+      className: cn(
+        "group relative inline-flex h-9 items-center gap-1.5 rounded-full border border-prism-cyan/40 bg-glass px-3 font-mono text-xs font-medium text-glass shadow-soft transition-smooth hover:border-prism-cyan/70 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-prism-cyan/50",
+        className
+      ),
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(VusdTokenIcon, { className: "transition-transform group-hover:scale-110" }),
+        "Pagar con vUSD"
+      ]
+    }
+  );
+}
+function Dialog({
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Root$1, { "data-slot": "dialog", ...props });
+}
+function DialogPortal({
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Portal, { "data-slot": "dialog-portal", ...props });
+}
+function DialogOverlay({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Overlay,
+    {
+      "data-slot": "dialog-overlay",
+      className: cn(
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function DialogContent({
+  className,
+  children,
+  showCloseButton = true,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogPortal, { "data-slot": "dialog-portal", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DialogOverlay, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Content,
+      {
+        "data-slot": "dialog-content",
+        className: cn(
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+          className
+        ),
+        ...props,
+        children: [
+          children,
+          showCloseButton && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Close,
+            {
+              "data-slot": "dialog-close",
+              className: "ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(X, {}),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sr-only", children: "Close" })
+              ]
+            }
+          )
+        ]
+      }
     )
+  ] });
+}
+function DialogHeader({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "div",
+    {
+      "data-slot": "dialog-header",
+      className: cn("flex flex-col gap-2 text-center sm:text-left", className),
+      ...props
+    }
+  );
+}
+function DialogFooter({ className, ...props }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "div",
+    {
+      "data-slot": "dialog-footer",
+      className: cn(
+        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function DialogTitle({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Title,
+    {
+      "data-slot": "dialog-title",
+      className: cn("text-lg leading-none font-semibold", className),
+      ...props
+    }
+  );
+}
+function DialogDescription({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Description,
+    {
+      "data-slot": "dialog-description",
+      className: cn("text-muted-foreground text-sm", className),
+      ...props
+    }
+  );
+}
+const STEP_LABELS = [
+  "Conectar wallet",
+  "Precio en vUSD",
+  "Confirmar mint",
+  "Éxito"
+];
+const NS_PER_MS = 1000000n;
+function formatDateFromNs(ns) {
+  const ms2 = Number(ns / NS_PER_MS);
+  return new Date(ms2).toLocaleString("es-CL", {
+    dateStyle: "long",
+    timeStyle: "short"
   });
-};
-function record_opt_to_undefined(arg) {
-  return arg == null ? void 0 : arg;
 }
-var ProductBadge = /* @__PURE__ */ ((ProductBadge2) => {
-  ProductBadge2["new_"] = "new";
-  ProductBadge2["recommended"] = "recommended";
-  return ProductBadge2;
-})(ProductBadge || {});
-var ServiceCategory = /* @__PURE__ */ ((ServiceCategory2) => {
-  ServiceCategory2["especial"] = "especial";
-  ServiceCategory2["corporal"] = "corporal";
-  ServiceCategory2["facial"] = "facial";
-  return ServiceCategory2;
-})(ServiceCategory || {});
-class Backend {
-  constructor(actor, _uploadFile, _downloadFile, processError2) {
-    this.actor = actor;
-    this._uploadFile = _uploadFile;
-    this._downloadFile = _downloadFile;
-    this.processError = processError2;
-  }
-  async _initialize_access_control() {
-    if (this.processError) {
-      try {
-        const result = await this.actor._initialize_access_control();
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor._initialize_access_control();
-      return result;
+function shortAddress(walletId) {
+  const head = walletId.slice(0, 10);
+  const tail = walletId.slice(-4);
+  return `${head}…${tail}`;
+}
+function StepIndicator({ current }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "ol",
+    {
+      className: "flex items-center gap-1.5",
+      "aria-label": "Pasos del flujo demo",
+      "data-ocid": "vusd.step_indicator",
+      children: STEP_LABELS.map((label, i) => {
+        const n = i + 1;
+        const active = n === current;
+        const done = n < current;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex items-center gap-1.5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              className: cn(
+                "flex size-6 items-center justify-center rounded-full border font-mono text-[0.65rem] font-semibold transition-smooth",
+                active && "border-prism-cyan/60 bg-prism-cyan/15 text-prism-cyan shadow-soft",
+                done && "border-prism-gold/50 bg-prism-gold/15 text-prism-gold",
+                !active && !done && "border-border bg-muted/40 text-muted-foreground"
+              ),
+              "aria-current": active ? "step" : void 0,
+              children: done ? /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "size-3" }) : n
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              className: cn(
+                "hidden font-mono text-[0.65rem] uppercase tracking-[0.15em] sm:inline",
+                active ? "text-prism-cyan" : "text-muted-foreground"
+              ),
+              children: label
+            }
+          ),
+          n < STEP_LABELS.length && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              "aria-hidden": true,
+              className: cn(
+                "h-px w-4 sm:w-6",
+                done ? "bg-prism-gold/40" : "bg-border"
+              )
+            }
+          )
+        ] }, label);
+      })
     }
-  }
-  async _internet_identity_sign_in_finish() {
-    if (this.processError) {
-      try {
-        const result = await this.actor._internet_identity_sign_in_finish();
-        return from_candid_Result_1_n1(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
+  );
+}
+function ConnectWalletStep({
+  walletId,
+  connecting,
+  onConnect
+}) {
+  const mockAddress = reactExports.useMemo(
+    () => `0xvUSD${Date.now().toString(16).slice(0, 8)}`,
+    []
+  );
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-5 py-2", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "relative flex size-20 items-center justify-center rounded-full border border-prism-cyan/40 bg-glass shadow-glass",
+        "data-ocid": "vusd.wallet_icon",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              "aria-hidden": true,
+              className: "absolute inset-0 animate-prism-pulse rounded-full",
+              style: {
+                background: "radial-gradient(circle, oklch(var(--prism-cyan)/0.25), transparent 70%)"
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Wallet, { className: "relative size-9 text-prism-cyan" })
+        ]
       }
-    } else {
-      const result = await this.actor._internet_identity_sign_in_finish();
-      return from_candid_Result_1_n1(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async _internet_identity_sign_in_start() {
-    if (this.processError) {
-      try {
-        const result = await this.actor._internet_identity_sign_in_start();
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-display text-lg text-foreground", children: "Conecta tu billetera demo" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-muted-foreground", children: "Simularemos la conexión de una wallet Web3. No se realiza ninguna transacción real on-chain." })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full rounded-xl border border-border bg-muted/30 px-4 py-3 font-mono text-xs text-muted-foreground", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-prism-cyan", children: "Dirección demo:" }),
+      " ",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-foreground", children: mockAddress })
+    ] }),
+    walletId ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 rounded-full border border-prism-gold/40 bg-prism-gold/10 px-3 py-1.5 font-mono text-xs text-prism-gold", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "size-3.5" }),
+      "Wallet conectada · ",
+      shortAddress(walletId)
+    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+      BlackGlassButton,
+      {
+        onClick: onConnect,
+        disabled: connecting,
+        "data-ocid": "vusd.connect_wallet_button",
+        children: connecting ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(LoaderCircle, { className: "size-4 animate-spin" }),
+          "Conectando…"
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Wallet, { className: "size-4" }),
+          "Conectar wallet demo"
+        ] })
       }
-    } else {
-      const result = await this.actor._internet_identity_sign_in_start();
-      return result;
-    }
-  }
-  async assignCallerUserRole(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n5(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
+    )
+  ] });
+}
+function PriceStep({
+  itemName,
+  priceCLP,
+  clpUsdRate,
+  priceVusd,
+  balance,
+  onTopup,
+  onContinue,
+  topupPending
+}) {
+  const insufficient = balance < priceVusd;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 py-1", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border border-border bg-muted/30 p-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground", children: "Reserva" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-display text-lg text-foreground", children: itemName }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 grid grid-cols-2 gap-3 text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-xs text-muted-foreground", children: "Precio CLP" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-display text-base text-foreground", children: formatCLP(priceCLP) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-xs text-muted-foreground", children: "Tipo de cambio referencial" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "font-mono text-base text-prism-violet", children: [
+            Number(clpUsdRate),
+            " CLP = 1 USD"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-xs text-muted-foreground", children: "Equivalente en vUSD" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-display text-xl text-prism-cyan", children: formatVusd(priceVusd) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-xs text-muted-foreground", children: "Saldo disponible" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "p",
+            {
+              className: cn(
+                "font-display text-xl",
+                insufficient ? "text-destructive" : "text-prism-gold"
+              ),
+              children: formatVusd(balance)
+            }
+          )
+        ] })
+      ] })
+    ] }),
+    insufficient && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "flex flex-col gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4",
+        "data-ocid": "vusd.insufficient_balance",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-destructive", children: "Saldo insuficiente para completar la reserva demo." }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            BlackGlassButton,
+            {
+              size: "sm",
+              onClick: onTopup,
+              disabled: topupPending,
+              "data-ocid": "vusd.topup_button",
+              className: "self-start",
+              children: topupPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(LoaderCircle, { className: "size-4 animate-spin" }),
+                "Recargando…"
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "size-3.5" }),
+                "Recargar saldo demo"
+              ] })
+            }
+          )
+        ]
       }
-    } else {
-      const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n5(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-  async execute(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.execute(arg0);
-        return from_candid_Result__1_n7(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      BlackGlassButton,
+      {
+        onClick: onContinue,
+        disabled: insufficient,
+        "data-ocid": "vusd.continue_to_mint_button",
+        className: "self-end",
+        children: "Continuar"
       }
-    } else {
-      const result = await this.actor.execute(arg0);
-      return from_candid_Result__1_n7(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getCallerUserRole() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getCallerUserRole();
-        return from_candid_UserRole_n15(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
+    )
+  ] });
+}
+function ConfirmStep({
+  itemName,
+  priceVusd,
+  onConfirm,
+  minting
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 py-1", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm leading-relaxed text-muted-foreground", children: [
+      "Al confirmar, se minteará un",
+      " ",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-prism-cyan", children: "service token de demostración" }),
+      " ",
+      "asociado a tu reserva. Esto es solo una demo visual, no una transacción real on-chain."
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "relative overflow-hidden rounded-xl border border-prism-cyan/40 bg-glass p-4 shadow-glass",
+        "data-ocid": "vusd.token_preview",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              "aria-hidden": true,
+              className: "absolute inset-x-0 top-0 h-px bg-[length:200%_100%] animate-prism-shimmer",
+              style: { backgroundImage: "var(--gradient-prism)" }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-[0.65rem] uppercase tracking-[0.2em] text-prism-cyan", children: "Service token · preview" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-display text-lg text-foreground", children: itemName }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 font-mono text-sm text-prism-gold", children: formatVusd(priceVusd) })
+        ]
       }
-    } else {
-      const result = await this.actor.getCallerUserRole();
-      return from_candid_UserRole_n15(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getCombos() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getCombos();
-        return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      BlackGlassButton,
+      {
+        onClick: onConfirm,
+        disabled: minting,
+        "data-ocid": "vusd.confirm_mint_button",
+        className: "self-end",
+        children: minting ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(LoaderCircle, { className: "size-4 animate-spin" }),
+          "Minteando…"
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "size-4" }),
+          "Confirmar y mintear"
+        ] })
       }
-    } else {
-      const result = await this.actor.getCombos();
-      return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getPartners() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getPartners();
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
+    )
+  ] });
+}
+function SuccessStep({
+  result,
+  itemName,
+  walletId
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-5 py-2", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: "relative flex size-16 items-center justify-center rounded-full border border-prism-gold/50 bg-prism-gold/10",
+        "data-ocid": "vusd.success_icon",
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "size-8 text-prism-gold" })
       }
-    } else {
-      const result = await this.actor.getPartners();
-      return result;
-    }
-  }
-  async getProducts() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getProducts();
-        return from_candid_vec_n22(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-display text-xl text-foreground", children: "¡Service token minteado!" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-muted-foreground", children: "Tu reserva demo quedó registrada con vUSD." })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "relative w-full overflow-hidden rounded-2xl border border-prism-cyan/50 bg-glass p-5 shadow-glass",
+        "data-ocid": "vusd.minted_token_card",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              "aria-hidden": true,
+              className: "absolute inset-x-0 top-0 h-px bg-[length:200%_100%] animate-prism-shimmer",
+              style: { backgroundImage: "var(--gradient-prism)" }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              "aria-hidden": true,
+              className: "absolute inset-0 opacity-30",
+              style: {
+                background: "radial-gradient(circle at top right, oklch(var(--prism-cyan)/0.18), transparent 60%)"
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-start justify-between gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-[0.65rem] uppercase tracking-[0.2em] text-prism-cyan", children: "Service token" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-display text-lg leading-tight text-foreground", children: itemName })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1 rounded-full border border-prism-cyan/40 bg-prism-cyan/10 px-2.5 py-1 font-mono text-[0.65rem] font-medium text-prism-cyan", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "span",
+                {
+                  "aria-hidden": true,
+                  className: "size-1.5 animate-prism-pulse rounded-full bg-prism-cyan"
+                }
+              ),
+              "Reservado con vUSD"
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("dl", { className: "relative mt-4 grid grid-cols-2 gap-3 font-mono text-xs", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-muted-foreground", children: "Token ID" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("dd", { className: "text-foreground", children: [
+                "#",
+                result.tokenId.toString()
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-muted-foreground", children: "Fecha de mint" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "text-foreground", children: formatDateFromNs(BigInt(Date.now()) * NS_PER_MS) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-muted-foreground", children: "Wallet" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "truncate text-foreground", children: shortAddress(walletId) })
+            ] })
+          ] })
+        ]
       }
-    } else {
-      const result = await this.actor.getProducts();
-      return from_candid_vec_n22(this._uploadFile, this._downloadFile, result);
+    )
+  ] });
+}
+function VusdPayModal({
+  open,
+  onOpenChange,
+  itemType: _itemType,
+  itemId: _itemId,
+  itemName,
+  priceCLP,
+  onSuccess
+}) {
+  var _a2, _b2;
+  const { walletId, setWalletId } = useVusdSession();
+  const configQuery = useVusdConfig();
+  const walletQuery = useVusdWallet(walletId);
+  const connectMutation = useConnectDemoWallet();
+  const topupMutation = useTopupVusd();
+  const mintMutation = useMintServiceToken();
+  const [step, setStep] = reactExports.useState(1);
+  const [mintResult, setMintResult] = reactExports.useState(null);
+  reactExports.useEffect(() => {
+    if (open) {
+      setMintResult(null);
+      setStep(walletId ? 2 : 1);
     }
-  }
-  async getServices() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getServices();
-        return from_candid_vec_n28(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
+  }, [open, walletId]);
+  const clpUsdRate = ((_a2 = configQuery.data) == null ? void 0 : _a2.clpUsdRate) ?? 950n;
+  const priceVusd = clpToVusdCents(priceCLP, clpUsdRate);
+  const balance = ((_b2 = walletQuery.data) == null ? void 0 : _b2.balance) ?? 0n;
+  const handleConnect = () => {
+    connectMutation.mutate(void 0, {
+      onSuccess: (wallet) => {
+        setWalletId(wallet.walletId);
+        setStep(2);
       }
-    } else {
-      const result = await this.actor.getServices();
-      return from_candid_vec_n28(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getServicesByCategory(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getServicesByCategory(to_candid_ServiceCategory_n33(this._uploadFile, this._downloadFile, arg0));
-        return from_candid_vec_n28(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getServicesByCategory(to_candid_ServiceCategory_n33(this._uploadFile, this._downloadFile, arg0));
-      return from_candid_vec_n28(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getTestimonials() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getTestimonials();
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getTestimonials();
-      return result;
-    }
-  }
-  async getWorkers() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getWorkers();
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getWorkers();
-      return result;
-    }
-  }
-  async isCallerAdmin() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.isCallerAdmin();
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.isCallerAdmin();
-      return result;
-    }
-  }
-  async schema() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.schema();
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.schema();
-      return result;
-    }
-  }
-  async submitApplication(arg0, arg1, arg2, arg3) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.submitApplication(arg0, arg1, arg2, arg3);
-        return from_candid_Result_n35(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.submitApplication(arg0, arg1, arg2, arg3);
-      return from_candid_Result_n35(this._uploadFile, this._downloadFile, result);
-    }
-  }
-}
-function from_candid_Cell_n11(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n12(_uploadFile, _downloadFile, value);
-}
-function from_candid_ComboType_n20(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n21(_uploadFile, _downloadFile, value);
-}
-function from_candid_Combo_n18(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n19(_uploadFile, _downloadFile, value);
-}
-function from_candid_Error__n37(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n38(_uploadFile, _downloadFile, value);
-}
-function from_candid_Error_n3(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n4(_uploadFile, _downloadFile, value);
-}
-function from_candid_ProductBadge_n26(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n27(_uploadFile, _downloadFile, value);
-}
-function from_candid_Product_n23(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n24(_uploadFile, _downloadFile, value);
-}
-function from_candid_Result_1_n1(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n2(_uploadFile, _downloadFile, value);
-}
-function from_candid_Result__1_n7(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n8(_uploadFile, _downloadFile, value);
-}
-function from_candid_Result_n35(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n36(_uploadFile, _downloadFile, value);
-}
-function from_candid_ServiceCategory_n31(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n32(_uploadFile, _downloadFile, value);
-}
-function from_candid_Service_n29(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n30(_uploadFile, _downloadFile, value);
-}
-function from_candid_UserRole_n15(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n16(_uploadFile, _downloadFile, value);
-}
-function from_candid_Value_n13(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n14(_uploadFile, _downloadFile, value);
-}
-function from_candid_opt_n25(_uploadFile, _downloadFile, value) {
-  return value.length === 0 ? null : from_candid_ProductBadge_n26(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_record_n12(_uploadFile, _downloadFile, value) {
-  return {
-    value: from_candid_Value_n13(_uploadFile, _downloadFile, value.value),
-    name: value.name
+    });
   };
-}
-function from_candid_record_n19(_uploadFile, _downloadFile, value) {
-  return {
-    id: value.id,
-    validity: value.validity,
-    regularPriceCLP: value.regularPriceCLP,
-    agendaproUrl: value.agendaproUrl,
-    name: value.name,
-    description: value.description,
-    comboType: from_candid_ComboType_n20(_uploadFile, _downloadFile, value.comboType),
-    cuposTotal: value.cuposTotal,
-    servicesIncluded: value.servicesIncluded,
-    priceCLP: value.priceCLP
+  const handleTopup = () => {
+    if (!walletId) return;
+    topupMutation.mutate({ walletId });
   };
-}
-function from_candid_record_n24(_uploadFile, _downloadFile, value) {
-  return {
-    id: value.id,
-    name: value.name,
-    description: value.description,
-    usage: value.usage,
-    badge: record_opt_to_undefined(from_candid_opt_n25(_uploadFile, _downloadFile, value.badge))
+  const handleConfirm = () => {
+    if (!walletId) return;
+    mintMutation.mutate(
+      {
+        walletId,
+        itemType: _itemType,
+        itemId: _itemId,
+        itemName,
+        priceVusd
+      },
+      {
+        onSuccess: (result) => {
+          setMintResult(result);
+          setStep(4);
+        }
+      }
+    );
   };
-}
-function from_candid_record_n30(_uploadFile, _downloadFile, value) {
-  return {
-    id: value.id,
-    durationMins: value.durationMins,
-    agendaproUrl: value.agendaproUrl,
-    techniques: value.techniques,
-    toolsIncluded: value.toolsIncluded,
-    allIncluded: value.allIncluded,
-    name: value.name,
-    description: value.description,
-    cuposTotal: value.cuposTotal,
-    category: from_candid_ServiceCategory_n31(_uploadFile, _downloadFile, value.category),
-    priceCLP: value.priceCLP,
-    longDescription: value.longDescription
+  const handleClose = () => {
+    if (mintResult) onSuccess(mintResult);
+    onOpenChange(false);
   };
-}
-function from_candid_record_n8(_uploadFile, _downloadFile, value) {
-  return {
-    hasMore: value.hasMore,
-    rows: from_candid_vec_n9(_uploadFile, _downloadFile, value.rows)
-  };
-}
-function from_candid_variant_n14(_uploadFile, _downloadFile, value) {
-  return "int" in value ? {
-    __kind__: "int",
-    int: value.int
-  } : "nat" in value ? {
-    __kind__: "nat",
-    nat: value.nat
-  } : "float" in value ? {
-    __kind__: "float",
-    float: value.float
-  } : "bool" in value ? {
-    __kind__: "bool",
-    bool: value.bool
-  } : "null" in value ? {
-    __kind__: "null",
-    null: value.null
-  } : "text" in value ? {
-    __kind__: "text",
-    text: value.text
-  } : value;
-}
-function from_candid_variant_n16(_uploadFile, _downloadFile, value) {
-  return "admin" in value ? "admin" : "user" in value ? "user" : "guest" in value ? "guest" : value;
-}
-function from_candid_variant_n2(_uploadFile, _downloadFile, value) {
-  return "ok" in value ? {
-    __kind__: "ok",
-    ok: value.ok
-  } : "err" in value ? {
-    __kind__: "err",
-    err: from_candid_Error_n3(_uploadFile, _downloadFile, value.err)
-  } : value;
-}
-function from_candid_variant_n21(_uploadFile, _downloadFile, value) {
-  return "untilDecember" in value ? "untilDecember" : "monthly" in value ? "monthly" : "newClient" in value ? "newClient" : value;
-}
-function from_candid_variant_n27(_uploadFile, _downloadFile, value) {
-  return "new" in value ? ProductBadge.new : "recommended" in value ? "recommended" : value;
-}
-function from_candid_variant_n32(_uploadFile, _downloadFile, value) {
-  return "especial" in value ? "especial" : "corporal" in value ? "corporal" : "facial" in value ? "facial" : value;
-}
-function from_candid_variant_n36(_uploadFile, _downloadFile, value) {
-  return "ok" in value ? {
-    __kind__: "ok",
-    ok: value.ok
-  } : "err" in value ? {
-    __kind__: "err",
-    err: from_candid_Error__n37(_uploadFile, _downloadFile, value.err)
-  } : value;
-}
-function from_candid_variant_n38(_uploadFile, _downloadFile, value) {
-  return "invalidInput" in value ? {
-    __kind__: "invalidInput",
-    invalidInput: value.invalidInput
-  } : "notFound" in value ? {
-    __kind__: "notFound",
-    notFound: value.notFound
-  } : "unauthorized" in value ? {
-    __kind__: "unauthorized",
-    unauthorized: value.unauthorized
-  } : value;
-}
-function from_candid_variant_n4(_uploadFile, _downloadFile, value) {
-  return "FrontendOriginsNotConfigured" in value ? {
-    __kind__: "FrontendOriginsNotConfigured",
-    FrontendOriginsNotConfigured: value.FrontendOriginsNotConfigured
-  } : "MixedSsoSources" in value ? {
-    __kind__: "MixedSsoSources",
-    MixedSsoSources: value.MixedSsoSources
-  } : "Stale" in value ? {
-    __kind__: "Stale",
-    Stale: value.Stale
-  } : "MalformedCandid" in value ? {
-    __kind__: "MalformedCandid",
-    MalformedCandid: value.MalformedCandid
-  } : "AmbiguousAttribute" in value ? {
-    __kind__: "AmbiguousAttribute",
-    AmbiguousAttribute: value.AmbiguousAttribute
-  } : "NoAttributes" in value ? {
-    __kind__: "NoAttributes",
-    NoAttributes: value.NoAttributes
-  } : "UnknownNonce" in value ? {
-    __kind__: "UnknownNonce",
-    UnknownNonce: value.UnknownNonce
-  } : "UntrustedSsoSource" in value ? {
-    __kind__: "UntrustedSsoSource",
-    UntrustedSsoSource: value.UntrustedSsoSource
-  } : "MissingField" in value ? {
-    __kind__: "MissingField",
-    MissingField: value.MissingField
-  } : "FrontendOriginMismatch" in value ? {
-    __kind__: "FrontendOriginMismatch",
-    FrontendOriginMismatch: value.FrontendOriginMismatch
-  } : value;
-}
-function from_candid_vec_n10(_uploadFile, _downloadFile, value) {
-  return value.map((x2) => from_candid_Cell_n11(_uploadFile, _downloadFile, x2));
-}
-function from_candid_vec_n17(_uploadFile, _downloadFile, value) {
-  return value.map((x2) => from_candid_Combo_n18(_uploadFile, _downloadFile, x2));
-}
-function from_candid_vec_n22(_uploadFile, _downloadFile, value) {
-  return value.map((x2) => from_candid_Product_n23(_uploadFile, _downloadFile, x2));
-}
-function from_candid_vec_n28(_uploadFile, _downloadFile, value) {
-  return value.map((x2) => from_candid_Service_n29(_uploadFile, _downloadFile, x2));
-}
-function from_candid_vec_n9(_uploadFile, _downloadFile, value) {
-  return value.map((x2) => from_candid_vec_n10(_uploadFile, _downloadFile, x2));
-}
-function to_candid_ServiceCategory_n33(_uploadFile, _downloadFile, value) {
-  return to_candid_variant_n34(_uploadFile, _downloadFile, value);
-}
-function to_candid_UserRole_n5(_uploadFile, _downloadFile, value) {
-  return to_candid_variant_n6(_uploadFile, _downloadFile, value);
-}
-function to_candid_variant_n34(_uploadFile, _downloadFile, value) {
-  return value == "especial" ? {
-    especial: null
-  } : value == "corporal" ? {
-    corporal: null
-  } : value == "facial" ? {
-    facial: null
-  } : value;
-}
-function to_candid_variant_n6(_uploadFile, _downloadFile, value) {
-  return value == "admin" ? {
-    admin: null
-  } : value == "user" ? {
-    user: null
-  } : value == "guest" ? {
-    guest: null
-  } : value;
-}
-function createActor(canisterId, _uploadFile, _downloadFile, options = {}) {
-  const agent = options.agent || HttpAgent.createSync({
-    ...options.agentOptions
-  });
-  if (options.agent && options.agentOptions) {
-    console.warn("Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.");
-  }
-  const actor = Actor.createActor(idlFactory, {
-    agent,
-    canisterId,
-    ...options.actorOptions
-  });
-  return new Backend(actor, _uploadFile, _downloadFile, options.processError);
-}
-function deriveCuposTier(cuposTotal) {
-  const n = Number(cuposTotal);
-  if (n <= 0) return "agotado";
-  if (n <= 3) return "bajo";
-  if (n <= 8) return "medio";
-  return "alto";
-}
-const CUPOS_TIER_LABEL = {
-  alto: "Cupos disponibles",
-  medio: "Cupos limitados",
-  bajo: "Últimos cupos",
-  agotado: "Cupos agotados"
-};
-const SERVICE_CATEGORY_LABEL = {
-  facial: "Facial",
-  corporal: "Corporal",
-  especial: "Especial"
-};
-const COMBO_TYPE_LABEL = {
-  untilDecember: "Válido hasta diciembre",
-  monthly: "Mensual",
-  newClient: "Nuevos clientes"
-};
-const PRODUCT_BADGE_LABEL = {
-  new: "Nuevo",
-  recommended: "Recomendado"
-};
-function formatCLP(value) {
-  return `$${Number(value).toLocaleString("es-CL")}`;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Dialog, { open, onOpenChange, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogContent, { className: "sm:max-w-md", "data-ocid": "vusd.pay_modal", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogHeader, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogTitle, { className: "font-display text-foreground", children: "Reservar con vUSD" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(DialogDescription, { children: "Demo visual del flujo mint service · sin transacciones reales." })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(StepIndicator, { current: step }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-h-[12rem]", children: [
+      step === 1 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ConnectWalletStep,
+        {
+          walletId,
+          connecting: connectMutation.isPending,
+          onConnect: handleConnect
+        }
+      ),
+      step === 2 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PriceStep,
+        {
+          itemName,
+          priceCLP,
+          clpUsdRate,
+          priceVusd,
+          balance,
+          onTopup: handleTopup,
+          onContinue: () => setStep(3),
+          topupPending: topupMutation.isPending
+        }
+      ),
+      step === 3 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ConfirmStep,
+        {
+          itemName,
+          priceVusd,
+          onConfirm: handleConfirm,
+          minting: mintMutation.isPending
+        }
+      ),
+      step === 4 && mintResult && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SuccessStep,
+        {
+          result: mintResult,
+          itemName,
+          walletId: walletId ?? ""
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(DialogFooter, { children: [
+      step === 4 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        BlackGlassButton,
+        {
+          onClick: handleClose,
+          "data-ocid": "vusd.close_success_button",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "size-4" }),
+            "Listo"
+          ]
+        }
+      ),
+      step < 4 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => onOpenChange(false),
+          "data-ocid": "vusd.cancel_button",
+          className: "font-mono text-xs text-muted-foreground transition-colors hover:text-foreground",
+          children: "Cancelar"
+        }
+      )
+    ] })
+  ] }) });
 }
 const LayoutGroupContext = reactExports.createContext({});
 function useConstant(init) {
@@ -50663,6 +54373,12 @@ function ComboCard({
   const price = Number(combo.priceCLP);
   const hasDiscount = regular > price && regular > 0;
   const discountPct = hasDiscount ? Math.round((regular - price) / regular * 100) : 0;
+  const { walletId } = useVusdSession();
+  const mintedQuery = useMintedTokens(walletId);
+  const [modalOpen, setModalOpen] = reactExports.useState(false);
+  const minted = (mintedQuery.data ?? []).some(
+    (t) => t.itemType === MintableItemType.combo && t.itemId === combo.id
+  );
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     motion.article,
     {
@@ -50677,6 +54393,20 @@ function ComboCard({
       className: "group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-soft transition-smooth hover:-translate-y-1 hover:shadow-elevated",
       "data-ocid": `combo.card.${index2 + 1}`,
       children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          VusdPayModal,
+          {
+            open: modalOpen,
+            onOpenChange: setModalOpen,
+            itemType: MintableItemType.combo,
+            itemId: combo.id,
+            itemName: combo.name,
+            priceCLP: combo.priceCLP,
+            onSuccess: () => {
+              void mintedQuery.refetch();
+            }
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "span",
           {
@@ -50719,28 +54449,43 @@ function ComboCard({
             " cupos disponibles"
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-auto flex items-end justify-between gap-3 pt-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-auto flex flex-col gap-3 pt-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
             hasDiscount && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono text-xs text-muted-foreground line-through", children: formatCLP(combo.regularPriceCLP) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-display text-3xl text-foreground", children: formatCLP(combo.priceCLP) })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            BlackGlassButton,
-            {
-              size: "sm",
-              asChild: true,
-              "data-ocid": `combo.agendar_button.${index2 + 1}`,
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "a",
-                {
-                  href: combo.agendaproUrl,
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                  children: "Agendar"
-                }
-              )
-            }
-          )
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              BlackGlassButton,
+              {
+                size: "sm",
+                asChild: true,
+                className: "flex-1",
+                "data-ocid": `combo.agendar_button.${index2 + 1}`,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "a",
+                  {
+                    href: combo.agendaproUrl,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    children: "Agendar"
+                  }
+                )
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              VusdPayButton,
+              {
+                itemType: MintableItemType.combo,
+                itemId: combo.id,
+                itemName: combo.name,
+                priceCLP: combo.priceCLP,
+                onPay: () => setModalOpen(true),
+                minted,
+                ocidSuffix: `combo.${index2 + 1}`
+              }
+            )
+          ] })
         ] })
       ]
     }
@@ -50798,6 +54543,12 @@ function ServiceCard({
 }) {
   const tier = deriveCuposTier(service.cuposTotal);
   const cuposNum = Number(service.cuposTotal);
+  const { walletId } = useVusdSession();
+  const mintedQuery = useMintedTokens(walletId);
+  const [modalOpen, setModalOpen] = reactExports.useState(false);
+  const minted = (mintedQuery.data ?? []).some(
+    (t) => t.itemType === MintableItemType.service && t.itemId === service.id
+  );
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     motion.article,
     {
@@ -50812,6 +54563,20 @@ function ServiceCard({
       className: "group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-soft transition-smooth hover:-translate-y-1 hover:shadow-elevated",
       "data-ocid": `service.card.${index2 + 1}`,
       children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          VusdPayModal,
+          {
+            open: modalOpen,
+            onOpenChange: setModalOpen,
+            itemType: MintableItemType.service,
+            itemId: service.id,
+            itemName: service.name,
+            priceCLP: service.priceCLP,
+            onSuccess: () => {
+              void mintedQuery.refetch();
+            }
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "span",
           {
@@ -50859,31 +54624,46 @@ function ServiceCard({
             " restantes"
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-auto flex items-end justify-between gap-3 pt-6", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-auto flex flex-col gap-3 pt-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-end justify-between gap-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-display text-2xl text-foreground", children: formatCLP(service.priceCLP) }),
             service.allIncluded && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 inline-flex items-center gap-1 text-xs text-prism-rose", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "size-3" }),
               "Todo incluido"
             ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            BlackGlassButton,
-            {
-              size: "sm",
-              asChild: true,
-              "data-ocid": `service.agendar_button.${index2 + 1}`,
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "a",
-                {
-                  href: service.agendaproUrl,
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                  children: "Agendar"
-                }
-              )
-            }
-          )
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              BlackGlassButton,
+              {
+                size: "sm",
+                asChild: true,
+                className: "flex-1",
+                "data-ocid": `service.agendar_button.${index2 + 1}`,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "a",
+                  {
+                    href: service.agendaproUrl,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    children: "Agendar"
+                  }
+                )
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              VusdPayButton,
+              {
+                itemType: MintableItemType.service,
+                itemId: service.id,
+                itemName: service.name,
+                priceCLP: service.priceCLP,
+                onPay: () => setModalOpen(true),
+                minted,
+                ocidSuffix: `service.${index2 + 1}`
+              }
+            )
+          ] })
         ] })
       ]
     }
@@ -51086,12 +54866,18 @@ const FALLBACK_PARTNERS$1 = [
   },
   {
     id: 1n,
+    name: "Protocolo DeFi vUSD",
+    description: "Protocolo DeFi que emite vUSD, un USD sintético estable, para pagos y reservas sin fricción.",
+    logoText: "vU"
+  },
+  {
+    id: 2n,
     name: "Descuentos Protocolo",
     description: "Beneficios exclusivos para profesionales y clientas dentro del protocolo Liza.",
     logoText: "Descuentos Protocolo"
   },
   {
-    id: 2n,
+    id: 3n,
     name: "Red Liza",
     description: "Red colaborativa de profesionales aliadas con beneficios cruzados y cupos compartidos.",
     logoText: "Red Liza"
@@ -51754,7 +55540,13 @@ function ServiceDetailCard({
   index: index2
 }) {
   const [open, setOpen] = reactExports.useState(false);
+  const [vusdOpen, setVusdOpen] = reactExports.useState(false);
   const benefits = reactExports.useMemo(() => deriveBenefits(service), [service]);
+  const { walletId } = useVusdSession();
+  const mintedQuery = useMintedTokens(walletId);
+  const minted = (mintedQuery.data ?? []).some(
+    (t) => t.itemType === MintableItemType.service && t.itemId === service.id
+  );
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     motion.article,
     {
@@ -51772,6 +55564,20 @@ function ServiceDetailCard({
       ),
       "data-ocid": `servicios.service_card.${index2 + 1}`,
       children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          VusdPayModal,
+          {
+            open: vusdOpen,
+            onOpenChange: setVusdOpen,
+            itemType: MintableItemType.service,
+            itemId: service.id,
+            itemName: service.name,
+            priceCLP: service.priceCLP,
+            onSuccess: () => {
+              void mintedQuery.refetch();
+            }
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "span",
           {
@@ -51912,26 +55718,40 @@ function ServiceDetailCard({
                     ] })
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  BlackGlassButton,
-                  {
-                    size: "default",
-                    asChild: true,
-                    "data-ocid": `servicios.agendar_button.${index2 + 1}`,
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                      "a",
-                      {
-                        href: service.agendaproUrl || AGENDAPRO_URL,
-                        target: "_blank",
-                        rel: "noopener noreferrer",
-                        children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "size-4" }),
-                          "Agenda este servicio"
-                        ]
-                      }
-                    )
-                  }
-                )
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    BlackGlassButton,
+                    {
+                      size: "default",
+                      asChild: true,
+                      "data-ocid": `servicios.agendar_button.${index2 + 1}`,
+                      children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        "a",
+                        {
+                          href: service.agendaproUrl || AGENDAPRO_URL,
+                          target: "_blank",
+                          rel: "noopener noreferrer",
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar, { className: "size-4" }),
+                            "Agenda este servicio"
+                          ]
+                        }
+                      )
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    VusdPayButton,
+                    {
+                      itemType: MintableItemType.service,
+                      itemId: service.id,
+                      itemName: service.name,
+                      priceCLP: service.priceCLP,
+                      onPay: () => setVusdOpen(true),
+                      minted,
+                      ocidSuffix: `servicios.${index2 + 1}`
+                    }
+                  )
+                ] })
               ] })
             ] })
           }
@@ -54254,8 +58074,8 @@ var NODES = [
   "ul"
 ];
 var Primitive = NODES.reduce((primitive, node) => {
-  const Slot2 = /* @__PURE__ */ createSlot(`Primitive.${node}`);
-  const Node = reactExports.forwardRef((props, forwardedRef) => {
+  const Slot2 = /* @__PURE__ */ createSlot$1(`Primitive.${node}`);
+  const Node2 = reactExports.forwardRef((props, forwardedRef) => {
     const { asChild, ...primitiveProps } = props;
     const Comp = asChild ? Slot2 : node;
     if (typeof window !== "undefined") {
@@ -54263,8 +58083,8 @@ var Primitive = NODES.reduce((primitive, node) => {
     }
     return /* @__PURE__ */ jsxRuntimeExports.jsx(Comp, { ...primitiveProps, ref: forwardedRef });
   });
-  Node.displayName = `Primitive.${node}`;
-  return { ...primitive, [node]: Node };
+  Node2.displayName = `Primitive.${node}`;
+  return { ...primitive, [node]: Node2 };
 }, {});
 var NAME = "Label";
 var Label$1 = reactExports.forwardRef((props, forwardedRef) => {
@@ -54362,7 +58182,7 @@ function FormLabel({
 function FormControl({ ...props }) {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Slot,
+    Slot$1,
     {
       "data-slot": "form-control",
       id: formItemId,
@@ -54778,6 +58598,7 @@ function UnetePage() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(CommissionSection, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx(BenefitsSection, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx(PartnersBanner, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(VusdProtocolSection, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ApplicationForm, {})
   ] });
 }
@@ -55083,17 +58904,202 @@ const FALLBACK_PARTNERS = [
   },
   {
     id: 2n,
+    name: "Protocolo DeFi vUSD",
+    description: "USD sintético para reservas",
+    logoText: "vU"
+  },
+  {
+    id: 3n,
     name: "Descuentos Protocolo",
     description: "Insumos y servicios",
     logoText: "DP"
   },
   {
-    id: 3n,
+    id: 4n,
     name: "Red Liza",
     description: "Derivaciones entre aliadas",
     logoText: "LZ"
   }
 ];
+const VUSD_FEATURES = [
+  {
+    title: "¿Qué es vUSD?",
+    description: "Un USD sintético estable emitido por el protocolo DeFi partner. 1 vUSD equivale a 1 USD, así de simple: un valor estable pensado para pagos y reservas.",
+    icon: Wallet,
+    accent: "text-prism-cyan"
+  },
+  {
+    title: "¿Qué es un mint service?",
+    description: "Al reservar con vUSD se mintea un service token digital que representa tu reserva. Es una representación visual de tu pago, no un NFT real.",
+    icon: Sparkles,
+    accent: "text-prism-gold"
+  },
+  {
+    title: "Reservas sin fricción",
+    description: "Paga y reserva en segundos desde tu wallet demo. Sin formularios largos ni transferencias bancarias: conectas, confirmas y listo.",
+    icon: Zap,
+    accent: "text-prism-cyan"
+  },
+  {
+    title: "Demo segura",
+    description: "Esta es una demostración visual del flujo. No hay transacciones reales on-chain ni riesgo para tu dinero: todo ocurre en memoria dentro del sitio.",
+    icon: Lock,
+    accent: "text-prism-gold"
+  }
+];
+function VusdProtocolSection() {
+  const scrollToServices = () => {
+    if (typeof document !== "undefined") {
+      window.location.href = "/servicios";
+    }
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "section",
+    {
+      id: "vusd",
+      "data-ocid": "unete.vusd.section",
+      className: "relative overflow-hidden bg-background",
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "span",
+          {
+            "aria-hidden": true,
+            className: "pointer-events-none absolute -top-24 right-1/4 size-96 rounded-full opacity-30 blur-3xl",
+            style: {
+              background: "radial-gradient(circle, oklch(var(--prism-cyan) / 0.22), transparent 70%)"
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "span",
+          {
+            "aria-hidden": true,
+            className: "pointer-events-none absolute -bottom-32 left-1/4 size-96 rounded-full opacity-30 blur-3xl",
+            style: {
+              background: "radial-gradient(circle, oklch(var(--prism-gold) / 0.18), transparent 70%)"
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(SectionReveal, { direction: "up", className: "mx-auto max-w-2xl text-center", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-xs uppercase tracking-[0.3em] text-prism-cyan", children: "Partner DeFi · vUSD" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-3 font-display text-3xl text-foreground sm:text-4xl", children: "Paga con vUSD: el protocolo DeFi partner de Liza" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-4 text-base leading-relaxed text-muted-foreground", children: [
+              "Liza se asocia con un protocolo DeFi que emite",
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-prism-cyan", children: "vUSD" }),
+              ", un token sintético que representa",
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-prism-gold", children: "1 vUSD = 1 USD" }),
+              ". Permite pagar y reservar servicios de forma digital, minteando un",
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-prism-cyan", children: "service token" }),
+              " que representa tu reserva. Una forma moderna, simple y sin fricción de asegurar tu hora."
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4", children: VUSD_FEATURES.map((f2, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(SectionReveal, { direction: "up", delay: revealDelay(i), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              "data-ocid": `unete.vusd.card.${i + 1}`,
+              className: "group relative h-full overflow-hidden rounded-2xl border border-border bg-glass p-6 shadow-glass transition-smooth hover:-translate-y-1 hover:border-prism-cyan/40",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "span",
+                  {
+                    "aria-hidden": true,
+                    className: "absolute inset-x-0 top-0 h-px scale-x-0 bg-[length:200%_100%] opacity-0 transition-all duration-500 group-hover:scale-x-100 group-hover:opacity-100",
+                    style: {
+                      backgroundImage: "linear-gradient(90deg, oklch(var(--prism-cyan)), oklch(var(--prism-gold)))"
+                    }
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "span",
+                  {
+                    "aria-hidden": true,
+                    className: "inline-flex size-11 items-center justify-center rounded-xl border border-prism-cyan/25 bg-prism-cyan/10 transition-smooth group-hover:border-prism-cyan/50",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(f2.icon, { className: `size-5 ${f2.accent}` })
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-5 font-display text-lg text-foreground", children: f2.title }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: f2.description })
+              ]
+            }
+          ) }, f2.title)) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SectionReveal, { direction: "up", delay: 0.2, className: "mt-10", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              "data-ocid": "unete.vusd.benefits_panel",
+              className: "relative overflow-hidden rounded-2xl border border-prism-cyan/30 bg-card p-7 shadow-soft sm:p-9",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "span",
+                  {
+                    "aria-hidden": true,
+                    className: "pointer-events-none absolute inset-x-0 top-0 h-px bg-[length:200%_100%] animate-prism-shimmer",
+                    style: {
+                      backgroundImage: "linear-gradient(90deg, oklch(var(--prism-cyan)), oklch(var(--prism-gold)), oklch(var(--prism-cyan)))"
+                    }
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-xl", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-xs uppercase tracking-[0.25em] text-prism-gold", children: "Beneficios de pagar con vUSD" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-2 font-display text-xl text-foreground sm:text-2xl", children: "Reservas sin fricción, mint de service token" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "mt-4 space-y-2 text-sm text-muted-foreground", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex items-start gap-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            "aria-hidden": true,
+                            className: "mt-1.5 size-1.5 shrink-0 rounded-full bg-prism-cyan"
+                          }
+                        ),
+                        "Paga y reserva en segundos desde tu wallet demo."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex items-start gap-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            "aria-hidden": true,
+                            className: "mt-1.5 size-1.5 shrink-0 rounded-full bg-prism-gold"
+                          }
+                        ),
+                        "Recibe un service token visual que representa tu reserva."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex items-start gap-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            "aria-hidden": true,
+                            className: "mt-1.5 size-1.5 shrink-0 rounded-full bg-prism-cyan"
+                          }
+                        ),
+                        "Sin transferencias bancarias ni formularios largos."
+                      ] })
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    BlackGlassButton,
+                    {
+                      size: "lg",
+                      onClick: scrollToServices,
+                      "data-ocid": "unete.vusd.probar_demo_button",
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "size-4" }),
+                        "Probar demo de vUSD"
+                      ]
+                    }
+                  )
+                ] })
+              ]
+            }
+          ) })
+        ] })
+      ]
+    }
+  );
+}
 function ApplicationForm() {
   const form = useForm({
     defaultValues: { name: "", email: "", specialty: "", message: "" }

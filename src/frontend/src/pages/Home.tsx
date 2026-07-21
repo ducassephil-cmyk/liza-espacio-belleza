@@ -32,7 +32,7 @@ const AGENDAPRO_URL = "https://agendapro.com";
 type FilterKey = "todos" | ServiceCategory;
 
 // Fallback partners used when the backend returns an empty list, so the banner
-// always shows at least 3 partners (Flow + 2 others).
+// always shows at least 4 partners (Flow + vUSD + 2 others).
 const FALLBACK_PARTNERS = [
   {
     id: 0n,
@@ -43,13 +43,20 @@ const FALLBACK_PARTNERS = [
   },
   {
     id: 1n,
+    name: "Protocolo DeFi vUSD",
+    description:
+      "Protocolo DeFi que emite vUSD, un USD sintético estable, para pagos y reservas sin fricción.",
+    logoText: "vU",
+  },
+  {
+    id: 2n,
     name: "Descuentos Protocolo",
     description:
       "Beneficios exclusivos para profesionales y clientas dentro del protocolo Liza.",
     logoText: "Descuentos Protocolo",
   },
   {
-    id: 2n,
+    id: 3n,
     name: "Red Liza",
     description:
       "Red colaborativa de profesionales aliadas con beneficios cruzados y cupos compartidos.",

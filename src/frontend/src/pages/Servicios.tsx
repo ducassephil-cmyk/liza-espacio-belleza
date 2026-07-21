@@ -1,7 +1,11 @@
+import { MintableItemType } from "@/backend";
 import { BlackGlassButton } from "@/components/BlackGlassButton";
 import { PrismDivider } from "@/components/PrismDivider";
 import { SectionReveal, revealDelay } from "@/components/SectionReveal";
+import { VusdPayButton } from "@/components/VusdPayButton";
+import { VusdPayModal } from "@/components/VusdPayModal";
 import { useProducts, useServices } from "@/hooks/useQueries";
+import { useMintedTokens, useVusdSession } from "@/hooks/useVusd";
 import { cn } from "@/lib/utils";
 import {
   PRODUCT_BADGE_LABEL,
@@ -167,7 +171,14 @@ function ServiceDetailCard({
   index: number;
 }) {
   const [open, setOpen] = useState(false);
+  const [vusdOpen, setVusdOpen] = useState(false);
   const benefits = useMemo(() => deriveBenefits(service), [service]);
+  const { walletId } = useVusdSession();
+  const mintedQuery = useMintedTokens(walletId);
+
+  const minted = (mintedQuery.data ?? []).some(
+    (t) => t.itemType === MintableItemType.service && t.itemId === service.id,
+  );
 
   return (
     <motion.article
@@ -187,6 +198,17 @@ function ServiceDetailCard({
       )}
       data-ocid={`servicios.service_card.${index + 1}`}
     >
+      <VusdPayModal
+        open={vusdOpen}
+        onOpenChange={setVusdOpen}
+        itemType={MintableItemType.service}
+        itemId={service.id}
+        itemName={service.name}
+        priceCLP={service.priceCLP}
+        onSuccess={() => {
+          void mintedQuery.refetch();
+        }}
+      />
       {/* Prism top accent */}
       <span
         aria-hidden
@@ -340,7 +362,7 @@ function ServiceDetailCard({
                 </div>
               </div>
 
-              {/* Footer row: price + agendar */}
+              {/* Footer row: price + agendar + vUSD */}
               <div className="mt-6 flex flex-col items-start justify-between gap-4 border-t border-border pt-5 sm:flex-row sm:items-center">
                 <div>
                   <span className="font-mono text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground">
@@ -355,20 +377,31 @@ function ServiceDetailCard({
                     </span>
                   </div>
                 </div>
-                <BlackGlassButton
-                  size="default"
-                  asChild
-                  data-ocid={`servicios.agendar_button.${index + 1}`}
-                >
-                  <a
-                    href={service.agendaproUrl || AGENDAPRO_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <div className="flex items-center gap-2">
+                  <BlackGlassButton
+                    size="default"
+                    asChild
+                    data-ocid={`servicios.agendar_button.${index + 1}`}
                   >
-                    <Calendar className="size-4" />
-                    Agenda este servicio
-                  </a>
-                </BlackGlassButton>
+                    <a
+                      href={service.agendaproUrl || AGENDAPRO_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Calendar className="size-4" />
+                      Agenda este servicio
+                    </a>
+                  </BlackGlassButton>
+                  <VusdPayButton
+                    itemType={MintableItemType.service}
+                    itemId={service.id}
+                    itemName={service.name}
+                    priceCLP={service.priceCLP}
+                    onPay={() => setVusdOpen(true)}
+                    minted={minted}
+                    ocidSuffix={`servicios.${index + 1}`}
+                  />
+                </div>
               </div>
             </div>
           </motion.div>

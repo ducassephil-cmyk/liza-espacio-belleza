@@ -1,7 +1,12 @@
+import { MintableItemType } from "@/backend";
 import { BlackGlassButton } from "@/components/BlackGlassButton";
+import { VusdPayButton } from "@/components/VusdPayButton";
+import { VusdPayModal } from "@/components/VusdPayModal";
+import { useMintedTokens, useVusdSession } from "@/hooks/useVusd";
 import { COMBO_TYPE_LABEL, type Combo, formatCLP } from "@/types";
 import { Check } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 export function ComboCard({
   combo,
@@ -13,6 +18,13 @@ export function ComboCard({
   const discountPct = hasDiscount
     ? Math.round(((regular - price) / regular) * 100)
     : 0;
+  const { walletId } = useVusdSession();
+  const mintedQuery = useMintedTokens(walletId);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const minted = (mintedQuery.data ?? []).some(
+    (t) => t.itemType === MintableItemType.combo && t.itemId === combo.id,
+  );
 
   return (
     <motion.article
@@ -27,6 +39,17 @@ export function ComboCard({
       className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-soft transition-smooth hover:-translate-y-1 hover:shadow-elevated"
       data-ocid={`combo.card.${index + 1}`}
     >
+      <VusdPayModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        itemType={MintableItemType.combo}
+        itemId={combo.id}
+        itemName={combo.name}
+        priceCLP={combo.priceCLP}
+        onSuccess={() => {
+          void mintedQuery.refetch();
+        }}
+      />
       {/* Prism border accent */}
       <span
         aria-hidden
@@ -79,7 +102,7 @@ export function ComboCard({
         </span>
       </div>
 
-      <div className="mt-auto flex items-end justify-between gap-3 pt-6">
+      <div className="mt-auto flex flex-col gap-3 pt-6">
         <div className="flex flex-col">
           {hasDiscount && (
             <span className="font-mono text-xs text-muted-foreground line-through">
@@ -90,19 +113,31 @@ export function ComboCard({
             {formatCLP(combo.priceCLP)}
           </span>
         </div>
-        <BlackGlassButton
-          size="sm"
-          asChild
-          data-ocid={`combo.agendar_button.${index + 1}`}
-        >
-          <a
-            href={combo.agendaproUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+        <div className="flex items-center gap-2">
+          <BlackGlassButton
+            size="sm"
+            asChild
+            className="flex-1"
+            data-ocid={`combo.agendar_button.${index + 1}`}
           >
-            Agendar
-          </a>
-        </BlackGlassButton>
+            <a
+              href={combo.agendaproUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Agendar
+            </a>
+          </BlackGlassButton>
+          <VusdPayButton
+            itemType={MintableItemType.combo}
+            itemId={combo.id}
+            itemName={combo.name}
+            priceCLP={combo.priceCLP}
+            onPay={() => setModalOpen(true)}
+            minted={minted}
+            ocidSuffix={`combo.${index + 1}`}
+          />
+        </div>
       </div>
     </motion.article>
   );
