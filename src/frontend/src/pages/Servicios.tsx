@@ -16,21 +16,25 @@ import {
   ServiceCategory,
   formatCLP,
 } from "@/types";
+import { WA_URL } from "@/components/Layout";
+import { generateOrderId, useFlowPayment } from "@/hooks/useFlowPayment";
 import {
   Calendar,
   CheckCircle2,
   ChevronDown,
   Clock,
+  CreditCard,
   Heart,
   Layers,
+  MessageCircle,
   Sparkles,
   Tag,
   Wrench,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useRef, useMemo, useState } from "react";
 
-const AGENDAPRO_URL = "https://agendapro.com";
+const AGENDAPRO_URL = "https://lizaespaciobelleza.cl";
 
 // Ordered categories for navigation — matches sidebar/anchor order.
 const CATEGORY_ORDER: ServiceCategory[] = [
@@ -172,6 +176,20 @@ function ServiceDetailCard({
 }) {
   const [open, setOpen] = useState(false);
   const [vusdOpen, setVusdOpen] = useState(false);
+  const [showEmailInput, setShowEmailInput] = useState(false);
+  const [email, setEmail] = useState("");
+  const emailRef = useRef<HTMLInputElement>(null);
+  const { pay, isPending, error: flowError } = useFlowPayment();
+
+  async function payWithFlow() {
+    if (!email) { setShowEmailInput(true); emailRef.current?.focus(); return; }
+    await pay({
+      amount: Number(service.priceCLP),
+      subject: service.name,
+      email,
+      orderId: generateOrderId(service.id),
+    });
+  }
   const benefits = useMemo(() => deriveBenefits(service), [service]);
   const { walletId } = useVusdSession();
   const mintedQuery = useMintedTokens(walletId);
@@ -377,30 +395,69 @@ function ServiceDetailCard({
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <BlackGlassButton
-                    size="default"
-                    asChild
-                    data-ocid={`servicios.agendar_button.${index + 1}`}
-                  >
+                <div className="flex flex-col gap-2 w-full sm:w-auto">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <BlackGlassButton
+                      size="default"
+                      asChild
+                      data-ocid={`servicios.agendar_button.${index + 1}`}
+                    >
+                      <a
+                        href={service.agendaproUrl || AGENDAPRO_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Calendar className="size-4" />
+                        Agenda este servicio
+                      </a>
+                    </BlackGlassButton>
                     <a
-                      href={service.agendaproUrl || AGENDAPRO_URL}
+                      href={WA_URL(`Hola! Quiero agendar: ${service.name} ($${Number(service.priceCLP).toLocaleString("es-CL")})`)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="inline-flex h-10 items-center gap-2 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-4 text-sm font-medium text-[#1a9e4a] transition-smooth hover:bg-[#25D366]/20 dark:text-[#25D366]"
                     >
-                      <Calendar className="size-4" />
-                      Agenda este servicio
+                      <MessageCircle className="size-4" />
+                      WhatsApp
                     </a>
-                  </BlackGlassButton>
-                  <VusdPayButton
-                    itemType={MintableItemType.service}
-                    itemId={service.id}
-                    itemName={service.name}
-                    priceCLP={service.priceCLP}
-                    onPay={() => setVusdOpen(true)}
-                    minted={minted}
-                    ocidSuffix={`servicios.${index + 1}`}
-                  />
+                    <button
+                      onClick={payWithFlow}
+                      disabled={isPending}
+                      className="inline-flex h-10 items-center gap-2 rounded-full border border-prism-cyan/40 bg-prism-cyan/10 px-4 text-sm font-medium text-prism-cyan transition-smooth hover:bg-prism-cyan/20 disabled:opacity-50"
+                    >
+                      <CreditCard className="size-4" />
+                      {isPending ? "Redirigiendo…" : "Pagar con Flow"}
+                    </button>
+                    <VusdPayButton
+                      itemType={MintableItemType.service}
+                      itemId={service.id}
+                      itemName={service.name}
+                      priceCLP={service.priceCLP}
+                      onPay={() => setVusdOpen(true)}
+                      minted={minted}
+                      ocidSuffix={`servicios.${index + 1}`}
+                    />
+                  </div>
+                  {showEmailInput && (
+                    <div className="flex items-center gap-2">
+                      <input
+                        ref={emailRef}
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="tu@correo.com"
+                        className="h-9 flex-1 rounded-full border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-prism-cyan"
+                      />
+                      <button
+                        onClick={payWithFlow}
+                        disabled={isPending || !email}
+                        className="inline-flex h-9 items-center gap-1 rounded-full bg-prism-cyan px-4 text-sm font-medium text-background transition-smooth hover:opacity-90 disabled:opacity-50"
+                      >
+                        Confirmar
+                      </button>
+                    </div>
+                  )}
+                  {flowError && <p className="text-xs text-red-500">{flowError}</p>}
                 </div>
               </div>
             </div>
