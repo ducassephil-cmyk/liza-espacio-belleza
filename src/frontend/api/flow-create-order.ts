@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 const FLOW_BASE =
   process.env.FLOW_ENV === "production"
@@ -11,18 +12,22 @@ function sign(params: Record<string, string>, secret: string): string {
   return crypto.createHmac("sha256", secret).update(msg).digest("hex");
 }
 
-export default async function handler(req: Request): Promise<Response> {
-  if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== "POST") return res.status(405).send("Method not allowed");
 
   const apiKey = process.env.FLOW_API_KEY;
   const secretKey = process.env.FLOW_SECRET_KEY;
-  const siteUrl = process.env.SITE_URL ?? "https://liza-espacio-belleza-frontend-pek85l4xe-pegassus.vercel.app";
+  const siteUrl = process.env.SITE_URL ?? "https://liza-espacio-belleza-frontend-ke8yzx3u0-pegassus.vercel.app";
 
   if (!apiKey || !secretKey)
-    return new Response(JSON.stringify({ error: "Flow credentials not configured" }), { status: 500, headers: { "Content-Type": "application/json" } });
+    return res.status(500).json({ error: "Flow credentials not configured" });
 
-  const body = await req.json() as { amount: number; subject: string; email: string; orderId: string };
-  const { amount, subject, email, orderId } = body;
+  const { amount, subject, email, orderId } = req.body as {
+    amount: number;
+    subject: string;
+    email: string;
+    orderId: string;
+  };
 
   const params: Record<string, string> = {
     apiKey,
@@ -37,19 +42,16 @@ export default async function handler(req: Request): Promise<Response> {
   };
   params.s = sign(params, secretKey);
 
-  const res = await fetch(`${FLOW_BASE}/payment/create`, {
+  const flowRes = await fetch(`${FLOW_BASE}/payment/create`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(params).toString(),
   });
 
-  const data = await res.json() as { url?: string; token?: string; error?: number; message?: string };
+  const data = await flowRes.json() as { url?: string; token?: string; error?: number; message?: string };
 
-  if (!res.ok || data.error)
-    return new Response(JSON.stringify({ error: data.message ?? "Flow API error" }), { status: 502, headers: { "Content-Type": "application/json" } });
+  if (!flowRes.ok || data.error)
+    return res.status(502).json({ error: data.message ?? "Flow API error" });
 
-  return new Response(JSON.stringify({ redirectUrl: `${data.url}?token=${data.token}`, token: data.token }), {
-    status: 200,
-    headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": siteUrl },
-  });
+  return res.status(200).json({ redirectUrl: `${data.url}?token=${data.token}`, token: data.token });
 }
