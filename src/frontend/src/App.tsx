@@ -1,5 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { HomePage } from "@/pages/Home";
+import { PagoExitosoPage } from "@/pages/PagoExitoso";
 import { ServiciosPage } from "@/pages/Servicios";
 import { UnetePage } from "@/pages/Unete";
 import {
@@ -31,10 +32,17 @@ const uneteRoute = createRoute({
   component: UnetePage,
 });
 
+const pagoExitosoRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/pago-exitoso",
+  component: PagoExitosoPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   serviciosRoute,
   uneteRoute,
+  pagoExitosoRoute,
 ]);
 
 const router = createRouter({ routeTree });
