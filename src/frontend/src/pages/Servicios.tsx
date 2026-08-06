@@ -179,16 +179,21 @@ function ServiceDetailCard({
   const [showEmailInput, setShowEmailInput] = useState(false);
   const [email, setEmail] = useState("");
   const emailRef = useRef<HTMLInputElement>(null);
-  const { pay, isPending, error: flowError } = useFlowPayment();
+  const { createPaymentLink, isPending, paymentUrl, error: flowError, reset } = useFlowPayment();
 
-  async function payWithFlow() {
-    if (!email) { setShowEmailInput(true); emailRef.current?.focus(); return; }
-    await pay({
+  async function handleFlow() {
+    if (!showEmailInput) { setShowEmailInput(true); setTimeout(() => emailRef.current?.focus(), 50); return; }
+    if (!email) { emailRef.current?.focus(); return; }
+    await createPaymentLink({
       amount: Number(service.priceCLP),
       subject: service.name,
       email,
       orderId: generateOrderId(service.id),
     });
+  }
+
+  function flowWaMsg(url: string) {
+    return `Hola! Te enviamos el link de pago para *${service.name}*:\n${url}`;
   }
   const benefits = useMemo(() => deriveBenefits(service), [service]);
   const { walletId } = useVusdSession();
@@ -412,7 +417,7 @@ function ServiceDetailCard({
                       </a>
                     </BlackGlassButton>
                     <a
-                      href={WA_URL(`Hola! Quiero agendar: ${service.name} ($${Number(service.priceCLP).toLocaleString("es-CL")})`)}
+                      href={WA_URL(`Hola! Quiero agendar: ${service.name} (${formatCLP(service.priceCLP)})`)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex h-10 items-center gap-2 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-4 text-sm font-medium text-[#1a9e4a] transition-smooth hover:bg-[#25D366]/20 dark:text-[#25D366]"
@@ -421,12 +426,12 @@ function ServiceDetailCard({
                       WhatsApp
                     </a>
                     <button
-                      onClick={payWithFlow}
+                      onClick={handleFlow}
                       disabled={isPending}
                       className="inline-flex h-10 items-center gap-2 rounded-full border border-prism-cyan/40 bg-prism-cyan/10 px-4 text-sm font-medium text-prism-cyan transition-smooth hover:bg-prism-cyan/20 disabled:opacity-50"
                     >
                       <CreditCard className="size-4" />
-                      {isPending ? "Redirigiendo…" : "Pagar con Flow"}
+                      {isPending ? "Generando…" : "Pagar con Flow"}
                     </button>
                     <VusdPayButton
                       itemType={MintableItemType.service}
@@ -438,26 +443,63 @@ function ServiceDetailCard({
                       ocidSuffix={`servicios.${index + 1}`}
                     />
                   </div>
-                  {showEmailInput && (
+
+                  {/* Flow: email input */}
+                  {showEmailInput && !paymentUrl && (
                     <div className="flex items-center gap-2">
                       <input
                         ref={emailRef}
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="tu@correo.com"
+                        onKeyDown={(e) => e.key === "Enter" && handleFlow()}
+                        placeholder="Correo del cliente"
                         className="h-9 flex-1 rounded-full border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-prism-cyan"
                       />
                       <button
-                        onClick={payWithFlow}
+                        onClick={handleFlow}
                         disabled={isPending || !email}
                         className="inline-flex h-9 items-center gap-1 rounded-full bg-prism-cyan px-4 text-sm font-medium text-background transition-smooth hover:opacity-90 disabled:opacity-50"
                       >
-                        Confirmar
+                        {isPending ? "…" : "Generar link"}
                       </button>
                     </div>
                   )}
-                  {flowError && <p className="text-xs text-red-500">{flowError}</p>}
+
+                  {/* Flow: link generado → enviar por WA o email */}
+                  {paymentUrl && (
+                    <div className="rounded-xl border border-prism-cyan/30 bg-prism-cyan/5 p-3">
+                      <p className="mb-2 text-xs text-muted-foreground">Link de pago generado — envíalo al cliente:</p>
+                      <div className="flex flex-wrap gap-2">
+                        <a
+                          href={`https://wa.me/?text=${encodeURIComponent(flowWaMsg(paymentUrl))}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-3 text-xs font-medium text-[#1a9e4a] hover:bg-[#25D366]/20 dark:text-[#25D366]"
+                        >
+                          <MessageCircle className="size-3" />
+                          Enviar por WhatsApp
+                        </a>
+                        <a
+                          href={`mailto:${email}?subject=Tu link de pago — ${service.name}&body=${encodeURIComponent(`Hola!\n\nAquí está tu link de pago para ${service.name}:\n\n${paymentUrl}\n\nEquipo Liza Espacio Belleza`)}`}
+                          className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 text-xs font-medium text-foreground hover:bg-muted"
+                        >
+                          Enviar por Email
+                        </a>
+                        <button
+                          onClick={() => { void navigator.clipboard.writeText(paymentUrl); }}
+                          className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 text-xs font-medium text-foreground hover:bg-muted"
+                        >
+                          Copiar link
+                        </button>
+                        <button onClick={reset} className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground">
+                          Nueva orden
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {flowError && <p className="text-xs text-destructive">{flowError}</p>}
                 </div>
               </div>
             </div>

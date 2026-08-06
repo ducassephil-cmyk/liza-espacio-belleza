@@ -9,11 +9,13 @@ export interface FlowPaymentOptions {
 
 export function useFlowPayment() {
   const [isPending, setIsPending] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function pay(options: FlowPaymentOptions): Promise<void> {
+  async function createPaymentLink(options: FlowPaymentOptions): Promise<string | null> {
     setIsPending(true);
     setError(null);
+    setPaymentUrl(null);
     try {
       const res = await fetch("/api/flow-create-order", {
         method: "POST",
@@ -22,14 +24,22 @@ export function useFlowPayment() {
       });
       const data = await res.json() as { redirectUrl?: string; error?: string };
       if (!res.ok || !data.redirectUrl) throw new Error(data.error ?? "Error al crear la orden");
-      window.location.href = data.redirectUrl;
+      setPaymentUrl(data.redirectUrl);
+      return data.redirectUrl;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error inesperado");
+      return null;
+    } finally {
       setIsPending(false);
     }
   }
 
-  return { pay, isPending, error };
+  function reset() {
+    setPaymentUrl(null);
+    setError(null);
+  }
+
+  return { createPaymentLink, isPending, paymentUrl, error, reset };
 }
 
 export function generateOrderId(serviceId: bigint): string {
