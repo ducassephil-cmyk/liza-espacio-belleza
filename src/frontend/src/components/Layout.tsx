@@ -8,6 +8,10 @@ import { useState } from "react";
 
 const AGENDAPRO_URL = "https://agendapro.com";
 
+export const WA_NUMBER = "56981872620";
+export const WA_URL = (msg = "Hola, quiero agendar una hora en Liza Espacio Belleza") =>
+  `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+
 const NAV_LINKS = [
   { label: "Inicio", to: "/", ocid: "nav.inicio" },
   { label: "Servicios", to: "/#servicios", ocid: "nav.servicios" },
