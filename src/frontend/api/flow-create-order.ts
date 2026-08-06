@@ -16,7 +16,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   const apiKey = process.env.FLOW_API_KEY;
   const secretKey = process.env.FLOW_SECRET_KEY;
-  const siteUrl = process.env.SITE_URL ?? "https://liza-espacio-belleza-frontend-l88z4paqk-pegassus.vercel.app";
+  const siteUrl = process.env.SITE_URL ?? "https://liza-espacio-belleza-frontend-pek85l4xe-pegassus.vercel.app";
 
   if (!apiKey || !secretKey)
     return new Response(JSON.stringify({ error: "Flow credentials not configured" }), { status: 500, headers: { "Content-Type": "application/json" } });
