@@ -217,7 +217,7 @@
     -webkit-backdrop-filter: blur(14px) saturate(140%);
     border: 1px solid oklch(var(--glass-border) / 0.6);
   }
-  .bg-glass-hover:hover {
+  .bg-glass:hover {
     background-color: oklch(var(--glass-bg-hover) / 0.9);
   }
   .text-glass {

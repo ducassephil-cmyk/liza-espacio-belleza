@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "liza-frontend",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@caffeine/template-frontend", "dev"],
+      "port": 5173
+    }
+  ]
+}

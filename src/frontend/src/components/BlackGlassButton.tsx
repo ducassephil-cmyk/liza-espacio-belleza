@@ -46,7 +46,7 @@ function BlackGlassButton({
   return (
     <Comp
       data-slot="black-glass-button"
-      className={cn(blackGlassVariants({ size }), "bg-glass-hover", className)}
+      className={cn(blackGlassVariants({ size }), className)}
       {...props}
     >
       {children}
