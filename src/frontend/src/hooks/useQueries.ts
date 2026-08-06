@@ -10,92 +10,76 @@ import type {
   Testimonial,
   Worker,
 } from "@/backend";
+import { mockBackend } from "@/mocks/backend";
 import { useActor } from "@caffeineai/core-infrastructure";
 import { useMutation, useQuery } from "@tanstack/react-query";
+
+function resolveActor(actor: Awaited<ReturnType<typeof createActor>> | null) {
+  return actor ?? mockBackend;
+}
 
 // ---- Queries ----
 
 export function useServices() {
-  const { actor, isFetching } = useActor(createActor);
+  const { actor } = useActor(createActor);
   return useQuery<Service[]>({
     queryKey: ["services"],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getServices();
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async () => resolveActor(actor).getServices(),
+    enabled: true,
   });
 }
 
 export function useServicesByCategory(category: ServiceCategory) {
-  const { actor, isFetching } = useActor(createActor);
+  const { actor } = useActor(createActor);
   return useQuery<Service[]>({
     queryKey: ["services", category],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getServicesByCategory(category);
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async () => resolveActor(actor).getServicesByCategory(category),
+    enabled: true,
   });
 }
 
 export function useCombos() {
-  const { actor, isFetching } = useActor(createActor);
+  const { actor } = useActor(createActor);
   return useQuery<Combo[]>({
     queryKey: ["combos"],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getCombos();
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async () => resolveActor(actor).getCombos(),
+    enabled: true,
   });
 }
 
 export function useWorkers() {
-  const { actor, isFetching } = useActor(createActor);
+  const { actor } = useActor(createActor);
   return useQuery<Worker[]>({
     queryKey: ["workers"],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getWorkers();
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async () => resolveActor(actor).getWorkers(),
+    enabled: true,
   });
 }
 
 export function useProducts() {
-  const { actor, isFetching } = useActor(createActor);
+  const { actor } = useActor(createActor);
   return useQuery<Product[]>({
     queryKey: ["products"],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getProducts();
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async () => resolveActor(actor).getProducts(),
+    enabled: true,
   });
 }
 
 export function useTestimonials() {
-  const { actor, isFetching } = useActor(createActor);
+  const { actor } = useActor(createActor);
   return useQuery<Testimonial[]>({
     queryKey: ["testimonials"],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getTestimonials();
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async () => resolveActor(actor).getTestimonials(),
+    enabled: true,
   });
 }
 
 export function usePartners() {
-  const { actor, isFetching } = useActor(createActor);
+  const { actor } = useActor(createActor);
   return useQuery<Partner[]>({
     queryKey: ["partners"],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getPartners();
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async () => resolveActor(actor).getPartners(),
+    enabled: true,
   });
 }
 
