@@ -259,6 +259,11 @@ function ServiceDetailCard({
                 Todo incluido
               </span>
             )}
+            {service.cuposTotal > 0n && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-prism-cyan/30 bg-prism-cyan/10 px-2 py-0.5 text-[0.65rem] font-medium text-prism-cyan">
+                {Number(service.cuposTotal)} cupos
+              </span>
+            )}
           </div>
           <h3 className="mt-1.5 font-display text-2xl leading-tight text-foreground">
             {service.name}
