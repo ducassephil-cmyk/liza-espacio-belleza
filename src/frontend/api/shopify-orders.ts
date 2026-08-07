@@ -1,6 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { isAuthenticated } from "./_lib/session";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (!isAuthenticated(req)) {
+    return res.status(401).json({ connected: false, orders: [], revenue: 0, error: "unauthorized" });
+  }
+
   const token = process.env.SHOPIFY_ADMIN_TOKEN;
   const domain = process.env.SHOPIFY_STORE_DOMAIN;
 

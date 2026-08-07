@@ -1,8 +1,10 @@
+import { BlackGlassButton } from "@/components/BlackGlassButton";
 import { WA_URL } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useDashboardAuth } from "@/hooks/useDashboardAuth";
 import { useFlowPayment } from "@/hooks/useFlowPayment";
 import { useInstagramMetrics } from "@/hooks/useInstagram";
 import { useServices, useWorkers } from "@/hooks/useQueries";
@@ -17,6 +19,8 @@ import {
   Heart,
   Instagram,
   Link2,
+  Lock,
+  LogOut,
   MessageCircle,
   RefreshCw,
   ShoppingBag,
@@ -146,8 +150,84 @@ function KpiTile({
   );
 }
 
-// ── Dashboard page ────────────────────────────────────────────────────────────
+// ── Dashboard page (auth gate) ──────────────────────────────────────────────
 export function DashboardPage() {
+  const { status, error, login, logout } = useDashboardAuth();
+
+  if (status === "checking") return <DashboardLoading />;
+  if (status === "anonymous") return <DashboardLogin onSubmit={login} error={error} />;
+  return <DashboardContent onLogout={logout} />;
+}
+
+// ── Loading ──────────────────────────────────────────────────────────────────
+function DashboardLoading() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-muted/20">
+      <span className="font-display text-sm text-muted-foreground">Cargando…</span>
+    </div>
+  );
+}
+
+// ── Login screen ─────────────────────────────────────────────────────────────
+function DashboardLogin({
+  onSubmit,
+  error,
+}: {
+  onSubmit: (password: string) => Promise<boolean>;
+  error: string | null;
+}) {
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password || isSubmitting) return;
+    setIsSubmitting(true);
+    await onSubmit(password);
+    setIsSubmitting(false);
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-muted/20 px-4">
+      <Card className="w-full max-w-sm border-border bg-card shadow-elevated">
+        <CardContent className="p-8">
+          <div className="flex flex-col items-center text-center">
+            <span className="inline-flex size-11 items-center justify-center rounded-full border border-border bg-muted/40">
+              <Lock className="size-4 text-prism-violet" />
+            </span>
+            <h1 className="mt-4 font-display text-xl text-foreground">
+              ✦ Liza <span className="font-mono text-sm font-normal text-muted-foreground">ops</span>
+            </h1>
+            <p className="mt-1 text-xs text-muted-foreground">Acceso privado</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-6 space-y-3">
+            <Input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoFocus
+              autoComplete="current-password"
+              className="text-center"
+            />
+            <BlackGlassButton type="submit" className="w-full justify-center" disabled={isSubmitting || !password}>
+              {isSubmitting ? "Entrando…" : "Entrar"}
+            </BlackGlassButton>
+            {error && (
+              <p role="alert" className="text-center text-xs text-destructive">
+                {error}
+              </p>
+            )}
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ── Dashboard content ────────────────────────────────────────────────────────
+function DashboardContent({ onLogout }: { onLogout: () => void }) {
   const shopify = useShopifyData();
   const instagram = useInstagramMetrics();
 
@@ -192,6 +272,14 @@ export function DashboardPage() {
               Sitio
               <ExternalLink className="size-3" />
             </a>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
+            >
+              <LogOut className="size-3" />
+              <span className="hidden sm:inline">Salir</span>
+            </button>
           </div>
         </div>
       </header>

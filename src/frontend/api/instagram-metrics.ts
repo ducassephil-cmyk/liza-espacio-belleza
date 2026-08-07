@@ -1,6 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { isAuthenticated } from "./_lib/session";
 
-export default async function handler(_req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (!isAuthenticated(req)) {
+    return res.status(401).json({ connected: false, error: "unauthorized" });
+  }
+
   const token = process.env.INSTAGRAM_ACCESS_TOKEN;
 
   if (!token) {

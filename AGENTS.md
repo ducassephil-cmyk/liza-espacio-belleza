@@ -42,7 +42,8 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 - **Fix visual:** `BlackGlassButton.tsx` — tailwind-merge tiraba `bg-glass`; hover movido a CSS (`.bg-glass:hover` en `index.css`)
 - **Fix animaciones mobile:** `SectionReveal.tsx` — `whileInView` reemplazado por `useInView` hook (RAF se pausa con `document.hidden=true` en preview)
 - **Auto-deploy:** Vercel conectado a GitHub `main`. Cada push despliega automáticamente.
-- **Dashboard operacional:** mockup completo publicado como Artifact (Flow, WA, IG, Gmail, Equipo, KPIs)
+- **Dashboard operacional:** página real en `/dashboard` (Flow, WA, IG, agenda, KPIs, estado de conexiones) — no es mockup, es la app
+- **Login del dashboard:** password compartida + cookie de sesión firmada (HMAC). Ver `api/_lib/session.ts`
 - **Documentación:** `APPS.md` con mapa de todas las plataformas, responsabilidades y prioridades
 
 ## Variables de Entorno Vercel — Estado Actual
@@ -53,12 +54,20 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 | `FLOW_SECRET_KEY` | ✅ Configurada | Secret key de producción de Flow |
 | `FLOW_ENV` | ✅ `production` | Apunta a producción; cuenta pendiente de activación por Flow |
 | `SITE_URL` | ✅ Configurada | URL actual de Vercel |
+| `DASHBOARD_PASSWORD` | ⚪ Falta agregar | Contraseña para entrar a `/dashboard`. Philippe elige el valor |
+| `DASHBOARD_SESSION_SECRET` | ⚪ Falta agregar | Secreto random para firmar la cookie de sesión. Generar con `openssl rand -hex 32` en terminal — no pedirle este valor a Claude, generarlo localmente |
+| `SHOPIFY_ADMIN_TOKEN` | ⚪ Falta agregar | Token de Shopify Admin API (ver `APPS.md`) |
+| `SHOPIFY_STORE_DOMAIN` | ⚪ Falta agregar | Ej. `liza-espacio-belleza.myshopify.com` |
+| `INSTAGRAM_ACCESS_TOKEN` | ⚪ Falta agregar | Token de Instagram Graph API (ver `APPS.md`) |
 
-> **Nota:** Flow devuelve "token unexpected" porque la cuenta de producción aún no está activada por Flow Chile.
+> **Nota Flow:** devuelve "token unexpected" porque la cuenta de producción aún no está activada por Flow Chile.
 > El código está correcto. Cuando Flow active la cuenta, los pagos funcionarán sin cambios adicionales.
+
+> **Nota Dashboard:** sin `DASHBOARD_PASSWORD` y `DASHBOARD_SESSION_SECRET` configuradas, `/dashboard` muestra el login pero no deja entrar (login devuelve error 500 "no configurada"). Agregar ambas variables en Vercel → Settings → Environment Variables, Production, y hacer redeploy.
 
 ## Pendiente — Funcionalidades
 
+- [ ] **Activar login dashboard**: Philippe agrega `DASHBOARD_PASSWORD` (elige una) y `DASHBOARD_SESSION_SECRET` (genera con `openssl rand -hex 32`) en Vercel
 - [ ] **Flow producción**: esperar activación de cuenta por Flow Chile (sin acción de código)
 - [ ] **Test Flow completo**: probar servicio → email → link → pago → `/pago-exitoso` una vez activa la cuenta
 - [ ] **Appointly embed**: modal de reservas inline en `/servicios`. Necesita código embed de Shopify Admin → Apps → Appointly
