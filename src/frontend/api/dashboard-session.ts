@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { isAuthenticated } from "./_lib/session.js";
+import { getSessionUser } from "./_lib/session.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  return res.status(200).json({ authenticated: isAuthenticated(req) });
+  const user = getSessionUser(req);
+  return res.status(200).json({ authenticated: !!user, user });
 }

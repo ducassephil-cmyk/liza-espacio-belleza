@@ -1,9 +1,10 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { isAuthenticated } from "./_lib/session.js";
+import { getSessionUser } from "./_lib/session.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!isAuthenticated(req)) {
-    return res.status(401).json({ connected: false, orders: [], revenue: 0, error: "unauthorized" });
+  const user = getSessionUser(req);
+  if (!user || user.role !== "admin") {
+    return res.status(403).json({ connected: false, orders: [], revenue: 0, error: "forbidden" });
   }
 
   const token = process.env.SHOPIFY_ADMIN_TOKEN;

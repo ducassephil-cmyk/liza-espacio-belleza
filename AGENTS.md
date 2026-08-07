@@ -43,7 +43,8 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 - **Fix animaciones mobile:** `SectionReveal.tsx` — `whileInView` reemplazado por `useInView` hook (RAF se pausa con `document.hidden=true` en preview)
 - **Auto-deploy:** Vercel conectado a GitHub `main`. Cada push despliega automáticamente.
 - **Dashboard operacional:** página real en `/dashboard` (Flow, WA, IG, agenda, KPIs, estado de conexiones) — no es mockup, es la app
-- **Login del dashboard:** password compartida + cookie de sesión firmada (HMAC). Ver `api/_lib/session.ts`
+- **Login del dashboard:** 4 passwords nombradas (no una compartida) + cookie de sesión firmada (HMAC). Ver `api/_lib/session.ts`
+- **Roles del dashboard:** `admin` (Philippe, socio) ve todo — KPIs, agenda completa, Shopify, Instagram, conexiones. `worker` (Nersa, Jennifer) ve solo su propia agenda + generador de links Flow (pueden generar cobros, el dinero igual entra a la cuenta Flow del negocio, no a ellas)
 - **Documentación:** `APPS.md` con mapa de todas las plataformas, responsabilidades y prioridades
 
 ## Variables de Entorno Vercel — Estado Actual
@@ -54,8 +55,11 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 | `FLOW_SECRET_KEY` | ✅ Configurada | Secret key de producción de Flow |
 | `FLOW_ENV` | ✅ `production` | Apunta a producción; cuenta pendiente de activación por Flow |
 | `SITE_URL` | ✅ Configurada | URL actual de Vercel |
-| `DASHBOARD_PASSWORD` | ⚪ Falta agregar | Contraseña para entrar a `/dashboard`. Philippe elige el valor |
-| `DASHBOARD_SESSION_SECRET` | ⚪ Falta agregar | Secreto random para firmar la cookie de sesión. Generar con `openssl rand -hex 32` en terminal — no pedirle este valor a Claude, generarlo localmente |
+| `DASHBOARD_PASSWORD_PHILIPPE` | ⚪ Falta agregar | Contraseña de Philippe (admin) — nombre de variable nuevo, distinto al `DASHBOARD_PASSWORD` original |
+| `DASHBOARD_PASSWORD_SOCIO` | ⚪ Falta agregar | Contraseña del socio (admin) |
+| `DASHBOARD_PASSWORD_NERSA` | ⚪ Falta agregar | Contraseña de Nersa (worker — solo ve su agenda + Flow) |
+| `DASHBOARD_PASSWORD_JENNIFER` | ⚪ Falta agregar | Contraseña de Jennifer (worker — solo ve su agenda + Flow) |
+| `DASHBOARD_SESSION_SECRET` | ✅ Configurada | Secreto random que firma la cookie de sesión (`openssl rand -hex 32`) — no cambia, se reutiliza |
 | `SHOPIFY_ADMIN_TOKEN` | ⚪ Falta agregar | Token de Shopify Admin API (ver `APPS.md`) |
 | `SHOPIFY_STORE_DOMAIN` | ⚪ Falta agregar | Ej. `liza-espacio-belleza.myshopify.com` |
 | `INSTAGRAM_ACCESS_TOKEN` | ⚪ Falta agregar | Token de Instagram Graph API (ver `APPS.md`) |
@@ -63,11 +67,11 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 > **Nota Flow:** devuelve "token unexpected" porque la cuenta de producción aún no está activada por Flow Chile.
 > El código está correcto. Cuando Flow active la cuenta, los pagos funcionarán sin cambios adicionales.
 
-> **Nota Dashboard:** sin `DASHBOARD_PASSWORD` y `DASHBOARD_SESSION_SECRET` configuradas, `/dashboard` muestra el login pero no deja entrar (login devuelve error 500 "no configurada"). Agregar ambas variables en Vercel → Settings → Environment Variables, Production, y hacer redeploy.
+> **Nota Dashboard:** la variable `DASHBOARD_PASSWORD` (singular, sin sufijo) que se usó al principio **ya no se lee** — el código ahora compara contra las 4 variables `DASHBOARD_PASSWORD_<NOMBRE>`. Se puede borrar de Vercel, no rompe nada si se deja. El nombre de usuario (`user.id`, ej. `"nersa"`) que determina el rol viene fijo en `api/_lib/session.ts` — si se agrega una tercera trabajadora hay que agregarla ahí también, no solo en Vercel.
 
 ## Pendiente — Funcionalidades
 
-- [ ] **Activar login dashboard**: Philippe agrega `DASHBOARD_PASSWORD` (elige una) y `DASHBOARD_SESSION_SECRET` (genera con `openssl rand -hex 32`) en Vercel
+- [ ] **Activar accesos faltantes**: Philippe agrega `DASHBOARD_PASSWORD_SOCIO`, `DASHBOARD_PASSWORD_NERSA`, `DASHBOARD_PASSWORD_JENNIFER` en Vercel (cada una la elige él o la persona)
 - [ ] **Flow producción**: esperar activación de cuenta por Flow Chile (sin acción de código)
 - [ ] **Test Flow completo**: probar servicio → email → link → pago → `/pago-exitoso` una vez activa la cuenta
 - [ ] **Appointly embed**: modal de reservas inline en `/servicios`. Necesita código embed de Shopify Admin → Apps → Appointly

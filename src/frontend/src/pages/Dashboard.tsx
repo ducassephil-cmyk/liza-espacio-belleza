@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useDashboardAuth } from "@/hooks/useDashboardAuth";
+import { type DashboardUser, useDashboardAuth } from "@/hooks/useDashboardAuth";
 import { useFlowPayment } from "@/hooks/useFlowPayment";
 import { useInstagramMetrics } from "@/hooks/useInstagram";
 import { useServices, useWorkers } from "@/hooks/useQueries";
@@ -152,11 +152,12 @@ function KpiTile({
 
 // ── Dashboard page (auth gate) ──────────────────────────────────────────────
 export function DashboardPage() {
-  const { status, error, login, logout } = useDashboardAuth();
+  const { status, user, error, login, logout } = useDashboardAuth();
 
   if (status === "checking") return <DashboardLoading />;
-  if (status === "anonymous") return <DashboardLogin onSubmit={login} error={error} />;
-  return <DashboardContent onLogout={logout} />;
+  if (status === "anonymous" || !user) return <DashboardLogin onSubmit={login} error={error} />;
+  if (user.role === "worker") return <WorkerDashboard user={user} onLogout={logout} />;
+  return <DashboardContent user={user} onLogout={logout} />;
 }
 
 // ── Loading ──────────────────────────────────────────────────────────────────
@@ -226,8 +227,42 @@ function DashboardLogin({
   );
 }
 
+// ── Worker dashboard (agenda propia + Flow) ─────────────────────────────────
+function WorkerDashboard({ user, onLogout }: { user: DashboardUser; onLogout: () => void }) {
+  return (
+    <div className="min-h-screen bg-muted/20">
+      <header className="sticky top-0 z-40 border-b border-border bg-card/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-3">
+            <span className="font-display text-lg text-foreground">✦ Liza</span>
+            <span className="hidden text-xs text-muted-foreground sm:block capitalize">{today()}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">
+              Hola, <span className="font-medium text-foreground">{user.displayName}</span>
+            </span>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
+            >
+              <LogOut className="size-3" />
+              <span className="hidden sm:inline">Salir</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-3xl space-y-6 px-4 py-6 sm:px-6">
+        <AgendaSection workerFilter={user.displayName} />
+        <FlowSection />
+      </main>
+    </div>
+  );
+}
+
 // ── Dashboard content ────────────────────────────────────────────────────────
-function DashboardContent({ onLogout }: { onLogout: () => void }) {
+function DashboardContent({ user, onLogout }: { user: DashboardUser; onLogout: () => void }) {
   const shopify = useShopifyData();
   const instagram = useInstagramMetrics();
 
@@ -252,6 +287,9 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
           </div>
 
           <div className="flex items-center gap-2">
+            <span className="hidden text-xs text-muted-foreground sm:block">
+              Hola, <span className="font-medium text-foreground">{user.displayName}</span>
+            </span>
             <span className="flex items-center gap-1.5 rounded-full border border-border bg-background px-2.5 py-1 text-xs">
               <StatusDot ok={true} />
               <span className="hidden sm:inline text-muted-foreground">Flow</span>
@@ -341,7 +379,7 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
 }
 
 // ── Agenda ────────────────────────────────────────────────────────────────────
-function AgendaSection() {
+function AgendaSection({ workerFilter }: { workerFilter?: string } = {}) {
   const { data: workers } = useWorkers();
 
   const nersa = workers?.find((w) => w.name === "Nersa");
@@ -350,17 +388,21 @@ function AgendaSection() {
   const workerColor = (name: string) =>
     name === "Nersa" ? "text-prism-violet" : "text-prism-cyan";
 
+  const agenda = workerFilter
+    ? MOCK_AGENDA.filter((a) => a.worker === workerFilter)
+    : MOCK_AGENDA;
+
   return (
     <Card className="border-border bg-card shadow-soft">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <CardTitle className="font-display text-base text-foreground">
-          Agenda del día
+          {workerFilter ? "Tu agenda de hoy" : "Agenda del día"}
         </CardTitle>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="text-[0.65rem]">
             Demo · Appointly pendiente
           </Badge>
-          {(nersa || jennifer) && (
+          {!workerFilter && (nersa || jennifer) && (
             <div className="flex items-center gap-1.5">
               {nersa && (
                 <span className="rounded-full border border-prism-violet/30 bg-prism-violet/10 px-2 py-0.5 font-mono text-[0.6rem] text-prism-violet">
@@ -377,7 +419,12 @@ function AgendaSection() {
         </div>
       </CardHeader>
       <CardContent className="space-y-2 pt-0">
-        {MOCK_AGENDA.map((appt) => (
+        {agenda.length === 0 && (
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            Sin citas agendadas para hoy.
+          </p>
+        )}
+        {agenda.map((appt) => (
           <div
             key={appt.id}
             className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-4 py-3"
