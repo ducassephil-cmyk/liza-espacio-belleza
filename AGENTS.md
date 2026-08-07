@@ -6,7 +6,10 @@ Frontend React + Vite + TypeScript + Tailwind + TanStack Router/Query + Radix UI
 Generado por Caffeine (ICP/Motoko). Sin canister real desplegado — usa `mockBackend` como fallback.
 Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify: lizaespaciobelleza.cl.
 
-**URL Vercel actual:** https://liza-espacio-belleza-frontend-f5vt5lhkv-pegassus.vercel.app
+**URL Vercel fija (usar siempre esta, no la de hash del deploy):** https://liza-espacio-belleza-frontend.vercel.app
+**Dashboard:** https://liza-espacio-belleza-frontend.vercel.app/dashboard
+
+> Cada deploy genera una URL única con hash (ej. `-8jqfwrz9j-`). Esa URL cambia en cada push — nunca compartirla como referencia fija. El dominio de arriba sin hash es el alias estable que Vercel mantiene apuntando siempre al último deploy de producción.
 **Repo GitHub:** git@github.com:ducassephil-cmyk/liza-espacio-belleza.git
 **Ver todas las apps y sus responsabilidades:** `APPS.md`
 
