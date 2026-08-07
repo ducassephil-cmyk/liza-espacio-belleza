@@ -6,7 +6,7 @@ Frontend React + Vite + TypeScript + Tailwind + TanStack Router/Query + Radix UI
 Generado por Caffeine (ICP/Motoko). Sin canister real desplegado — usa `mockBackend` como fallback.
 Deploy en Vercel (subdominio de prueba). Web principal en Shopify: lizaespaciobelleza.cl.
 
-**URL Vercel actual:** https://liza-espacio-belleza-frontend-2k30ntiq8-pegassus.vercel.app
+**URL Vercel actual:** https://liza-espacio-belleza-frontend-f5vt5lhkv-pegassus.vercel.app
 **Repo GitHub:** git@github.com:ducassephil-cmyk/liza-espacio-belleza.git
 
 ## Arquitectura
