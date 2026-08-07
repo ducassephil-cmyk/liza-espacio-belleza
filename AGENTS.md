@@ -82,7 +82,7 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 - [ ] **Subdominio**: configurar `app.lizaespaciobelleza.cl` → Vercel en DNS de Shopify
 - [ ] **Instagram API**: conectar métricas reales al dashboard (Philippe crea Facebook App)
 - [ ] **Shopify Admin API**: token para leer ventas/reservas en dashboard (Philippe genera en Shopify Admin)
-- [ ] **Gmail correo Liza**: conectar el correo correcto del negocio (no Lagregochilena@gmail.com)
+- [ ] **Gmail correo Liza**: usar `Lagregochilena@gmail.com` como cuenta de prueba (recibe reservas reales vía bigbox — autorizado 2026-08-07); evaluar más adelante si conviene un correo dedicado al negocio
 - [ ] **Test mobile real**: verificar animaciones y layout en iPhone físico
 - [ ] **ICP canister**: deployment real para automatización de agendas (largo plazo)
 
@@ -92,7 +92,7 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 - **NUNCA** abrir la pestaña 🔐CREDENCIALES del Excel
 - **NUNCA** modificar el tema live de Shopify sin aprobación explícita del founder
 - **NUNCA** copiar que el salón acepta walk-ins (es solo por reserva)
-- Gmail conectado a `Lagregochilena@gmail.com` — NO es el correo de Liza, no leer/enviar emails de clientes
+- Gmail conectado a `Lagregochilena@gmail.com` — autorizado como cuenta de prueba (recibe reservas reales vía bigbox). Al leer, filtrar solo lo relacionado a reservas/bigbox; no mostrar correspondencia personal no relacionada al negocio; no enviar correos desde ahí sin pedido explícito de Philippe en la sesión
 
 ## Verified Commands
 

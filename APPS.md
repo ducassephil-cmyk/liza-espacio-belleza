@@ -108,14 +108,12 @@ Cliente
 - **Responsabilidad Claude:** escribir la función que llama a la API y alimenta el dashboard.
 
 ### Gmail
-- **Rol:** Ver correos del negocio de Liza (consultas, postulaciones, proveedores) en el dashboard.
-- **Estado:** hay un Gmail MCP conectado pero apunta a `Lagregochilena@gmail.com`, que NO es el correo de Liza.
-- **Regla crítica:** NUNCA leer ni enviar desde `Lagregochilena@gmail.com` en nombre de Liza.
-- **Para conectar el correo correcto:**
-  1. Philippe indica cuál es el Gmail del negocio de Liza
-  2. Autoriza acceso desde esa cuenta de Google (OAuth en Claude settings)
-- **Responsabilidad Philippe:** confirmar el correo, autorizar el acceso.
-- **Responsabilidad Claude:** filtrar solo emails relevantes (clientes, Flow, Appointly). Nunca leer o escribir sin instrucción explícita.
+- **Rol:** Ver correos de reservas del negocio (notificaciones de bigbox) en el dashboard.
+- **Estado:** Gmail MCP conectado a `Lagregochilena@gmail.com` — autorizado por Philippe (2026-08-07) como cuenta de prueba, ya que es la que efectivamente recibe las notificaciones de reservas vía bigbox.
+- **Precaución:** al leer, filtrar solo correos relacionados a reservas/bigbox — no mostrar correspondencia personal no relacionada al negocio. No enviar correos desde esta cuenta sin instrucción explícita de Philippe en la sesión.
+- **A futuro:** evaluar si conviene migrar a un correo dedicado 100% al negocio de Liza.
+- **Responsabilidad Philippe:** decidir cuándo migrar a un correo dedicado, si aplica.
+- **Responsabilidad Claude:** filtrar solo emails relevantes a reservas. Nunca leer o escribir fuera de eso sin instrucción explícita.
 
 ### ICP (Internet Computer Protocol) — Canister Motoko
 - **Rol (futuro):** automatización de agenda, lógica de negocio on-chain, emisión de vUSD.
@@ -136,7 +134,7 @@ Cliente
 - **Sesiones activas:** a través de Claude.ai / Claude Code (CLI).
 - **No tiene acceso autónomo** a Vercel, GitHub, ni producción — todo cambio requiere aprobación de Philippe en la sesión.
 - **Lo que sí puede hacer:** leer y modificar código local, sugerir deploys, revisar logs de Vercel, conectar APIs cuando Philippe provee las claves.
-- **Lo que NO hace:** guardar claves en el historial de chat, modificar Shopify sin aprobación, leer el correo de Lagregochilena@gmail.com en nombre de Liza, abrir el archivo 🔐CREDENCIALES.
+- **Lo que NO hace:** guardar claves en el historial de chat, modificar Shopify sin aprobación, leer correspondencia personal no relacionada a reservas en Lagregochilena@gmail.com, abrir el archivo 🔐CREDENCIALES.
 
 ### Formspree
 - **Rol:** recibir el formulario de postulación de `/únete` y enviar el email a Philippe.

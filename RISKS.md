@@ -26,22 +26,23 @@ Registro de escenarios de riesgo una vez todas las APIs (Flow, Shopify, Instagra
 
 ---
 
-## 2. Gmail equivocado conectado
+## 2. Gmail personal mezclado con correspondencia de negocio
 
-**Estado:** 🔴 Sin mitigar (Gmail aún no conectado al dashboard)
+**Estado:** 🟡 Riesgo aceptado para pruebas — decisión explícita de Philippe (2026-08-07)
 
-**Qué pasa:** El Gmail MCP disponible hoy apunta a `Lagregochilena@gmail.com`, que NO es el correo de Liza. Si se conecta por error o se mezcla con el correo real del negocio, se arriesga mostrar correspondencia personal en una herramienta de negocio — o enviar algo desde la cuenta equivocada.
+**Qué pasa:** El Gmail MCP disponible apunta a `Lagregochilena@gmail.com`. Philippe confirmó que esta cuenta ya recibe las notificaciones reales de reservas vía bigbox, así que se autorizó usarla como cuenta de prueba para el dashboard en vez de esperar un correo dedicado al negocio. El riesgo real ahora no es "cuenta equivocada" sino mostrar correspondencia personal no relacionada al negocio al leer esa bandeja.
 
-**Por qué es grave:** Mezcla de vida personal y negocio, posible filtración de información privada no relacionada con Liza.
+**Por qué es grave:** Si el dashboard (o quien lo lea) muestra correos personales de Philippe sin querer, se mezcla vida personal con una herramienta que podría verse por su socio o trabajadoras.
 
 **Cómo evitarlo:**
-- Confirmar explícitamente cuál es el Gmail del negocio antes de autorizar cualquier acceso
-- Nunca autorizar `Lagregochilena@gmail.com` para uso del dashboard
+- Al construir la integración, filtrar solo correos relacionados a reservas/bigbox — no mostrar la bandeja completa
+- No enviar correos desde esta cuenta sin pedido explícito de Philippe en la sesión actual
+- Evaluar más adelante si conviene migrar a un correo dedicado 100% al negocio (menos riesgo, más profesional de cara a clientas)
 
-**Plan B (si se conectó el equivocado):**
-1. Revocar el acceso OAuth desde la configuración de Google de esa cuenta inmediatamente
-2. Verificar en el dashboard/logs si se leyó o envió algo desde esa cuenta
-3. Reconectar con el Gmail correcto del negocio
+**Plan B (si se muestra algo personal por error):**
+1. Quitar de inmediato esa vista/función del dashboard
+2. Revisar qué se mostró y a quién (si el dashboard fue visto por alguien más en ese momento)
+3. Ajustar el filtro antes de reactivar la integración
 
 ---
 
@@ -158,7 +159,7 @@ Registro de escenarios de riesgo una vez todas las APIs (Flow, Shopify, Instagra
 |---|--------|-----------|------------------|
 | 1 | Password del dashboard filtrada | 🔴 Alta | Expone todo el negocio de una vez |
 | 3 | Precios desincronizados | 🔴 Alta | Afecta directamente a clientas y cobros |
-| 2 | Gmail equivocado | 🟡 Media | Aún no conectado, pero crítico cuando se active |
+| 2 | Gmail personal mezclado con negocio | 🟡 Media | Autorizado para test — filtrar bien qué se muestra |
 | 6 | Token Shopify con permisos de más | 🟡 Media | Se evita en el momento de generar el token |
 | 7 | Un solo admin | 🟡 Media | No urgente, pero crece con el negocio |
 | 5 | Vercel Hobby suspendido | 🟢 Baja | Bajo riesgo actual, sube con más tráfico |
