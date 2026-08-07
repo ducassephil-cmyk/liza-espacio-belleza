@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { buildSessionCookie, createSessionToken, safeCompare } from "./_lib/session";
+import { buildSessionCookie, createSessionToken, safeCompare } from "./_lib/session.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).json({ ok: false, error: "Method not allowed" });

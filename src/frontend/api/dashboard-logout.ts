@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { buildClearCookie } from "./_lib/session";
+import { buildClearCookie } from "./_lib/session.js";
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   res.setHeader("Set-Cookie", buildClearCookie());
