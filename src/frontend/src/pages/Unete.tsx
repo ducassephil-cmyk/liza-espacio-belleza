@@ -33,6 +33,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -733,13 +734,44 @@ function VusdProtocolSection() {
 
 type FormValues = SubmitApplicationInput;
 
+const FORMSPREE_ID = import.meta.env.VITE_FORMSPREE_ID as string | undefined;
+
 function ApplicationForm() {
   const form = useForm<FormValues>({
     defaultValues: { name: "", email: "", specialty: "", message: "" },
   });
   const mutation = useSubmitApplication();
+  const [formspreeLoading, setFormspreeLoading] = useState(false);
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = async (values: FormValues) => {
+    if (FORMSPREE_ID) {
+      setFormspreeLoading(true);
+      try {
+        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(values),
+        });
+        if (res.ok) {
+          toast.success("¡Postulación enviada!", {
+            description: "Nuestro equipo revisará tu postulación y te contactará por email.",
+          });
+          form.reset();
+        } else {
+          toast.error("No pudimos enviar tu postulación", {
+            description: "Verifica tu conexión e intenta nuevamente.",
+          });
+        }
+      } catch {
+        toast.error("No pudimos enviar tu postulación", {
+          description: "Ocurrió un error inesperado. Intenta nuevamente en unos minutos.",
+        });
+      } finally {
+        setFormspreeLoading(false);
+      }
+      return;
+    }
+
     mutation.mutate(values, {
       onSuccess: (result) => {
         if (result.__kind__ === "ok") {
@@ -771,7 +803,7 @@ function ApplicationForm() {
     });
   };
 
-  const isSubmitting = mutation.isPending;
+  const isSubmitting = FORMSPREE_ID ? formspreeLoading : mutation.isPending;
 
   return (
     <section

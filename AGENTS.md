@@ -4,17 +4,18 @@
 
 Frontend React + Vite + TypeScript + Tailwind + TanStack Router/Query + Radix UI.
 Generado por Caffeine (ICP/Motoko). Sin canister real desplegado — usa `mockBackend` como fallback.
-Deploy en Vercel (subdominio de prueba). Web principal en Shopify: lizaespaciobelleza.cl.
+Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify: lizaespaciobelleza.cl.
 
 **URL Vercel actual:** https://liza-espacio-belleza-frontend-f5vt5lhkv-pegassus.vercel.app
 **Repo GitHub:** git@github.com:ducassephil-cmyk/liza-espacio-belleza.git
+**Ver todas las apps y sus responsabilidades:** `APPS.md`
 
 ## Arquitectura
 
 - **Shopify** → web principal, booking live (Appointly), e-commerce
-- **Vercel** → nuevo frontend React, testing y automatización futura
-- **ICP (futuro)** → automatización de agendas con canister Motoko
-- **Flow Chile** → pasarela de pagos online (sandbox activo, producción pendiente)
+- **Vercel** → nuevo frontend React, Edge Functions (Flow), auto-deploy desde GitHub `main`
+- **ICP (futuro)** → automatización de agendas con canister Motoko + vUSD
+- **Flow Chile** → pasarela de pagos online (vars en Vercel, cuenta producción pendiente de activación)
 
 ## Estado Actual — Completado ✓
 
@@ -28,35 +29,46 @@ Deploy en Vercel (subdominio de prueba). Web principal en Shopify: lizaespaciobe
 - Stats band (4 cifras) en `Home.tsx` entre Hero y EspacioSection
 - Botón WhatsApp por servicio en `Servicios.tsx` (mensaje pre-llenado con nombre y precio)
 - Botón "Pagar con Flow" por servicio con input de email en `Servicios.tsx`
+- Badge de cupos disponibles en cards de servicios (`Servicios.tsx`)
 - Hook `useFlowPayment` en `hooks/useFlowPayment.ts`
 - Edge function `api/flow-create-order.ts` (HMAC-SHA256, sandbox/producción)
 - Webhook `api/flow-confirm.ts` (confirma pago en Flow)
 - Página `/pago-exitoso` con CTA WhatsApp (`pages/PagoExitoso.tsx`)
 - Ruta `/pago-exitoso` registrada en `App.tsx`
-- **Fix crítico:** `useQueries.ts` — reemplazado `enabled: !!actor && !isFetching` por `resolveActor()` + mock fallback + `enabled: true`. Sin este fix los servicios nunca cargan.
+- **Fix crítico:** `useQueries.ts` — `resolveActor()` + mock fallback + `enabled: true`. Sin este fix los servicios nunca cargan.
+- **Fix visual:** `BlackGlassButton.tsx` — tailwind-merge tiraba `bg-glass`; hover movido a CSS (`.bg-glass:hover` en `index.css`)
+- **Fix animaciones mobile:** `SectionReveal.tsx` — `whileInView` reemplazado por `useInView` hook (RAF se pausa con `document.hidden=true` en preview)
+- **Auto-deploy:** Vercel conectado a GitHub `main`. Cada push despliega automáticamente.
+- **Dashboard operacional:** mockup completo publicado como Artifact (Flow, WA, IG, Gmail, Equipo, KPIs)
+- **Documentación:** `APPS.md` con mapa de todas las plataformas, responsabilidades y prioridades
 
-## Pendiente — Variables de Entorno Vercel
+## Variables de Entorno Vercel — Estado Actual
 
-Agregar en Vercel Dashboard → Settings → Environment Variables:
+| Key | Estado | Notas |
+|-----|--------|-------|
+| `FLOW_API_KEY` | ✅ Configurada | API key de producción de Flow |
+| `FLOW_SECRET_KEY` | ✅ Configurada | Secret key de producción de Flow |
+| `FLOW_ENV` | ✅ `production` | Apunta a producción; cuenta pendiente de activación por Flow |
+| `SITE_URL` | ✅ Configurada | URL actual de Vercel |
 
-| Key | Value |
-|-----|-------|
-| `FLOW_API_KEY` | API key de Flow Chile |
-| `FLOW_SECRET_KEY` | Secret key de Flow Chile |
-| `FLOW_ENV` | `sandbox` (cambiar a `production` cuando esté listo) |
-| `SITE_URL` | URL actual de Vercel |
+> **Nota:** Flow devuelve "token unexpected" porque la cuenta de producción aún no está activada por Flow Chile.
+> El código está correcto. Cuando Flow active la cuenta, los pagos funcionarán sin cambios adicionales.
 
 ## Pendiente — Funcionalidades
 
-- [ ] **Appointly embed**: abrir modal de agendas de Shopify inline. Necesita código embed desde Shopify Admin → Apps → Appointly
-- [ ] **Formspree**: conectar formulario `/unete` a email. Necesita token desde formspree.io
-- [ ] **Combos reales**: reemplazar datos mock con combos reales (nombre, precio, servicios incluidos)
-- [ ] **Productos reales**: actualizar lista de productos desde Shopify
-- [ ] **URLs por servicio**: si Appointly soporta links por servicio, reemplazar `lizaespaciobelleza.cl`
-- [ ] **Flow producción**: cambiar `FLOW_ENV=production` cuando pasen las pruebas sandbox
-- [ ] **Test Flow sandbox**: probar flujo completo (servicio → email → Flow → pago-exitoso)
+- [ ] **Flow producción**: esperar activación de cuenta por Flow Chile (sin acción de código)
+- [ ] **Test Flow completo**: probar servicio → email → link → pago → `/pago-exitoso` una vez activa la cuenta
+- [ ] **Appointly embed**: modal de reservas inline en `/servicios`. Necesita código embed de Shopify Admin → Apps → Appointly
+- [ ] **Formspree**: conectar formulario `/unete` a email. Philippe crea cuenta en formspree.io → pasa el formId
+- [ ] **Combos reales**: reemplazar datos mock con nombre, precio y servicios reales de Liza
+- [ ] **Productos reales**: actualizar lista desde Shopify (precios, nombres, descripcion)
+- [ ] **URLs por servicio**: verificar si Appointly permite links por servicio; si sí, reemplazar `lizaespaciobelleza.cl`
+- [ ] **Subdominio**: configurar `app.lizaespaciobelleza.cl` → Vercel en DNS de Shopify
+- [ ] **Instagram API**: conectar métricas reales al dashboard (Philippe crea Facebook App)
+- [ ] **Shopify Admin API**: token para leer ventas/reservas en dashboard (Philippe genera en Shopify Admin)
+- [ ] **Gmail correo Liza**: conectar el correo correcto del negocio (no Lagregochilena@gmail.com)
+- [ ] **Test mobile real**: verificar animaciones y layout en iPhone físico
 - [ ] **ICP canister**: deployment real para automatización de agendas (largo plazo)
-- [ ] **Cupos badge**: mostrar badge de cupos disponibles en cards de servicios
 
 ## Reglas Críticas
 

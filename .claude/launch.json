@@ -5,7 +5,8 @@
       "name": "liza-frontend",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@caffeine/template-frontend", "dev"],
-      "port": 5173
+      "port": 5173,
+      "autoPort": true
     }
   ]
 }
