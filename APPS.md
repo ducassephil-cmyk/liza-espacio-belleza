@@ -78,16 +78,25 @@ Cliente
 - **Responsabilidad Philippe:** copiar el código embed desde Shopify Admin → Apps → Appointly.
 - **Responsabilidad Claude:** insertar el embed en el componente React correcto.
 
+**Costo real confirmado por Philippe (2026-08):**
+
+| Plan Shopify | Costo | Incluye Appointly? |
+|---|---|---|
+| Básico | $9 USD/mes | No — sin agenda/reservas |
+| Plan requerido para Appointly | $27 USD/mes | Sí |
+
+Es decir, tener reservas online vía Appointly cuesta **$18 USD/mes extra** sobre el plan básico de Shopify (Appointly en sí puede ser gratis como app, pero exige un plan Shopify superior para funcionar) — unos $216 USD/año solo por la función de agenda.
+
 **Alternativas evaluadas (investigado 2026-08):**
 
 | Opción | Costo aprox. | Nota |
 |---|---|---|
-| **Fresha** | Ya no es gratis: ~$14,95 USD/mes por trabajadora reservable (2 trabajadoras ≈ $30 USD/mes) + comisión del 20% si la clienta llega por el marketplace de Fresha (no aplica a reservas propias) + cobro de pago aparte | El modelo "gratis para siempre" que hizo famoso a Fresha ya no existe (cambió en 2026) |
-| **Booksy** | Requiere cotizar directo, especializado en belleza/spa, fuerte en LatAm | No se encontró precio público confiable |
-| **Cal.com** | Tiene plan gratuito, API abierta | Permite conectar reservas directo al React app sin depender de Shopify — la única opción que desacopla completamente de Shopify |
-| **Appointly (actual)** | No se encontró el precio exacto del plan actual en la búsqueda | Verificar directamente en Shopify Admin → Apps → Appointly qué plan está contratado hoy |
+| **Appointly (vía Shopify $27/mes)** | ~$216 USD/año extra sobre el plan básico | Lo que se paga hoy |
+| **Fresha** | Ya no es gratis: ~$14,95 USD/mes por trabajadora reservable (2 trabajadoras ≈ $30 USD/mes ≈ $360 USD/año) + comisión del 20% si la clienta llega por el marketplace de Fresha (no aplica a reservas propias) + cobro de pago aparte | Más caro que Appointly en este caso — el modelo "gratis para siempre" que hizo famoso a Fresha ya no existe |
+| **Booksy** | Requiere cotizar directo | No se encontró precio público confiable |
+| **Cal.com** | Tiene plan gratuito, API abierta | Permite conectar reservas directo al React app sin depender de Shopify — la única opción que desacopla completamente de Shopify y podría eliminar el costo de agenda por completo |
 
-**Conclusión:** no está claro que cambiarse ahorre plata — Fresha dejó de ser gratis y su costo real (suscripción + comisión de marketplace) puede terminar siendo más caro que Appointly. Antes de migrar, revisar qué plan de Appointly se está pagando hoy exactamente y comparar cifra contra cifra, no en base a percepción de "gratis vs. pago".
+**Conclusión actualizada:** con el número real ($27/mes Shopify vs. Fresha ~$30/mes), **Fresha no es más barato** — de hecho sale un poco más caro y suma la comisión de marketplace. La única alternativa que representaría un ahorro real es **Cal.com** (gratis, pero requiere integrarlo directo al React app y dejar de depender del plan Shopify $27 — solo tiene sentido si además se evalúa bajar a Shopify $9/mes y mover reservas 100% fuera de Shopify).
 
 ### Flow Chile
 - **Rol:** Pasarela de pagos online. Philippe genera un link de cobro por servicio, lo envía por WhatsApp, la cliente paga online.
@@ -95,6 +104,8 @@ Cliente
 - **Sandbox:** funciona. Producción: Flow debe activar la cuenta manualmente.
 - **Responsabilidad Philippe:** responder a Flow si piden documentación adicional, cambiar `FLOW_ENV=production` cuando confirmen.
 - **Responsabilidad Claude:** nada pendiente en código. Mantenimiento si cambia la API.
+
+**Confirmado por Philippe (2026-08):** Flow no cobra mensualidad, solo comisión por transacción — coincide con lo investigado.
 
 **Comparativa de comisiones (investigado 2026-08, cifras referenciales — reconfirmar antes de decidir, cambian seguido):**
 
