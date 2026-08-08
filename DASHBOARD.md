@@ -8,6 +8,13 @@ Documento dedicado al dashboard de Liza: qué es, cómo funciona el login, qué 
 
 El "sistema operativo de negocio" de Philippe — reemplaza abrir Flow, WhatsApp, Instagram, Gmail y Shopify en pestañas separadas. Página real dentro de la app React (no es un mockup), vive en `src/frontend/src/pages/Dashboard.tsx`.
 
+## Dos caminos de pago (no confundir)
+
+- **Primario — reserva por modal de agendar (Appointly hoy, Cal.com si se migra):** al confirmarse la reserva, debe abrirse Flow automáticamente para que la clienta pague ahí mismo. Sin intervención del staff. **Pendiente de construir** — hoy Appointly aún no está embebido en `/servicios` (ver `AGENTS.md`).
+- **Secundario — reserva por WhatsApp:** no pasa por ningún modal de agenda, así que no hay evento de "reserva confirmada" que dispare nada solo. El staff genera el link manualmente desde el dashboard (`FlowSection` en `Dashboard.tsx`) — esto es lo que ya está construido y protegido con login.
+
+Ambos caminos se van a seguir usando en paralelo — no es que uno reemplace al otro.
+
 ## Arquitectura
 
 - **Auth:** 4 contraseñas nombradas (no una compartida) + cookie de sesión firmada con HMAC, 30 días de expiración. Sin base de datos — todo vive en `api/_lib/session.ts`.
