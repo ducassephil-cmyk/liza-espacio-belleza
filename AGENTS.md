@@ -12,6 +12,7 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 > Cada deploy genera una URL única con hash (ej. `-8jqfwrz9j-`). Esa URL cambia en cada push — nunca compartirla como referencia fija. El dominio de arriba sin hash es el alias estable que Vercel mantiene apuntando siempre al último deploy de producción.
 **Repo GitHub:** git@github.com:ducassephil-cmyk/liza-espacio-belleza.git
 **Ver todas las apps y sus responsabilidades:** `APPS.md`
+**Ver detalle completo del dashboard (auth, roles, changelog):** `DASHBOARD.md`
 
 ## Arquitectura
 
@@ -31,21 +32,20 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 - `WA_URL` y `WA_NUMBER` exportados desde `Layout.tsx`
 - Stats band (4 cifras) en `Home.tsx` entre Hero y EspacioSection
 - Botón WhatsApp por servicio en `Servicios.tsx` (mensaje pre-llenado con nombre y precio)
-- Botón "Pagar con Flow" por servicio con input de email en `Servicios.tsx`
 - Badge de cupos disponibles en cards de servicios (`Servicios.tsx`)
 - Hook `useFlowPayment` en `hooks/useFlowPayment.ts`
-- Edge function `api/flow-create-order.ts` (HMAC-SHA256, sandbox/producción)
+- Edge function `api/flow-create-order.ts` (HMAC-SHA256, sandbox/producción, **requiere sesión de dashboard** — ya no público)
 - Webhook `api/flow-confirm.ts` (confirma pago en Flow)
 - Página `/pago-exitoso` con CTA WhatsApp (`pages/PagoExitoso.tsx`)
 - Ruta `/pago-exitoso` registrada en `App.tsx`
 - **Fix crítico:** `useQueries.ts` — `resolveActor()` + mock fallback + `enabled: true`. Sin este fix los servicios nunca cargan.
 - **Fix visual:** `BlackGlassButton.tsx` — tailwind-merge tiraba `bg-glass`; hover movido a CSS (`.bg-glass:hover` en `index.css`)
 - **Fix animaciones mobile:** `SectionReveal.tsx` — `whileInView` reemplazado por `useInView` hook (RAF se pausa con `document.hidden=true` en preview)
+- **Fix seguridad:** el botón público "Pagar con Flow" en `Servicios.tsx` generaba links sin límite ni autenticación — quitado del sitio público; ahora solo se genera desde el dashboard (staff logueado). Ver `DASHBOARD.md`
+- vUSD deshabilitado en `Servicios.tsx` (comentado, no borrado — no aplica todavía)
 - **Auto-deploy:** Vercel conectado a GitHub `main`. Cada push despliega automáticamente.
-- **Dashboard operacional:** página real en `/dashboard` (Flow, WA, IG, agenda, KPIs, estado de conexiones) — no es mockup, es la app
-- **Login del dashboard:** 4 passwords nombradas (no una compartida) + cookie de sesión firmada (HMAC). Ver `api/_lib/session.ts`
-- **Roles del dashboard:** `admin` (Philippe, socio) ve todo — KPIs, agenda completa, Shopify, Instagram, conexiones. `worker` (Nersa, Jennifer) ve solo su propia agenda + generador de links Flow (pueden generar cobros, el dinero igual entra a la cuenta Flow del negocio, no a ellas)
-- **Documentación:** `APPS.md` con mapa de todas las plataformas, responsabilidades y prioridades
+- **Dashboard operacional:** página real en `/dashboard`, con login por roles. Detalle completo (auth, roles, changelog) en `DASHBOARD.md` — no duplicar aquí
+- **Documentación:** `APPS.md` (plataformas), `DASHBOARD.md` (dashboard), `RISKS.md` (riesgos), `PRODUCT-VISION-ICP.md` (ideas de producto futuras)
 
 ## Variables de Entorno Vercel — Estado Actual
 
@@ -55,11 +55,8 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 | `FLOW_SECRET_KEY` | ✅ Configurada | Secret key de producción de Flow |
 | `FLOW_ENV` | ✅ `production` | Apunta a producción; cuenta pendiente de activación por Flow |
 | `SITE_URL` | ✅ Configurada | URL actual de Vercel |
-| `DASHBOARD_PASSWORD_PHILIPPE` | ⚪ Falta agregar | Contraseña de Philippe (admin) — nombre de variable nuevo, distinto al `DASHBOARD_PASSWORD` original |
-| `DASHBOARD_PASSWORD_SOCIO` | ⚪ Falta agregar | Contraseña del socio (admin) |
-| `DASHBOARD_PASSWORD_NERSA` | ⚪ Falta agregar | Contraseña de Nersa (worker — solo ve su agenda + Flow) |
-| `DASHBOARD_PASSWORD_JENNIFER` | ⚪ Falta agregar | Contraseña de Jennifer (worker — solo ve su agenda + Flow) |
-| `DASHBOARD_SESSION_SECRET` | ✅ Configurada | Secreto random que firma la cookie de sesión (`openssl rand -hex 32`) — no cambia, se reutiliza |
+| `DASHBOARD_SESSION_SECRET` | ✅ Configurada | Firma la cookie de sesión del dashboard |
+| `DASHBOARD_PASSWORD_PHILIPPE/SOCIO/NERSA/JENNIFER` | ⚪ Falta agregar 3 de 4 | Ver detalle completo en `DASHBOARD.md` |
 | `SHOPIFY_ADMIN_TOKEN` | ⚪ Falta agregar | Token de Shopify Admin API (ver `APPS.md`) |
 | `SHOPIFY_STORE_DOMAIN` | ⚪ Falta agregar | Ej. `liza-espacio-belleza.myshopify.com` |
 | `INSTAGRAM_ACCESS_TOKEN` | ⚪ Falta agregar | Token de Instagram Graph API (ver `APPS.md`) |
@@ -67,11 +64,9 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 > **Nota Flow:** devuelve "token unexpected" porque la cuenta de producción aún no está activada por Flow Chile.
 > El código está correcto. Cuando Flow active la cuenta, los pagos funcionarán sin cambios adicionales.
 
-> **Nota Dashboard:** la variable `DASHBOARD_PASSWORD` (singular, sin sufijo) que se usó al principio **ya no se lee** — el código ahora compara contra las 4 variables `DASHBOARD_PASSWORD_<NOMBRE>`. Se puede borrar de Vercel, no rompe nada si se deja. El nombre de usuario (`user.id`, ej. `"nersa"`) que determina el rol viene fijo en `api/_lib/session.ts` — si se agrega una tercera trabajadora hay que agregarla ahí también, no solo en Vercel.
-
 ## Pendiente — Funcionalidades
 
-- [ ] **Activar accesos faltantes**: Philippe agrega `DASHBOARD_PASSWORD_SOCIO`, `DASHBOARD_PASSWORD_NERSA`, `DASHBOARD_PASSWORD_JENNIFER` en Vercel (cada una la elige él o la persona)
+- [ ] **Activar accesos faltantes del dashboard**: ver `DASHBOARD.md` para las 3 variables pendientes
 - [ ] **Flow producción**: esperar activación de cuenta por Flow Chile (sin acción de código)
 - [ ] **Test Flow completo**: probar servicio → email → link → pago → `/pago-exitoso` una vez activa la cuenta
 - [x] **Plan actual de Appointly confirmado**: Shopify $27 USD/mes (vs. $9 sin agenda) — $18/mes extra. Fresha (~$30/mes) no es más barato. Cal.com (gratis) sería la única alternativa con ahorro real, pero requiere desacoplar reservas de Shopify por completo — ver `APPS.md`
