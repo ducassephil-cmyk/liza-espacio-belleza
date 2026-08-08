@@ -74,6 +74,8 @@ Deploy en Vercel (auto-deploy activo vía GitHub push). Web principal en Shopify
 - [ ] **Activar accesos faltantes**: Philippe agrega `DASHBOARD_PASSWORD_SOCIO`, `DASHBOARD_PASSWORD_NERSA`, `DASHBOARD_PASSWORD_JENNIFER` en Vercel (cada una la elige él o la persona)
 - [ ] **Flow producción**: esperar activación de cuenta por Flow Chile (sin acción de código)
 - [ ] **Test Flow completo**: probar servicio → email → link → pago → `/pago-exitoso` una vez activa la cuenta
+- [ ] **Revisar plan actual de Appointly**: confirmar qué se paga hoy antes de evaluar alternativas (Fresha ya no es gratis, ver `APPS.md`)
+- [ ] **Preguntar a Flow si se puede usar tarifa de transferencia (~0,99%)** en vez de tarjeta (~2,9%) — posible ahorro sin cambiar de proveedor (ver `APPS.md`)
 - [ ] **Appointly embed**: modal de reservas inline en `/servicios`. Necesita código embed de Shopify Admin → Apps → Appointly
 - [ ] **Formspree**: conectar formulario `/unete` a email. Philippe crea cuenta en formspree.io → pasa el formId
 - [ ] **Combos reales**: reemplazar datos mock con nombre, precio y servicios reales de Liza

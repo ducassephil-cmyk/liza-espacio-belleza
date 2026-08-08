@@ -78,12 +78,35 @@ Cliente
 - **Responsabilidad Philippe:** copiar el código embed desde Shopify Admin → Apps → Appointly.
 - **Responsabilidad Claude:** insertar el embed en el componente React correcto.
 
+**Alternativas evaluadas (investigado 2026-08):**
+
+| Opción | Costo aprox. | Nota |
+|---|---|---|
+| **Fresha** | Ya no es gratis: ~$14,95 USD/mes por trabajadora reservable (2 trabajadoras ≈ $30 USD/mes) + comisión del 20% si la clienta llega por el marketplace de Fresha (no aplica a reservas propias) + cobro de pago aparte | El modelo "gratis para siempre" que hizo famoso a Fresha ya no existe (cambió en 2026) |
+| **Booksy** | Requiere cotizar directo, especializado en belleza/spa, fuerte en LatAm | No se encontró precio público confiable |
+| **Cal.com** | Tiene plan gratuito, API abierta | Permite conectar reservas directo al React app sin depender de Shopify — la única opción que desacopla completamente de Shopify |
+| **Appointly (actual)** | No se encontró el precio exacto del plan actual en la búsqueda | Verificar directamente en Shopify Admin → Apps → Appointly qué plan está contratado hoy |
+
+**Conclusión:** no está claro que cambiarse ahorre plata — Fresha dejó de ser gratis y su costo real (suscripción + comisión de marketplace) puede terminar siendo más caro que Appointly. Antes de migrar, revisar qué plan de Appointly se está pagando hoy exactamente y comparar cifra contra cifra, no en base a percepción de "gratis vs. pago".
+
 ### Flow Chile
 - **Rol:** Pasarela de pagos online. Philippe genera un link de cobro por servicio, lo envía por WhatsApp, la cliente paga online.
 - **Estado:** código 100% listo (Edge Function en Vercel). Cuenta de producción pendiente de activación por parte de Flow.
 - **Sandbox:** funciona. Producción: Flow debe activar la cuenta manualmente.
 - **Responsabilidad Philippe:** responder a Flow si piden documentación adicional, cambiar `FLOW_ENV=production` cuando confirmen.
 - **Responsabilidad Claude:** nada pendiente en código. Mantenimiento si cambia la API.
+
+**Comparativa de comisiones (investigado 2026-08, cifras referenciales — reconfirmar antes de decidir, cambian seguido):**
+
+| Pasarela | Comisión aprox. | Nota |
+|---|---|---|
+| **Flow (tarjeta)** | 2,89–2,95% + IVA | Lo que se usa hoy |
+| **Flow (transferencia)** | ~0,99% + IVA | Tarifa promocional de Flow para pagos por transferencia — **posible ahorro sin cambiar de proveedor**, revisar si está habilitada |
+| **Khipu** | 0,69–1,5% + IVA | Pago por transferencia bancaria directa, no tarjeta. Sin comisión de red de tarjetas, la más barata para tickets altos |
+| **Webpay (Transbank)** | 2,35% crédito / 1,75% débito (+ IVA, comerciante nuevo) | El más reconocido/confiable para clientas chilenas que no conocen Flow |
+| **MercadoPago** | 2,89–3,29% + IVA | Similar a Flow, no representa ahorro claro |
+
+**Conclusión:** antes de migrar de proveedor, vale la pena preguntarle a Flow si se puede activar/usar la tarifa de transferencia (~0,99%) en vez de tarjeta — mismo proveedor, mismo código, posible ahorro grande sin trabajo de integración. Khipu es la alternativa más barata si se quiere cambiar de proveedor. Fuentes: [Flow tarifas oficiales](https://web.flow.cl/es-cl/tarifas/), [comparativa Webpay/Flow/Khipu](https://www.guiadesoftware.com/blog/mejor-pasarela-pago-chile), [Transbank tarifas](https://ayuda.transbank.cl/tarifas-vender-webpay).
 
 ### WhatsApp Business API
 - **Rol:** Recibir mensajes de clientes directamente en el dashboard (sin abrir el celular).
