@@ -62,6 +62,9 @@ El "sistema operativo de negocio" de Philippe — reemplaza abrir Flow, WhatsApp
 
 ## Registro de cambios
 
+### 2026-08-07 — Fix seguridad: generación de links Flow sin control
+`api/flow-create-order.ts` no tenía ningún chequeo de autenticación — cualquier visitante anónimo del sitio (o cualquiera con curl/Postman, sin pasar por la web) podía generar links de cobro Flow sin límite. Philippe lo detectó al notar que el botón "Pagar con Flow" público en `Servicios.tsx` permitía a cualquier usuario generar cuantos links quisiera. Corregido: el endpoint ahora exige `getSessionUser(req)` (cualquier rol del dashboard, admin o worker). Se quitó el botón/flujo de auto-servicio de `Servicios.tsx` — el único lugar donde se generan links de Flow ahora es el dashboard, con cada link atribuido a la persona logueada que lo generó. También se deshabilitó (comentado, no borrado) el botón de pago con vUSD en la misma página, por no aplicar todavía.
+
 ### 2026-08-07 — Login por roles (admin/worker)
 Reemplazado el esquema de 1 contraseña compartida por 4 contraseñas nombradas con roles. Trabajadoras (Nersa, Jennifer) ahora ven solo su agenda + Flow, no el dashboard completo. Requiere las 3 variables nuevas en Vercel (`DASHBOARD_PASSWORD_SOCIO/NERSA/JENNIFER`) — pendiente que Philippe las agregue.
 
