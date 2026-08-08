@@ -17,13 +17,11 @@ import {
   formatCLP,
 } from "@/types";
 import { WA_URL } from "@/components/Layout";
-import { generateOrderId, useFlowPayment } from "@/hooks/useFlowPayment";
 import {
   Calendar,
   CheckCircle2,
   ChevronDown,
   Clock,
-  CreditCard,
   Heart,
   Layers,
   MessageCircle,
@@ -175,33 +173,14 @@ function ServiceDetailCard({
   index: number;
 }) {
   const [open, setOpen] = useState(false);
-  const [vusdOpen, setVusdOpen] = useState(false);
-  const [showEmailInput, setShowEmailInput] = useState(false);
-  const [email, setEmail] = useState("");
-  const emailRef = useRef<HTMLInputElement>(null);
-  const { createPaymentLink, isPending, paymentUrl, error: flowError, reset } = useFlowPayment();
-
-  async function handleFlow() {
-    if (!showEmailInput) { setShowEmailInput(true); setTimeout(() => emailRef.current?.focus(), 50); return; }
-    if (!email) { emailRef.current?.focus(); return; }
-    await createPaymentLink({
-      amount: Number(service.priceCLP),
-      subject: service.name,
-      email,
-      orderId: generateOrderId(service.id),
-    });
-  }
-
-  function flowWaMsg(url: string) {
-    return `Hola! Te enviamos el link de pago para *${service.name}*:\n${url}`;
-  }
   const benefits = useMemo(() => deriveBenefits(service), [service]);
-  const { walletId } = useVusdSession();
-  const mintedQuery = useMintedTokens(walletId);
-
-  const minted = (mintedQuery.data ?? []).some(
-    (t) => t.itemType === MintableItemType.service && t.itemId === service.id,
-  );
+  // vUSD deshabilitado en producción (no aplica todavía) — código intacto en
+  // VusdPayButton.tsx / VusdPayModal.tsx / useVusd.ts para reactivar cuando corresponda.
+  // const { walletId } = useVusdSession();
+  // const mintedQuery = useMintedTokens(walletId);
+  // const minted = (mintedQuery.data ?? []).some(
+  //   (t) => t.itemType === MintableItemType.service && t.itemId === service.id,
+  // );
 
   return (
     <motion.article
@@ -221,6 +200,7 @@ function ServiceDetailCard({
       )}
       data-ocid={`servicios.service_card.${index + 1}`}
     >
+      {/* vUSD deshabilitado — ver nota arriba
       <VusdPayModal
         open={vusdOpen}
         onOpenChange={setVusdOpen}
@@ -232,6 +212,7 @@ function ServiceDetailCard({
           void mintedQuery.refetch();
         }}
       />
+      */}
       {/* Prism top accent */}
       <span
         aria-hidden
@@ -430,6 +411,10 @@ function ServiceDetailCard({
                       <MessageCircle className="size-4" />
                       WhatsApp
                     </a>
+                    {/* Pagar con Flow y vUSD deshabilitados en el sitio público —
+                        el link de pago ahora se genera desde el dashboard (staff
+                        autenticado) para que cada link quede atribuido a quien lo
+                        generó, no a un visitante anónimo. Ver Dashboard.tsx FlowSection.
                     <button
                       onClick={handleFlow}
                       disabled={isPending}
@@ -447,9 +432,10 @@ function ServiceDetailCard({
                       minted={minted}
                       ocidSuffix={`servicios.${index + 1}`}
                     />
+                    */}
                   </div>
 
-                  {/* Flow: email input */}
+                  {/* Flow: email input, link generado, error — deshabilitados junto con el botón de arriba
                   {showEmailInput && !paymentUrl && (
                     <div className="flex items-center gap-2">
                       <input
@@ -471,7 +457,6 @@ function ServiceDetailCard({
                     </div>
                   )}
 
-                  {/* Flow: link generado → enviar por WA o email */}
                   {paymentUrl && (
                     <div className="rounded-xl border border-prism-cyan/30 bg-prism-cyan/5 p-3">
                       <p className="mb-2 text-xs text-muted-foreground">Link de pago generado — envíalo al cliente:</p>
@@ -505,6 +490,7 @@ function ServiceDetailCard({
                   )}
 
                   {flowError && <p className="text-xs text-destructive">{flowError}</p>}
+                  */}
                 </div>
               </div>
             </div>

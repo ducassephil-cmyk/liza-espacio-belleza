@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { getSessionUser } from "./_lib/session.js";
 
 const FLOW_BASE =
   process.env.FLOW_ENV === "production"
@@ -14,6 +15,10 @@ function sign(params: Record<string, string>, secret: string): string {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).send("Method not allowed");
+
+  if (!getSessionUser(req)) {
+    return res.status(401).json({ error: "Debes iniciar sesión en el dashboard para generar links de pago" });
+  }
 
   const apiKey = process.env.FLOW_API_KEY;
   const secretKey = process.env.FLOW_SECRET_KEY;
