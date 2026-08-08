@@ -153,14 +153,58 @@ Registro de escenarios de riesgo una vez todas las APIs (Flow, Shopify, Instagra
 
 ---
 
+## 8. Dependencia de APIs externas (cambios sin aviso)
+
+**Estado:** 🟡 Riesgo estructural — no hay ICP nativo para pagos, todo pasa por APIs de terceros
+
+**Qué pasa:** Ningún pago pasa por ICP hoy (no hay canister, vUSD es demo). El 100% de los pagos reales depende de la API de Flow, y a futuro el dashboard dependerá también de la API de Shopify Admin y de Instagram Graph API. Estos proveedores pueden, sin avisar directamente a Liza:
+- Cambiar de versión su API (Meta ya deprecó Instagram Basic Display API y obligó a migrar a Graph API)
+- Rotar requisitos de autenticación (tokens que expiran, nuevos scopes obligatorios)
+- Modificar formatos de respuesta que rompan el código que los procesa
+
+**Por qué es grave:** Si Flow cambia algo en su API sin que nos enteremos, los cobros dejan de funcionar de un día para otro — no hay alerta automática, se detecta cuando una clienta reporta que no puede pagar.
+
+**Cómo evitarlo:**
+- No hay forma de prevenirlo del todo — es una dependencia estructural de depender de servicios de terceros
+- Mitigación real: monitoreo activo (ver plan más abajo) en vez de esperar a que una clienta avise
+
+**Plan B (si una API deja de funcionar):**
+1. Revisar `vercel logs` para identificar el endpoint que falla y el error exacto
+2. Revisar la documentación/changelog del proveedor (Flow, Meta, Shopify) para ver si hubo un cambio anunciado
+3. Actualizar el código del endpoint afectado y redeploy
+
+**Plan a futuro (propuesto 2026-08, no implementado):** app de monitoreo que revisa periódicamente la salud de cada API externa (Flow, Shopify, Instagram) y alerta a Philippe automáticamente si algo se rompe, en vez de depender de que una clienta reporte el problema primero. Ver sección "Plan de monitoreo" al final de este documento.
+
+---
+
 ## Resumen — prioridad de acción
 
 | # | Riesgo | Prioridad | Por qué primero |
 |---|--------|-----------|------------------|
 | 1 | Password del dashboard filtrada | 🔴 Alta | Expone todo el negocio de una vez |
 | 3 | Precios desincronizados | 🔴 Alta | Afecta directamente a clientas y cobros |
+| 8 | Dependencia de APIs externas | 🔴 Alta | Un cambio silencioso puede cortar los cobros sin aviso |
 | 2 | Gmail personal mezclado con negocio | 🟡 Media | Autorizado para test — filtrar bien qué se muestra |
 | 6 | Token Shopify con permisos de más | 🟡 Media | Se evita en el momento de generar el token |
 | 7 | Un solo admin | 🟡 Media | No urgente, pero crece con el negocio |
 | 5 | Vercel Hobby suspendido | 🟢 Baja | Bajo riesgo actual, sube con más tráfico |
 | 4 | WhatsApp bloqueado | ⚪ N/A | Solo aplica si se activa la API oficial |
+
+---
+
+## Plan de monitoreo (propuesto — no implementado)
+
+Idea de Philippe: una app que vigile la salud de las APIs externas y alerte automáticamente en vez de esperar a que algo se rompa en producción sin avisar.
+
+**Diseño en 3 niveles, de más simple a más ambicioso:**
+
+### Nivel 1 — Monitoreo con alerta (barato, alto valor, se puede construir ahora)
+Una función programada (cron job en Vercel) que cada cierto tiempo llama a cada API externa (Flow, Shopify, Instagram) con una petición mínima de prueba y revisa que la respuesta sea la esperada. Si algo falla, manda una alerta a Philippe por WhatsApp o email — no hay IA involucrada, es un chequeo de salud simple, igual que un servicio de "uptime monitoring".
+
+### Nivel 2 — Reporte estructurado (medio)
+Cuando el chequeo falla, en vez de solo alertar, arma automáticamente un reporte (qué falló, mensaje de error, hora) y crea un issue en GitHub — queda registrado y listo para revisar en la próxima sesión, en vez de perderse en una notificación de WhatsApp.
+
+### Nivel 3 — Parche asistido por Claude (la ambición completa)
+Un proceso programado revisa esos issues abiertos, investiga el error, y prepara una propuesta de arreglo (un pull request) — pero **nunca se auto-despliega a producción sin que Philippe lo apruebe explícitamente**, sobre todo si toca código de pagos (Flow). Auto-parchar y desplegar solo sin revisión humana es demasiado riesgoso para código que mueve dinero real — un parche mal generado podría cobrar de más, duplicar cobros, o romper el checkout completo.
+
+**Recomendación:** empezar por el Nivel 1 — es rápido de construir, no tiene riesgo, y ya resuelve el problema real ("nos enteramos por la clienta, no antes"). Los niveles 2 y 3 se evalúan después de tener el Nivel 1 funcionando.
